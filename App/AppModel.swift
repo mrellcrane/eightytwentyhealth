@@ -15,8 +15,12 @@ final class AppModel {
     let backup: BackupService
     let notifications: NotificationService
     let sync: SyncService
+    /// Owned here (not by the screens) so a run or a sit keeps going if you
+    /// navigate away, and there's only ever one GPS session.
+    let runRecorder: RunRecorder
+    let meditation: MeditationSession
 
-    /// Shown as a toast after something non-fatal goes wrong (e.g. Health write denied).
+    /// Shown as an alert after something non-fatal goes wrong (e.g. Health write denied).
     var notice: String?
 
     init(container: ModelContainer) {
@@ -28,6 +32,8 @@ final class AppModel {
         self.backup = BackupService()
         self.notifications = NotificationService.shared
         self.sync = SyncService(oura: oura, healthKit: healthKit)
+        self.runRecorder = RunRecorder(usesMiles: Units.defaultUsesMiles)
+        self.meditation = MeditationSession()
     }
 
     var context: ModelContext { container.mainContext }
@@ -35,7 +41,9 @@ final class AppModel {
     // MARK: Lifecycle
 
     func onForeground() async {
+        await applyReminderSettings()
         await sync.syncIfStale(context: context)
+        markMorningBriefSeenIfLooking()
         await backup.backupIfDue(context: context)
         BackgroundRefresh.schedule()
     }
@@ -43,7 +51,12 @@ final class AppModel {
     func backgroundRefresh() async {
         await sync.sync(context: context)
         await backup.backupIfDue(context: context)
-        BackgroundRefresh.schedule()
+        if await sendMorningBriefIfReady() {
+            BackgroundRefresh.schedule()
+        } else {
+            // Oura usually hasn't uploaded last night until you open its app; try again soon.
+            BackgroundRefresh.schedule(earliest: .now.addingTimeInterval(45 * 60))
+        }
     }
 
     func connectHealth() async {
@@ -52,6 +65,88 @@ final class AppModel {
             await sync.sync(context: context)
         } catch {
             notice = "Apple Health: \(error.localizedDescription)"
+        }
+    }
+
+    // MARK: Bars
+
+    func barsInput() -> BarsInput {
+        BarsInput(
+            snapshots: (try? context.fetch(FetchDescriptor<DailySnapshot>())) ?? [],
+            moods: (try? context.fetch(FetchDescriptor<MoodEntry>())) ?? [],
+            gratitude: (try? context.fetch(FetchDescriptor<GratitudeEntry>())) ?? [],
+            activities: (try? context.fetch(FetchDescriptor<ActivityLog>())) ?? []
+        )
+    }
+
+    // MARK: Reminders, wind-down, morning brief
+
+    var bedtimeString: String {
+        clockString(minutes: UserDefaults.standard.integer(forKey: PrefKey.bedtimeMinutes))
+    }
+
+    /// Re-applies every reminder from settings. Idempotent, so it runs on each launch too.
+    func applyReminderSettings() async {
+        let defaults = UserDefaults.standard
+
+        let mood = defaults.integer(forKey: PrefKey.moodReminderMinutes)
+        await notifications.setReminder(
+            .mood, enabled: defaults.bool(forKey: PrefKey.moodReminderOn), hour: mood / 60, minute: mood % 60,
+            title: "How are you feeling?",
+            body: "10-second check-in. It's the data your Mental bar runs on."
+        )
+
+        let gratitude = defaults.integer(forKey: PrefKey.gratitudeReminderMinutes)
+        await notifications.setReminder(
+            .gratitude, enabled: defaults.bool(forKey: PrefKey.gratitudeReminderOn), hour: gratitude / 60, minute: gratitude % 60,
+            title: "Three good things",
+            body: "Write down three things that went well today, and why."
+        )
+
+        let bedtime = defaults.integer(forKey: PrefKey.bedtimeMinutes)
+        let lead = defaults.integer(forKey: PrefKey.windDownLeadMinutes)
+        let windDown = (bedtime - lead + 24 * 60) % (24 * 60)
+        await notifications.setReminder(
+            .windDown, enabled: defaults.bool(forKey: PrefKey.windDownOn), hour: windDown / 60, minute: windDown % 60,
+            title: "Start winding down",
+            body: "Lights out by \(clockString(minutes: bedtime)). A regular bedtime beats extra hours: in a 60,000-person study, sleep regularity predicted mortality better than sleep length."
+        )
+    }
+
+    /// Returns true when today's brief is handled (sent, turned off, or too late to matter),
+    /// false when it should be retried later this morning.
+    func sendMorningBriefIfReady(now: Date = .now) async -> Bool {
+        let defaults = UserDefaults.standard
+        guard defaults.bool(forKey: PrefKey.morningBriefOn) else { return true }
+        let today = DayKey(date: now)
+        if defaults.string(forKey: PrefKey.morningBriefDay) == today.rawValue { return true }
+
+        let hour = Calendar.current.component(.hour, from: now)
+        if hour >= 12 { return true }   // A "morning" brief at 3pm is just noise.
+        guard hour >= 5 else { return false }
+
+        let input = barsInput()
+        // No readiness yet means Oura hasn't uploaded last night.
+        guard input.sensors[today]?.readinessScore != nil,
+              let brief = MorningBrief.compose(
+                  physical: input.display(.physical, on: today),
+                  mental: input.display(.mental, on: today),
+                  bedtime: bedtimeString
+              ) else { return false }
+
+        await notifications.post(id: NotificationService.morningBriefID, title: brief.title, body: brief.body)
+        defaults.set(today.rawValue, forKey: PrefKey.morningBriefDay)
+        return true
+    }
+
+    /// If you open the app in the morning and last night's data is in, you've
+    /// seen the brief already on the Today screen; don't send it again.
+    private func markMorningBriefSeenIfLooking(now: Date = .now) {
+        let hour = Calendar.current.component(.hour, from: now)
+        guard (5..<12).contains(hour) else { return }
+        let today = DayKey(date: now)
+        if barsInput().sensors[today]?.readinessScore != nil {
+            UserDefaults.standard.set(today.rawValue, forKey: PrefKey.morningBriefDay)
         }
     }
 

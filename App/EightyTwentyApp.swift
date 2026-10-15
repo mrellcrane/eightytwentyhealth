@@ -7,6 +7,7 @@ struct EightyTwentyApp: App {
     private let launchError: String?
 
     init() {
+        PrefKey.registerDefaults()
         NotificationService.shared.configure()
         do {
             let container = try Stores.makeContainer()

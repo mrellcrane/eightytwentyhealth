@@ -14,6 +14,10 @@ struct SettingsView: View {
     @AppStorage(PrefKey.moodReminderMinutes) private var moodReminderMinutes = 13 * 60
     @AppStorage(PrefKey.gratitudeReminderOn) private var gratitudeReminderOn = false
     @AppStorage(PrefKey.gratitudeReminderMinutes) private var gratitudeReminderMinutes = 21 * 60
+    @AppStorage(PrefKey.windDownOn) private var windDownOn = true
+    @AppStorage(PrefKey.bedtimeMinutes) private var bedtimeMinutes = 22 * 60 + 15
+    @AppStorage(PrefKey.windDownLeadMinutes) private var windDownLeadMinutes = 45
+    @AppStorage(PrefKey.morningBriefOn) private var morningBriefOn = true
 
     @State private var connecting = false
     @State private var latestBackupURL: URL?
@@ -25,6 +29,7 @@ struct SettingsView: View {
             ouraSection
             healthSection
             backupSection
+            sleepAndMorningSection
             remindersSection
 
             Section("Units") {
@@ -170,6 +175,28 @@ struct SettingsView: View {
         }
     }
 
+    // MARK: Wind-down and morning brief
+
+    private var sleepAndMorningSection: some View {
+        Section {
+            Toggle("Wind-down reminder", isOn: $windDownOn)
+            if windDownOn {
+                DatePicker("Target bedtime", selection: minutesBinding($bedtimeMinutes), displayedComponents: .hourAndMinute)
+                Picker("Remind me", selection: $windDownLeadMinutes) {
+                    ForEach([15, 30, 45, 60, 90], id: \.self) { Text("\($0) min before").tag($0) }
+                }
+            }
+            Toggle("Morning brief", isOn: $morningBriefOn)
+        } header: {
+            Text("Sleep and mornings")
+        } footer: {
+            Text("The morning brief arrives after Oura has your night: both bars, the number dragging them, and one thing to do. iOS decides exactly when background refresh runs and learns from when you use the app, so it can come later than you'd like, or not at all on a day you open the app first (you've seen it then). Opening the Oura app in the morning gets your night uploaded sooner.")
+        }
+        .onChange(of: windDownOn) { updateReminders() }
+        .onChange(of: bedtimeMinutes) { updateReminders() }
+        .onChange(of: windDownLeadMinutes) { updateReminders() }
+    }
+
     // MARK: Reminders
 
     private var remindersSection: some View {
@@ -197,12 +224,7 @@ struct SettingsView: View {
     }
 
     private func updateReminders() {
-        Task {
-            await model.notifications.setReminder(.mood, enabled: moodReminderOn,
-                                                  hour: moodReminderMinutes / 60, minute: moodReminderMinutes % 60)
-            await model.notifications.setReminder(.gratitude, enabled: gratitudeReminderOn,
-                                                  hour: gratitudeReminderMinutes / 60, minute: gratitudeReminderMinutes % 60)
-        }
+        Task { await model.applyReminderSettings() }
     }
 
     // MARK: How the bars work

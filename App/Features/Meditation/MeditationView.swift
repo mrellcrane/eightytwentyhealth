@@ -1,4 +1,5 @@
 import SwiftUI
+import UIKit
 import EightyTwentyCore
 
 /// Drives a `MeditationTimer` (core) and handles bells + logging.
@@ -69,7 +70,8 @@ struct MeditationView: View {
     @Environment(AppModel.self) private var model
     @AppStorage(PrefKey.meditationMinutes) private var minutes = 10
     @AppStorage(PrefKey.meditationBellMinutes) private var bellMinutes = 0
-    @State private var session = MeditationSession()
+    /// Lives on AppModel so a sit survives navigating away from this screen.
+    private var session: MeditationSession { model.meditation }
 
     private let durations = [3, 5, 10, 15, 20, 30, 45]
     private let bellOptions = [0, 1, 2, 5, 10]

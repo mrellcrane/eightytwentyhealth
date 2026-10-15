@@ -48,7 +48,19 @@ final class BaselineTests: XCTestCase {
     func testFlatHistoryDoesNotDivideByZero() {
         let flat = Array(repeating: 52.0, count: 10)
         XCTAssertEqual(Baseline.robustZ(52, history: flat), 0)
-        XCTAssertEqual(Baseline.robustZ(55, history: flat), 1)
-        XCTAssertEqual(Baseline.robustZ(50, history: flat), -1)
+        // Spread falls back to the 5% noise floor: 2.6 bpm around 52.
+        XCTAssertEqual(Baseline.robustZ(55, history: flat)!, 3 / 2.6, accuracy: 1e-9)
+        XCTAssertEqual(Baseline.robustZ(50, history: flat)!, -2 / 2.6, accuracy: 1e-9)
+
+        let zeros = Array(repeating: 0.0, count: 10)
+        XCTAssertEqual(Baseline.robustZ(0, history: zeros), 0)
+        XCTAssertEqual(Baseline.robustZ(5, history: zeros), 1, "No scale at all: just the direction")
+    }
+
+    func testTinyWobbleOnASteadyWeekIsNoise() {
+        // HRV that barely moves: a 2 ms dip shouldn't read as a bad day.
+        let steady: [Double] = [59, 60, 61, 60, 59, 61, 60, 60, 62, 58]
+        let score = Baseline.score(z: Baseline.robustZ(58, history: steady)!)
+        XCTAssertGreaterThan(score, 65)
     }
 }

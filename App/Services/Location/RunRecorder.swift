@@ -14,6 +14,8 @@ final class RunRecorder {
     /// Accepted fixes, kept as CLLocations for the Apple Health route.
     private(set) var routeLocations: [CLLocation] = []
     private(set) var lastLocation: CLLocation?
+    /// Stored (not computed from the manager) so the UI updates when you answer the prompt.
+    private(set) var isLocationDenied = false
 
     private let manager = CLLocationManager()
     private var updatesTask: Task<Void, Never>?
@@ -25,14 +27,11 @@ final class RunRecorder {
 
     var state: RunTracker.State { tracker.state }
 
-    var isLocationDenied: Bool {
-        let status = manager.authorizationStatus
-        return status == .denied || status == .restricted
-    }
-
     /// Ask for permission and warm up GPS so the first fix is ready when you hit Start.
     func prepare() {
-        if manager.authorizationStatus == .notDetermined {
+        let status = manager.authorizationStatus
+        isLocationDenied = status == .denied || status == .restricted
+        if status == .notDetermined {
             manager.requestWhenInUseAuthorization()
         }
         startUpdates()
@@ -72,7 +71,11 @@ final class RunRecorder {
             do {
                 for try await update in CLLocationUpdate.liveUpdates(.fitness) {
                     guard let self, !Task.isCancelled else { return }
+                    if update.authorizationDenied {
+                        self.isLocationDenied = true
+                    }
                     if let location = update.location {
+                        self.isLocationDenied = false
                         self.handle(location)
                     }
                 }

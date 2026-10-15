@@ -1,4 +1,5 @@
 import SwiftUI
+import UIKit
 import MapKit
 import EightyTwentyCore
 
@@ -6,12 +7,13 @@ import EightyTwentyCore
 struct RunView: View {
     @Environment(AppModel.self) private var model
     @AppStorage(PrefKey.usesMiles) private var usesMiles = Units.defaultUsesMiles
-    @State private var recorder = RunRecorder(usesMiles: Units.defaultUsesMiles)
     @State private var camera: MapCameraPosition = .userLocation(fallback: .automatic)
     @State private var confirmDiscard = false
     @State private var saving = false
     @State private var saved = false
 
+    /// Lives on AppModel so a run survives navigating away from this screen.
+    private var recorder: RunRecorder { model.runRecorder }
     private var unitMeters: Double { Units.meters(usesMiles: usesMiles) }
     private var unit: String { Units.label(usesMiles: usesMiles) }
 

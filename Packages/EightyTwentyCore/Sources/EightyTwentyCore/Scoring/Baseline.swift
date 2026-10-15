@@ -15,6 +15,10 @@ public enum Baseline {
     /// Points per robust standard deviation.
     public static let pointsPerDeviation = 12.5
 
+    /// Deviations smaller than this share of your normal are treated as noise, so a
+    /// very steady week doesn't turn a 2 ms HRV dip into a "big drop".
+    public static let minimumRelativeSpread = 0.05
+
     /// Robust z-score of `value` relative to `history`. Nil if history is too short.
     public static func robustZ(_ value: Double, history: [Double]) -> Double? {
         guard history.count >= minimumSamples else { return nil }
@@ -22,6 +26,7 @@ public enum Baseline {
         // 1.4826 scales MAD to match SD for normally distributed data.
         var spread = 1.4826 * median(history.map { abs($0 - center) })
         if spread < 1e-9 { spread = standardDeviation(history) }
+        spread = max(spread, minimumRelativeSpread * abs(center))
         if spread < 1e-9 {
             if value == center { return 0 }
             return value > center ? 1 : -1

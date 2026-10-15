@@ -11,6 +11,7 @@ See [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md) for the full design.
 - **Today:** Physical and Mental bars (75 = your normal), change vs yesterday and vs your 7-day average, tap a bar to see exactly what built it.
 - **Log:** 10-second mood check-in (mirrored to Apple Health State of Mind), three-good-things gratitude, quick-log grid (meditation, breathwork, sunlight, alcohol, late caffeine, etc).
 - **Record:** meditation timer with interval bells that ring with the phone locked; Strava-style run recorder (time, distance, pace, splits, GPS route, works with the screen locked) that saves a workout + route to Apple Health.
+- **Sleep and mornings:** wind-down reminder before your target bedtime (default 10:15pm, 45 min ahead); morning brief notification once Oura has your night: both bars, the number dragging them, one action for the day.
 - **Insights:** 30-day bar trends, bedtime vs HRV scatter, progress toward the 21 days of check-ins needed before pattern finding.
 - **Sync:** Oura API v2 (readiness, sleep, HRV, stress, resilience, SpO2, VO2 max, workouts, Moments, tags) + Apple Health (steps, workouts, VO2 max, mindful minutes, moods you log in the Health app). Oura tags like alcohol or late caffeine become activity logs automatically.
 - **Your data is safe:** see [Not losing data](#not-losing-data) below.
@@ -62,7 +63,7 @@ Until the app is on your phone: log moods in Apple's Health app (Health > Browse
 
 ## Tests
 
-The scoring math, Oura parsing, OAuth, backup/restore, run tracking and meditation timer live in a pure-Swift package with 60 unit tests (they run on Linux too):
+The scoring math, Oura parsing, OAuth, backup/restore, run tracking and meditation timer live in a pure-Swift package with 66 unit tests (they run on Linux too):
 
 ```sh
 cd Packages/EightyTwentyCore
@@ -84,7 +85,7 @@ docs/ARCHITECTURE.md        Design and roadmap
 
 ## Roadmap
 
-1. **Foundation** (done): bars, logging, meditation timer, run recorder, Oura + Health sync, backups.
+1. **Foundation** (done): bars, logging, meditation timer, run recorder, Oura + Health sync, backups, wind-down reminder, morning brief.
 2. **Recommendations:** evidence catalog with verified citations, "Your 80/20 today" ranked by expected bar gain per minute.
 3. **Insights:** correlation engine over your own data (needs ~3 weeks of check-ins), personal effect sizes replacing research averages, experiments ("no caffeine after 2pm for 14 days").
-4. **Extras:** widgets, one-tap mood from the lock screen, wind-down reminder, morning brief, weekly review written by Claude.
+4. **Extras:** widgets, one-tap mood from the lock screen, weekly review written by Claude.

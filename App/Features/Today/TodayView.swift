@@ -11,6 +11,9 @@ struct TodayView: View {
     @Query(filter: #Predicate<GratitudeEntry> { $0.deletedAt == nil }) private var gratitude: [GratitudeEntry]
     @Query(filter: #Predicate<ActivityLog> { $0.deletedAt == nil }) private var activities: [ActivityLog]
 
+    @AppStorage(PrefKey.windDownOn) private var windDownOn = true
+    @AppStorage(PrefKey.bedtimeMinutes) private var bedtimeMinutes = 22 * 60 + 15
+
     @State private var showingMood = false
     @State private var showingGratitude = false
     @State private var selectedBar: BarKind?
@@ -99,9 +102,13 @@ struct TodayView: View {
         if !loggedMoodToday {
             steps.append("Log a 10-second mood check-in. It's 40% of your Mental bar.")
         }
+        let hour = Calendar.current.component(.hour, from: .now)
         let wroteGratitudeToday = gratitude.contains { DayKey(date: $0.date) == today }
-        if !wroteGratitudeToday && Calendar.current.component(.hour, from: .now) >= 17 {
+        if !wroteGratitudeToday && hour >= 17 {
             steps.append("Write three good things from today.")
+        }
+        if windDownOn && hour >= 20 {
+            steps.insert("Wind down: lights out by \(clockString(minutes: bedtimeMinutes)).", at: 0)
         }
         return steps
     }

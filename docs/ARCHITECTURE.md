@@ -69,7 +69,7 @@ Oura tokens live in the Keychain, this device only. Oura refresh tokens are sing
 Each bar is a weighted average of 0-100 component scores. Missing components are left out and the rest re-weighted; below 40% coverage the bar shows `--` instead of a made-up number.
 
 - Oura scores (readiness, sleep) are used as-is.
-- Raw metrics (HRV, resting HR, stress balance, VO2 max) are scored against **your own** rolling baseline with a robust z-score (median and MAD, so one freak day can't warp it), mapped so **75 = your normal** and each robust SD is 12.5 points.
+- Raw metrics (HRV, resting HR, stress balance, VO2 max) are scored against **your own** rolling baseline with a robust z-score (median and MAD, so one freak day can't warp it), mapped so **75 = your normal** and each robust SD is 12.5 points. The spread never goes below 5% of your normal, so on a very steady week a 2 ms HRV wobble stays noise instead of reading as a drop.
 - Steps: percent of an 8,000 step goal (the low end of the 8,000-10,000 range where mortality benefit levels off for adults under 60 in Paluch et al. 2022).
 
 | Physical | Weight | Mental | Weight |
@@ -89,6 +89,13 @@ Timing for day D, so the bar doesn't sag every morning just because the day hasn
 - Practices: D-6 through D.
 
 Displayed value = 60/25/15 weighted average of the last three days' readings, so one bad night dents the bar without cratering it.
+
+## Wind-down and morning brief
+
+- **Wind-down**: a daily notification at target bedtime minus lead time (defaults 10:15pm and 45 min), plus a nudge on Today after 8pm. Sleep regularity predicted mortality better than sleep duration in a UK Biobank study of about 60,000 people (Windred 2024, Sleep).
+- **Morning brief** (`MorningBrief` in core, tested): after the background sync finds last night's readiness, one notification with both bars, readiness and HRV, whichever component is furthest below 65 if it's something else, and one rule-based action for that component. Phase 2's recommender replaces the rules.
+- Background refresh asks iOS for "not before 7:15am". If Oura hasn't uploaded the night yet it retries every ~45 minutes until noon, then gives up for the day. Opening the app in the morning with the night's data in counts as having seen it, so you don't get a duplicate.
+- iOS decides when background refresh actually runs, so the brief can be late or skipped. That's a platform limit, not a bug.
 
 ## Phase 2: recommendation engine
 
@@ -122,3 +129,4 @@ Starter catalog candidates: mindfulness meditation (Goyal 2014, JAMA Intern Med)
 | Run | `Run/RunTracker`, `Run/Polyline` | `Services/Location/RunRecorder`, `Features/Run` |
 | Meditation | `Meditation/MeditationTimer` | `Features/Meditation`, `Services/Notifications` |
 | Mood | `Mood/MoodScale` | `Features/Log` |
+| Morning brief | `Briefing/MorningBrief` | `AppModel` (send/retry), `Services/Notifications` |

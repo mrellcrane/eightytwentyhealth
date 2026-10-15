@@ -9,6 +9,31 @@ enum PrefKey {
     static let moodReminderMinutes = "moodReminderMinutes"
     static let gratitudeReminderOn = "gratitudeReminderOn"
     static let gratitudeReminderMinutes = "gratitudeReminderMinutes"
+    static let windDownOn = "windDownOn"
+    static let bedtimeMinutes = "bedtimeMinutes"
+    static let windDownLeadMinutes = "windDownLeadMinutes"
+    static let morningBriefOn = "morningBriefOn"
+    /// Day (yyyy-MM-dd) the morning brief was last sent or made unnecessary.
+    static let morningBriefDay = "morningBriefDay"
+
+    /// Registered at launch so `@AppStorage` defaults and direct UserDefaults reads agree.
+    static let defaults: [String: Any] = [
+        moodReminderOn: false,
+        moodReminderMinutes: 13 * 60,
+        gratitudeReminderOn: false,
+        gratitudeReminderMinutes: 21 * 60,
+        // You asked for these two, so they start on.
+        windDownOn: true,
+        bedtimeMinutes: 22 * 60 + 15,
+        windDownLeadMinutes: 45,
+        morningBriefOn: true,
+        meditationMinutes: 10,
+        meditationBellMinutes: 0,
+    ]
+
+    static func registerDefaults() {
+        UserDefaults.standard.register(defaults: defaults)
+    }
 }
 
 enum Units {
@@ -21,7 +46,7 @@ enum Units {
 }
 
 extension Date {
-    /// Minutes since midnight <-> a Date today, for reminder time pickers.
+    /// Minutes since midnight <-> a Date today, for time pickers.
     static func todayAt(minutes: Int) -> Date {
         Calendar.current.startOfDay(for: .now).addingTimeInterval(TimeInterval(minutes * 60))
     }
@@ -30,4 +55,9 @@ extension Date {
         let c = Calendar.current.dateComponents([.hour, .minute], from: self)
         return (c.hour ?? 0) * 60 + (c.minute ?? 0)
     }
+}
+
+/// "10:15 PM" style, from minutes since midnight.
+func clockString(minutes: Int) -> String {
+    Date.todayAt(minutes: minutes).formatted(date: .omitted, time: .shortened)
 }

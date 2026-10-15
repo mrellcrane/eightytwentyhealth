@@ -233,7 +233,9 @@ final class HealthKitService {
             _ = try await builder.addWorkoutEvents(events)
         }
         _ = try await builder.endCollection(at: end)
-        guard let workout = try await builder.finishWorkout() else { return nil }
+        // Annotated so it compiles whether the SDK returns HKWorkout or HKWorkout?.
+        let finished: HKWorkout? = try await builder.finishWorkout()
+        guard let workout = finished else { return nil }
 
         if !route.isEmpty {
             let routeBuilder = HKWorkoutRouteBuilder(healthStore: store, device: .local())
