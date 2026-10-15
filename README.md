@@ -16,30 +16,25 @@ See [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md) for the full design.
 - **Sync:** Oura API v2 (readiness, sleep, HRV, stress, resilience, SpO2, VO2 max, workouts, Moments, tags) + Apple Health (steps, workouts, VO2 max, mindful minutes, moods you log in the Health app). Oura tags like alcohol or late caffeine become activity logs automatically.
 - **Your data is safe:** see [Not losing data](#not-losing-data) below.
 
-## Setup (on your Mac)
+## Setup
 
-You need Xcode 16 or newer and an iPhone on iOS 18+.
+Xcode 16+, iOS 18+, paid developer account (for CloudKit).
 
-1. **Apple Developer Program** ($99/yr, developer.apple.com/programs). Needed for iCloud sync. Without it, see step 3's no-iCloud option, and know that free-signed apps stop launching after 7 days until you rebuild.
-2. **Register an Oura app** at <https://cloud.ouraring.com/oauth/applications>:
-   - Redirect URI: `eightytwenty://oauth-callback`
-   - Note the client ID and client secret.
-3. **Create your secrets file:**
+1. **Oura app** (one time, about 2 minutes). The Oura connector in Claude uses its own registration, which this app can't reuse, and Oura retired personal tokens. At <https://cloud.ouraring.com/oauth/applications> create a new application: any name and description, Redirect URI `eightytwenty://oauth-callback`. Copy the client ID and secret.
+2. **Secrets:**
    ```sh
    cp Config/Secrets.example.xcconfig Config/Secrets.xcconfig
    ```
-   Fill in `DEVELOPMENT_TEAM`, `BUNDLE_ID_PREFIX` (e.g. `com.yourname`), `OURA_CLIENT_ID`, `OURA_CLIENT_SECRET`. This file is gitignored.
-4. **Generate the Xcode project and open it:**
+   Fill in `DEVELOPMENT_TEAM`, `BUNDLE_ID_PREFIX`, `OURA_CLIENT_ID`, `OURA_CLIENT_SECRET` (gitignored). xcconfig treats `//` as a comment, so if the secret contains `//`, write it as `/$()/`.
+3. **Build:**
    ```sh
    brew install xcodegen
-   xcodegen generate
-   open EightyTwenty.xcodeproj
+   xcodegen generate && open EightyTwenty.xcodeproj
    ```
-5. In Xcode, select the **EightyTwenty** target > **Signing & Capabilities**. Automatic signing should pick up HealthKit and iCloud from the entitlements file. If the iCloud section shows a red container, click the refresh button or `+` to create `iCloud.<your bundle id>`.
-6. Plug in your phone, pick it as the run destination, hit Run.
-7. In the app: **Settings > Connect Oura**, then **Allow Apple Health access**. The first sync pulls 120 days of history so your baselines exist on day one.
+   Entitlements cover HealthKit, iCloud (CloudKit + Documents) and push. If the iCloud container shows red under Signing & Capabilities, hit refresh to create `iCloud.<bundle id>`.
+4. **In the app:** Settings > Connect Oura, then Allow Apple Health access. First sync pulls 120 days so baselines exist on day one.
 
-If something doesn't compile, it's most likely an Apple API detail (this was written without access to Xcode). Paste the error into Claude and it'll fix it.
+Written without access to Xcode, so expect a compile nit or two around Apple API signatures. Paste errors to Claude.
 
 ## Not losing data
 
