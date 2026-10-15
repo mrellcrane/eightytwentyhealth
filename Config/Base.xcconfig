@@ -1,7 +1,7 @@
 // Shared build settings. Your personal values go in Config/Secrets.xcconfig
 // (copy Secrets.example.xcconfig). That file is gitignored.
 
-BUNDLE_ID_PREFIX = com.example
+BUNDLE_ID_PREFIX = com.mrellcrane
 DEVELOPMENT_TEAM =
 OURA_CLIENT_ID =
 OURA_CLIENT_SECRET =

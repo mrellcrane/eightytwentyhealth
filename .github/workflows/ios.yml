@@ -1,0 +1,51 @@
+# Builds the app on GitHub's Macs so nobody needs Xcode locally.
+# Step 1 (now): compile check, no secrets needed.
+# Step 2 (later): signed archive + TestFlight upload.
+name: iOS
+
+on:
+  push:
+    branches: ["main", "claude/**"]
+    paths-ignore: ["**.md", "docs/**"]
+  workflow_dispatch:
+
+concurrency:
+  group: ios-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  build:
+    name: Compile check
+    runs-on: macos-latest
+    timeout-minutes: 40
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Toolchain
+        run: |
+          xcodebuild -version
+          swift --version
+
+      - name: Core package tests
+        run: swift test --package-path Packages/EightyTwentyCore
+
+      - name: Generate Xcode project
+        run: |
+          brew install xcodegen
+          xcodegen generate
+
+      - name: Build app (iOS Simulator, unsigned)
+        run: |
+          set -o pipefail
+          xcodebuild build \
+            -project EightyTwenty.xcodeproj \
+            -scheme EightyTwenty \
+            -destination 'generic/platform=iOS Simulator' \
+            -derivedDataPath build \
+            CODE_SIGNING_ALLOWED=NO \
+            > build.log 2>&1 || true
+          echo "::group::Errors and warnings"
+          grep -E "(error|warning): " build.log | sort -u || true
+          echo "::endgroup::"
+          tail -5 build.log
+          grep -q "BUILD SUCCEEDED" build.log
