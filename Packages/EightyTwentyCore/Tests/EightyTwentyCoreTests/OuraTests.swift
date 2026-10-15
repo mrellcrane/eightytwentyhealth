@@ -199,7 +199,7 @@ final class OuraOAuthTests: XCTestCase {
         XCTAssertEqual(value("client_id"), "abc")
         XCTAssertEqual(value("redirect_uri"), "eightytwenty://oauth-callback")
         XCTAssertEqual(value("state"), "xyz")
-        XCTAssertEqual(value("scope"), "email personal daily heartrate workout tag session spo2Daily")
+        XCTAssertEqual(value("scope"), "email personal daily heartrate workout tag session spo2Daily stress heart_health")
     }
 
     func testCallbackParsing() throws {

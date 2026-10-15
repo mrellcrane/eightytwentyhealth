@@ -8,7 +8,13 @@ import FoundationNetworking
 public enum OuraOAuth {
     public static let authorizeURL = URL(string: "https://cloud.ouraring.com/oauth/authorize")!
     public static let tokenURL = URL(string: "https://api.ouraring.com/oauth/token")!
-    public static let scopes = ["email", "personal", "daily", "heartrate", "workout", "tag", "session", "spo2Daily"]
+    /// Must also be ticked on the app at cloud.ouraring.com/oauth/applications.
+    /// `stress` covers daily stress and resilience; `heart_health` covers VO2 max.
+    /// Without them those endpoints 403 and the app silently goes without.
+    public static let scopes = [
+        "email", "personal", "daily", "heartrate", "workout", "tag", "session", "spo2Daily",
+        "stress", "heart_health",
+    ]
 
     public struct Credentials: Sendable {
         public let clientID: String
