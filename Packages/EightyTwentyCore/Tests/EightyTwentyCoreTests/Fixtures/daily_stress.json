@@ -1,0 +1,8 @@
+{
+  "data": [
+    {"id": "st-1009", "day": "2026-10-09", "stress_high": 2700, "recovery_high": 900, "day_summary": "normal", "meta": {}},
+    {"id": "st-1010", "day": "2026-10-10", "stress_high": 6300, "recovery_high": 0, "day_summary": "normal", "meta": {}},
+    {"id": "st-1011", "day": "2026-10-11", "stress_high": 7200, "recovery_high": null, "day_summary": null, "meta": {}}
+  ],
+  "next_token": null
+}

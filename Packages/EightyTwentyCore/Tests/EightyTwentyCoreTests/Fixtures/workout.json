@@ -1,0 +1,4 @@
+{"data": [
+  {"id": "w1", "activity": "yardwork", "calories": 300, "day": "2026-10-03", "distance": null, "end_datetime": "2026-10-03T11:06:00-07:00", "intensity": "moderate", "label": null, "source": "autodetected", "start_datetime": "2026-10-03T10:00:00-07:00", "meta": {}},
+  {"id": "w2", "activity": "walking", "calories": 60, "day": "2026-10-03", "distance": 1100.5, "end_datetime": "2026-10-03T17:14:00-07:00", "intensity": "easy", "label": null, "source": "autodetected", "start_datetime": "2026-10-03T17:00:00-07:00", "meta": {}}
+], "next_token": null}

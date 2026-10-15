@@ -1,0 +1,8 @@
+{
+  "data": [
+    {"id": "ds-1009", "contributors": {"deep_sleep": 90, "efficiency": 94, "latency": 80, "rem_sleep": 85, "restfulness": 80, "timing": 95, "total_sleep": 97}, "day": "2026-10-09", "score": 91, "timestamp": "2026-10-09T00:00:00.000-07:00", "meta": {}},
+    {"id": "ds-1010", "contributors": {"deep_sleep": 88, "efficiency": 88, "latency": 85, "rem_sleep": 90, "restfulness": 78, "timing": 80, "total_sleep": 96}, "day": "2026-10-10", "score": 87, "timestamp": "2026-10-10T00:00:00.000-07:00", "meta": {}},
+    {"id": "ds-1011", "contributors": {"deep_sleep": 70, "efficiency": 87, "latency": 75, "rem_sleep": 72, "restfulness": 70, "timing": 30, "total_sleep": 82}, "day": "2026-10-11", "score": 71, "timestamp": "2026-10-11T00:00:00.000-07:00", "meta": {}}
+  ],
+  "next_token": null
+}

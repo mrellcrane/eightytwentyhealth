@@ -1,0 +1,8 @@
+{"data": [
+  {"id": "t1", "tag_type_code": "tag_generic_alcohol", "start_time": "2026-10-10T19:30:00-07:00", "end_time": null, "start_day": "2026-10-10", "end_day": null, "comment": "2 glasses wine", "custom_name": null, "meta": {}},
+  {"id": "t2", "tag_type_code": "tag_generic_caffeine", "start_time": "2026-10-10T08:00:00-07:00", "end_time": null, "start_day": "2026-10-10", "end_day": null, "comment": null, "custom_name": null, "meta": {}},
+  {"id": "t3", "tag_type_code": "tag_generic_caffeine", "start_time": "2026-10-10T15:30:00-07:00", "end_time": null, "start_day": "2026-10-10", "end_day": null, "comment": null, "custom_name": null, "meta": {}},
+  {"id": "t4", "tag_type_code": "custom", "start_time": "2026-10-11T07:00:00-07:00", "end_time": "2026-10-11T07:04:00-07:00", "start_day": "2026-10-11", "end_day": null, "comment": null, "custom_name": "Cold plunge", "meta": {}},
+  {"id": "t5", "tag_type_code": "tag_generic_sick", "start_time": "2026-10-12T09:00:00-07:00", "end_time": null, "start_day": "2026-10-12", "end_day": null, "comment": "head cold", "custom_name": null, "meta": {}},
+  {"id": "t6", "tag_type_code": "tag_generic_meditation", "start_time": null, "end_time": null, "start_day": "2026-10-12", "end_day": null, "comment": null, "custom_name": null, "meta": {}}
+], "next_token": null}

@@ -1,0 +1,11 @@
+{
+  "data": [
+    {"id": "sp-1009", "average_breath": 14.5, "average_heart_rate": 57.1, "average_hrv": 68, "awake_time": 1980, "bedtime_end": "2026-10-09T07:17:30-07:00", "bedtime_start": "2026-10-08T22:10:00-07:00", "day": "2026-10-09", "deep_sleep_duration": 5400, "efficiency": 94, "latency": 600, "light_sleep_duration": 16000, "low_battery_alert": false, "lowest_heart_rate": 52, "period": 0, "readiness_score_delta": null, "rem_sleep_duration": 9488, "restless_periods": 200, "sleep_score_delta": null, "time_in_bed": 32850, "total_sleep_duration": 30888, "type": "long_sleep", "meta": {}},
+    {"id": "sp-1010-nap", "average_hrv": 80, "bedtime_end": "2026-10-10T15:40:00-07:00", "bedtime_start": "2026-10-10T15:10:00-07:00", "day": "2026-10-10", "efficiency": 80, "low_battery_alert": false, "lowest_heart_rate": 55, "period": 1, "time_in_bed": 1800, "total_sleep_duration": 1500, "type": "late_nap", "meta": {}},
+    {"id": "sp-1010", "average_breath": 14.2, "average_heart_rate": 55.0, "average_hrv": 73, "bedtime_end": "2026-10-10T08:39:00-07:00", "bedtime_start": "2026-10-09T23:01:00-07:00", "day": "2026-10-10", "efficiency": 88, "low_battery_alert": false, "lowest_heart_rate": 48, "period": 0, "time_in_bed": 34680, "total_sleep_duration": 30564, "type": "long_sleep", "meta": {}},
+    {"id": "sp-1011-short", "average_hrv": 40, "bedtime_end": "2026-10-11T00:40:00-07:00", "bedtime_start": "2026-10-11T00:05:00-07:00", "day": "2026-10-11", "efficiency": 70, "low_battery_alert": false, "lowest_heart_rate": 60, "period": 0, "time_in_bed": 2100, "total_sleep_duration": 1500, "type": "sleep", "meta": {}},
+    {"id": "sp-1011", "average_breath": 15.1, "average_heart_rate": 61.3, "average_hrv": 35, "bedtime_end": "2026-10-11T09:01:00-07:00", "bedtime_start": "2026-10-11T01:02:00-07:00", "day": "2026-10-11", "efficiency": 87, "low_battery_alert": false, "lowest_heart_rate": 57, "period": 1, "time_in_bed": 28740, "total_sleep_duration": 25128, "type": "long_sleep", "meta": {}},
+    {"id": "sp-1011-deleted", "average_hrv": 99, "bedtime_end": "2026-10-11T14:00:00-07:00", "bedtime_start": "2026-10-11T10:00:00-07:00", "day": "2026-10-11", "low_battery_alert": false, "period": 2, "time_in_bed": 14400, "total_sleep_duration": 14000, "type": "deleted", "meta": {}}
+  ],
+  "next_token": null
+}

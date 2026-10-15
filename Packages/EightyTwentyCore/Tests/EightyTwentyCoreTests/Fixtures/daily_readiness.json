@@ -1,0 +1,8 @@
+{
+  "data": [
+    {"id": "rd-1009", "contributors": {"activity_balance": 82, "body_temperature": 100, "hrv_balance": 67, "previous_day_activity": 90, "previous_night": 92, "recovery_index": 88, "resting_heart_rate": 79, "sleep_balance": 84}, "day": "2026-10-09", "score": 79, "temperature_deviation": -0.32, "temperature_trend_deviation": -0.12, "timestamp": "2026-10-09T00:00:00.000-07:00", "meta": {}},
+    {"id": "rd-1010", "contributors": {"activity_balance": 85, "body_temperature": 100, "hrv_balance": 69, "previous_day_activity": 88, "previous_night": 95, "recovery_index": 90, "resting_heart_rate": 100, "sleep_balance": 86}, "day": "2026-10-10", "score": 87, "temperature_deviation": -0.25, "temperature_trend_deviation": -0.1, "timestamp": "2026-10-10T00:00:00.000-07:00", "meta": {}},
+    {"id": "rd-1011", "contributors": {"activity_balance": 80, "body_temperature": 95, "hrv_balance": 49, "previous_day_activity": 85, "previous_night": 60, "recovery_index": 40, "resting_heart_rate": 30, "sleep_balance": 82}, "day": "2026-10-11", "score": 65, "temperature_deviation": 0.28, "temperature_trend_deviation": 0.1, "timestamp": "2026-10-11T00:00:00.000-07:00", "meta": {}}
+  ],
+  "next_token": null
+}

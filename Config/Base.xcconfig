@@ -1,0 +1,13 @@
+// Shared build settings. Your personal values go in Config/Secrets.xcconfig
+// (copy Secrets.example.xcconfig). That file is gitignored.
+
+BUNDLE_ID_PREFIX = com.example
+DEVELOPMENT_TEAM =
+OURA_CLIENT_ID =
+OURA_CLIENT_SECRET =
+
+// Full setup: HealthKit + iCloud (needs a paid Apple Developer account).
+// Without one, set this to App/EightyTwenty-NoCloud.entitlements in Secrets.xcconfig.
+CODE_SIGN_ENTITLEMENTS = App/EightyTwenty.entitlements
+
+#include? "Secrets.xcconfig"

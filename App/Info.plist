@@ -1,0 +1,89 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>CFBundleDevelopmentRegion</key>
+	<string>$(DEVELOPMENT_LANGUAGE)</string>
+	<key>CFBundleDisplayName</key>
+	<string>80/20</string>
+	<key>CFBundleExecutable</key>
+	<string>$(EXECUTABLE_NAME)</string>
+	<key>CFBundleIdentifier</key>
+	<string>$(PRODUCT_BUNDLE_IDENTIFIER)</string>
+	<key>CFBundleInfoDictionaryVersion</key>
+	<string>6.0</string>
+	<key>CFBundleName</key>
+	<string>$(PRODUCT_NAME)</string>
+	<key>CFBundlePackageType</key>
+	<string>$(PRODUCT_BUNDLE_PACKAGE_TYPE)</string>
+	<key>CFBundleShortVersionString</key>
+	<string>$(MARKETING_VERSION)</string>
+	<key>CFBundleVersion</key>
+	<string>$(CURRENT_PROJECT_VERSION)</string>
+	<key>LSRequiresIPhoneOS</key>
+	<true/>
+	<key>UILaunchScreen</key>
+	<dict/>
+	<key>UISupportedInterfaceOrientations</key>
+	<array>
+		<string>UIInterfaceOrientationPortrait</string>
+	</array>
+
+	<!-- Oura OAuth app credentials, injected from Config/Secrets.xcconfig -->
+	<key>OuraClientID</key>
+	<string>$(OURA_CLIENT_ID)</string>
+	<key>OuraClientSecret</key>
+	<string>$(OURA_CLIENT_SECRET)</string>
+	<key>CFBundleURLTypes</key>
+	<array>
+		<dict>
+			<key>CFBundleURLName</key>
+			<string>Oura sign-in callback</string>
+			<key>CFBundleURLSchemes</key>
+			<array>
+				<string>eightytwenty</string>
+			</array>
+		</dict>
+	</array>
+
+	<!-- Permissions -->
+	<key>NSHealthShareUsageDescription</key>
+	<string>80/20 reads your steps, workouts, VO2 max, mindful minutes and State of Mind to build your Physical and Mental bars.</string>
+	<key>NSHealthUpdateUsageDescription</key>
+	<string>80/20 saves your mood check-ins, meditations and runs to Apple Health so you have a second copy of everything.</string>
+	<key>NSLocationWhenInUseUsageDescription</key>
+	<string>80/20 uses GPS while you record a run to measure distance, pace and your route.</string>
+
+	<!-- Background: GPS during runs, morning Oura sync, CloudKit sync pushes -->
+	<key>UIBackgroundModes</key>
+	<array>
+		<string>location</string>
+		<string>fetch</string>
+		<string>processing</string>
+		<string>remote-notification</string>
+	</array>
+	<key>BGTaskSchedulerPermittedIdentifiers</key>
+	<array>
+		<string>$(PRODUCT_BUNDLE_IDENTIFIER).refresh</string>
+	</array>
+
+	<!-- Backups: show the app's Documents folder in Files > On My iPhone -->
+	<key>UIFileSharingEnabled</key>
+	<true/>
+	<key>LSSupportsOpeningDocumentsInPlace</key>
+	<true/>
+	<!-- Backups: show the iCloud container as a folder in iCloud Drive -->
+	<key>NSUbiquitousContainers</key>
+	<dict>
+		<key>iCloud.$(PRODUCT_BUNDLE_IDENTIFIER)</key>
+		<dict>
+			<key>NSUbiquitousContainerIsDocumentScopePublic</key>
+			<true/>
+			<key>NSUbiquitousContainerName</key>
+			<string>80-20 Backups</string>
+			<key>NSUbiquitousContainerSupportedFolderLevels</key>
+			<string>Any</string>
+		</dict>
+	</dict>
+</dict>
+</plist>

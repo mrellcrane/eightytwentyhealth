@@ -1,0 +1,1 @@
+{"data": [{"id": "o2-1010", "breathing_disturbance_index": 3, "day": "2026-10-10", "spo2_percentage": {"average": 96.8}, "meta": {}}, {"id": "o2-1011", "day": "2026-10-11", "spo2_percentage": null, "meta": {}}], "next_token": null}

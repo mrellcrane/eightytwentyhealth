@@ -1,0 +1,8 @@
+{
+  "data": [
+    {"id": "da-1009", "active_calories": 305, "average_met_minutes": 1.4, "class_5_min": "1111", "contributors": {"meet_daily_targets": 60, "move_every_hour": 95, "recovery_time": 100, "stay_active": 80, "training_frequency": 70, "training_volume": 90}, "day": "2026-10-09", "equivalent_walking_distance": 4000, "high_activity_met_minutes": 0, "high_activity_time": 0, "inactivity_alerts": 0, "low_activity_met_minutes": 100, "low_activity_time": 10000, "medium_activity_met_minutes": 30, "medium_activity_time": 1200, "met": {"interval": 60, "items": [1.0, 1.1], "timestamp": "2026-10-09T04:00:00.000-07:00"}, "meters_to_target": 2000, "non_wear_time": 0, "resting_time": 30000, "score": 84, "sedentary_met_minutes": 10, "sedentary_time": 30000, "steps": 5127, "target_calories": 500, "target_meters": 8000, "timestamp": "2026-10-09T04:00:00.000-07:00", "total_calories": 2400, "meta": {}},
+    {"id": "da-1010", "active_calories": 684, "day": "2026-10-10", "score": 85, "steps": 9140, "meta": {}},
+    {"id": "da-1011", "active_calories": 430, "day": "2026-10-11", "score": 89, "steps": 5967, "meta": {}}
+  ],
+  "next_token": null
+}
