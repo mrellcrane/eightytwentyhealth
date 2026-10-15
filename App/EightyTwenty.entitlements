@@ -6,6 +6,12 @@
 	<true/>
 	<key>com.apple.developer.healthkit.access</key>
 	<array/>
+	<!-- Development everywhere: Xcode and TestFlight builds share one CloudKit
+	     database, and SwiftData can create its schema there automatically.
+	     Production would need a manual schema deploy first. Fine for a
+	     single-user app; switch to Production only if this ever ships. -->
+	<key>com.apple.developer.icloud-container-environment</key>
+	<string>Development</string>
 	<key>com.apple.developer.icloud-container-identifiers</key>
 	<array>
 		<string>iCloud.$(PRODUCT_BUNDLE_IDENTIFIER)</string>

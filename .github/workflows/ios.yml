@@ -1,6 +1,12 @@
 # Builds the app on GitHub's Macs so nobody needs Xcode locally.
-# Step 1 (now): compile check, no secrets needed.
-# Step 2 (later): signed archive + TestFlight upload.
+#
+# Without App Store Connect secrets: compile check only (unsigned Simulator build).
+# With them: signed archive, uploaded to TestFlight. Install from the TestFlight app.
+#
+# Secrets (repo Settings > Secrets and variables > Actions):
+#   ASC_KEY_ID, ASC_ISSUER_ID, ASC_KEY_P8   App Store Connect API key (Admin role), .p8 file contents
+#   APPLE_TEAM_ID                           10-character team ID
+#   OURA_CLIENT_ID, OURA_CLIENT_SECRET      from cloud.ouraring.com/oauth/applications
 name: iOS
 
 on:
@@ -15,11 +21,18 @@ concurrency:
 
 jobs:
   build:
-    name: Compile check
+    name: Build
     runs-on: macos-latest
-    timeout-minutes: 40
+    timeout-minutes: 45
+    env:
+      ASC_KEY_ID: ${{ secrets.ASC_KEY_ID }}
+      ASC_ISSUER_ID: ${{ secrets.ASC_ISSUER_ID }}
+      ASC_KEY_P8: ${{ secrets.ASC_KEY_P8 }}
+      APPLE_TEAM_ID: ${{ secrets.APPLE_TEAM_ID }}
+      OURA_CLIENT_ID: ${{ secrets.OURA_CLIENT_ID }}
+      OURA_CLIENT_SECRET: ${{ secrets.OURA_CLIENT_SECRET }}
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
 
       - name: Toolchain
         run: |
@@ -34,9 +47,20 @@ jobs:
           brew install xcodegen
           xcodegen generate
 
-      - name: Build app (iOS Simulator, unsigned)
+      - name: Decide mode
+        id: mode
         run: |
-          set -o pipefail
+          if [ -n "$ASC_KEY_ID" ] && [ -n "$ASC_ISSUER_ID" ] && [ -n "$ASC_KEY_P8" ] && [ -n "$APPLE_TEAM_ID" ]; then
+            echo "testflight=true" >> "$GITHUB_OUTPUT"
+            echo "App Store Connect secrets found: archiving for TestFlight."
+          else
+            echo "testflight=false" >> "$GITHUB_OUTPUT"
+            echo "No App Store Connect secrets: compile check only."
+          fi
+
+      - name: Compile check (iOS Simulator, unsigned)
+        if: steps.mode.outputs.testflight != 'true'
+        run: |
           xcodebuild build \
             -project EightyTwenty.xcodeproj \
             -scheme EightyTwenty \
@@ -49,3 +73,63 @@ jobs:
           echo "::endgroup::"
           tail -5 build.log
           grep -q "BUILD SUCCEEDED" build.log
+
+      - name: Archive and upload to TestFlight
+        if: steps.mode.outputs.testflight == 'true'
+        run: |
+          set -euo pipefail
+          KEY_PATH="$RUNNER_TEMP/AuthKey_$ASC_KEY_ID.p8"
+          printf '%s\n' "$ASC_KEY_P8" > "$KEY_PATH"
+
+          cat > Config/Secrets.xcconfig <<EOF
+          DEVELOPMENT_TEAM = $APPLE_TEAM_ID
+          OURA_CLIENT_ID = $OURA_CLIENT_ID
+          OURA_CLIENT_SECRET = $OURA_CLIENT_SECRET
+          EOF
+
+          cat > "$RUNNER_TEMP/ExportOptions.plist" <<EOF
+          <?xml version="1.0" encoding="UTF-8"?>
+          <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+          <plist version="1.0">
+          <dict>
+            <key>method</key><string>app-store-connect</string>
+            <key>destination</key><string>upload</string>
+            <key>signingStyle</key><string>automatic</string>
+            <key>teamID</key><string>$APPLE_TEAM_ID</string>
+            <key>manageAppVersionAndBuildNumber</key><false/>
+            <key>testFlightInternalTestingOnly</key><true/>
+          </dict>
+          </plist>
+          EOF
+
+          AUTH=(-allowProvisioningUpdates
+                -authenticationKeyPath "$KEY_PATH"
+                -authenticationKeyID "$ASC_KEY_ID"
+                -authenticationKeyIssuerID "$ASC_ISSUER_ID")
+          BUILD_NUMBER=$((100 + GITHUB_RUN_NUMBER))
+
+          if ! xcodebuild archive \
+                -project EightyTwenty.xcodeproj \
+                -scheme EightyTwenty \
+                -configuration Release \
+                -destination 'generic/platform=iOS' \
+                -archivePath "$RUNNER_TEMP/EightyTwenty.xcarchive" \
+                CURRENT_PROJECT_VERSION=$BUILD_NUMBER \
+                "${AUTH[@]}" > archive.log 2>&1; then
+            grep -E "error" archive.log | sort -u || true
+            tail -40 archive.log
+            exit 1
+          fi
+
+          if ! xcodebuild -exportArchive \
+                -archivePath "$RUNNER_TEMP/EightyTwenty.xcarchive" \
+                -exportOptionsPlist "$RUNNER_TEMP/ExportOptions.plist" \
+                -exportPath "$RUNNER_TEMP/export" \
+                "${AUTH[@]}" > export.log 2>&1; then
+            grep -iE "error" export.log | sort -u || true
+            tail -40 export.log
+            exit 1
+          fi
+
+          rm -f "$KEY_PATH"
+          echo "Uploaded build $BUILD_NUMBER. It shows up in TestFlight after Apple finishes processing (usually 5 to 15 minutes)."
