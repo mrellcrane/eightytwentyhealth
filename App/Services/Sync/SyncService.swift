@@ -17,6 +17,11 @@ final class SyncService {
 
     private(set) var lastSyncedAt: Date? = UserDefaults.standard.object(forKey: "lastSyncedAt") as? Date
 
+    private var ouraBackfilled: Bool {
+        get { UserDefaults.standard.bool(forKey: "ouraBackfilled") }
+        set { UserDefaults.standard.set(newValue, forKey: "ouraBackfilled") }
+    }
+
     private let oura: OuraAccount
     private let healthKit: HealthKitService
 
@@ -37,7 +42,10 @@ final class SyncService {
 
         let repository = Repository(context: context)
         let today = DayKey(date: .now)
-        let days = repository.hasAnySensorData ? Self.refreshWindowDays : Self.initialHistoryDays
+        // Backfill until a full Oura history pull has succeeded. Keyed on Oura, not on
+        // any cached data: Apple Health days alone mustn't stop the first Oura backfill.
+        let needsBackfill = !repository.hasAnySensorData || (oura.isConnected && !ouraBackfilled)
+        let days = needsBackfill ? Self.initialHistoryDays : Self.refreshWindowDays
         let start = today.adding(days: -days)
         let startDate = start.startDate()
         let endDate = today.adding(days: 1).startDate()
@@ -50,11 +58,15 @@ final class SyncService {
             do {
                 let bundle = try await fetchOura(start: start, end: today)
                 sensors = OuraDayAssembler.assemble(bundle)
+                if days == Self.initialHistoryDays { ouraBackfilled = true }
                 try repository.insertImported(OuraActivityMapper.activities(from: bundle.sessions))
                 try repository.insertImported(OuraActivityMapper.activities(from: bundle.tags))
             } catch OuraError.unauthorized, OuraError.notConnected {
-                oura.markDisconnected()
+                Log.sync.error("Oura auth failed during sync; disconnecting")
+                await oura.disconnect()
                 errors.append("Oura sign-in expired. Reconnect in Settings.")
+            } catch OuraError.missingScope(let endpoint) {
+                errors.append("Oura didn't grant access to \(endpoint). Disconnect and reconnect Oura, and allow everything it asks for.")
             } catch {
                 errors.append("Oura: \(error.localizedDescription)")
             }
@@ -92,6 +104,7 @@ final class SyncService {
             errors.append("Mood import: \(error.localizedDescription)")
         }
 
+        Log.sync.info("Sync done (\(days)-day window): Oura connected=\(self.oura.isConnected), \(sensors.count) days, \(moods.count) Health moods, errors: \(errors.joined(separator: " | "), privacy: .public)")
         lastError = errors.isEmpty ? nil : errors.joined(separator: "\n")
         if errors.isEmpty || !sensors.isEmpty {
             lastSyncedAt = .now
@@ -105,6 +118,7 @@ final class SyncService {
         do {
             return try await oura.client().bundle(start: start, end: end)
         } catch OuraError.unauthorized {
+            Log.sync.error("Oura API said 401; forcing a token refresh")
             _ = try await oura.tokens.accessToken(forceRefresh: true)
             return try await oura.client().bundle(start: start, end: end)
         }

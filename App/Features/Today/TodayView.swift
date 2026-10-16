@@ -86,6 +86,7 @@ struct TodayView: View {
             }
             .buttonStyle(.plain)
         }
+        .fixedSize(horizontal: false, vertical: true)
     }
 
     /// Plain nudges about missing data, until real recommendations land in Phase 2.
@@ -147,10 +148,11 @@ struct QuickActionLabel: View {
 
     var body: some View {
         VStack(spacing: 6) {
-            Image(systemName: systemImage).font(.title2)
+            // Fixed slot: SF Symbols differ in height, which knocked the labels out of line.
+            Image(systemName: systemImage).font(.title2).frame(height: 30)
             Text(title).font(.caption)
         }
-        .frame(maxWidth: .infinity)
+        .frame(maxWidth: .infinity, maxHeight: .infinity)
         .padding(.vertical, 12)
         .background(.background.secondary, in: RoundedRectangle(cornerRadius: 12))
     }

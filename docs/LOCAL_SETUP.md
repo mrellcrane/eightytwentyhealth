@@ -21,7 +21,7 @@ The owner wants to do as little as possible. Do the work yourself, in the termin
 | iCloud container | `iCloud.com.mrellcrane.eightytwenty` |
 | Oura client ID | `682e6545-f8eb-44eb-aea1-2693c4342c5f` |
 | Oura redirect URI | `eightytwenty://oauth-callback` |
-| Oura scopes the app requests | email, personal, daily, heartrate, workout, tag, session, spo2Daily, stress, heart_health |
+| Oura scopes the app requests | email, personal, daily, heartrate, workout, tag, session, spo2, stress, heart_health |
 | App Store Connect app name | `80/20 Health` (if taken: `EightyTwenty Health`) |
 | SKU | `eightytwenty-health` |
 

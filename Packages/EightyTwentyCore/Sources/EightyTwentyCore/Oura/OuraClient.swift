@@ -12,6 +12,9 @@ public protocol HTTPTransport: Sendable {
 public enum OuraError: Error, Equatable, Sendable {
     case notConnected
     case unauthorized
+    /// The token is fine but wasn't granted the scope this endpoint needs.
+    /// Oura answers these with 401 too, so they must not be read as a dead sign-in.
+    case missingScope(endpoint: String)
     case rateLimited(retryAfterSeconds: Double?)
     case http(status: Int, body: String)
     case decoding(endpoint: String, message: String)
@@ -110,6 +113,8 @@ public struct OuraClient: Sendable {
             return try await fetch()
         } catch OuraError.http(let status, _) where status == 403 || status == 404 {
             return []
+        } catch OuraError.missingScope {
+            return []
         } catch OuraError.decoding {
             return []
         }
@@ -120,6 +125,11 @@ public struct OuraClient: Sendable {
         case 200..<300:
             return
         case 401:
+            // e.g. {"detail":"Token is not authorized access spo2 scope."}
+            let body = String(decoding: data.prefix(500), as: UTF8.self)
+            if body.localizedCaseInsensitiveContains("scope") {
+                throw OuraError.missingScope(endpoint: response.url?.lastPathComponent ?? "")
+            }
             throw OuraError.unauthorized
         case 429:
             let retry = response.value(forHTTPHeaderField: "Retry-After").flatMap(Double.init)

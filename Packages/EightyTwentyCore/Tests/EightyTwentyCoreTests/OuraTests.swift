@@ -151,6 +151,17 @@ final class OuraClientTests: XCTestCase {
             XCTAssertEqual(error as? OuraError, .unauthorized)
         }
 
+        let clientScope = OuraClient(
+            transport: MockTransport { _ in (401, #"{"detail":"Token is not authorized access daily scope."}"#, [:]) },
+            accessToken: { "x" }
+        )
+        do {
+            let _: [OuraDailySleep] = try await clientScope.documents(.dailySleep, start: DayKey("2026-10-10")!, end: DayKey("2026-10-10")!)
+            XCTFail("Expected missing scope")
+        } catch {
+            XCTAssertEqual(error as? OuraError, .missingScope(endpoint: "daily_sleep"), "A scope 401 is not a dead sign-in")
+        }
+
         let client429 = OuraClient(transport: MockTransport { _ in (429, "{}", ["Retry-After": "30"]) }, accessToken: { "x" })
         do {
             let _: [OuraDailySleep] = try await client429.documents(.dailySleep, start: DayKey("2026-10-10")!, end: DayKey("2026-10-10")!)
@@ -163,7 +174,9 @@ final class OuraClientTests: XCTestCase {
     func testBundleSkipsEndpointsWithoutScope() async throws {
         let transport = MockTransport { request in
             let path = request.url!.path
-            if path.hasSuffix("daily_spo2") || path.hasSuffix("vO2_max") { return (403, "missing scope", [:]) }
+            if path.hasSuffix("vO2_max") { return (403, "missing scope", [:]) }
+            // What Oura actually sends when a scope wasn't granted.
+            if path.hasSuffix("daily_spo2") { return (401, #"{"detail":"Token is not authorized access spo2 scope."}"#, [:]) }
             if path.hasSuffix("daily_readiness") {
                 return (200, #"{"data":[{"id":"a","day":"2026-10-10","score":87}],"next_token":null}"#, [:])
             }
@@ -173,6 +186,7 @@ final class OuraClientTests: XCTestCase {
         let bundle = try await client.bundle(start: DayKey("2026-10-10")!, end: DayKey("2026-10-10")!)
         XCTAssertEqual(bundle.readiness.count, 1)
         XCTAssertTrue(bundle.spo2.isEmpty)
+        XCTAssertTrue(bundle.vo2Max.isEmpty)
         XCTAssertEqual(transport.requests.count, OuraEndpoint.allCases.count)
     }
 
@@ -199,7 +213,7 @@ final class OuraOAuthTests: XCTestCase {
         XCTAssertEqual(value("client_id"), "abc")
         XCTAssertEqual(value("redirect_uri"), "eightytwenty://oauth-callback")
         XCTAssertEqual(value("state"), "xyz")
-        XCTAssertEqual(value("scope"), "email personal daily heartrate workout tag session spo2Daily stress heart_health")
+        XCTAssertEqual(value("scope"), "email personal daily heartrate workout tag session spo2 stress heart_health")
     }
 
     func testCallbackParsing() throws {

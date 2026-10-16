@@ -22,6 +22,8 @@ final class AppModel {
 
     /// Shown as an alert after something non-fatal goes wrong (e.g. Health write denied).
     var notice: String?
+    /// Whether iOS has already shown the Health permission sheet. Nil until checked.
+    private(set) var healthAsked: Bool?
 
     init(container: ModelContainer) {
         let oura = OuraAccount()
@@ -59,9 +61,14 @@ final class AppModel {
         }
     }
 
+    func refreshHealthStatus() async {
+        healthAsked = await healthKit.hasAskedForAuthorization()
+    }
+
     func connectHealth() async {
         do {
             try await healthKit.requestAuthorization()
+            await refreshHealthStatus()
             await sync.sync(context: context)
         } catch {
             notice = "Apple Health: \(error.localizedDescription)"

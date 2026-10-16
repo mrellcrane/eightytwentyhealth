@@ -9,6 +9,9 @@ struct URLSessionTransport: HTTPTransport {
     func send(_ request: URLRequest) async throws -> (Data, HTTPURLResponse) {
         let (data, response) = try await session.data(for: request)
         guard let http = response as? HTTPURLResponse else { throw URLError(.badServerResponse) }
+        if !(200..<300).contains(http.statusCode), request.url?.path.hasPrefix("/v2/") == true {
+            Log.oura.error("\(request.url?.path ?? "", privacy: .public): HTTP \(http.statusCode) \(String(decoding: data.prefix(300), as: UTF8.self), privacy: .public)")
+        }
         return (data, http)
     }
 }
@@ -33,7 +36,8 @@ actor OuraTokenStore {
 
     func save(_ tokens: OuraTokens) {
         if let data = try? JSONEncoder().encode(tokens) {
-            Keychain.set(data, for: Self.account)
+            let ok = Keychain.set(data, for: Self.account)
+            Log.oura.info("Saved tokens: keychain ok=\(ok), refresh token=\(tokens.refreshToken != nil), expires \(tokens.expiresAt, privacy: .public)")
         }
     }
 
@@ -48,6 +52,7 @@ actor OuraTokenStore {
     func exchange(code: String) async throws {
         let request = OuraOAuth.tokenRequest(.authorizationCode(code), credentials: credentials)
         let (data, response) = try await transport.send(request)
+        Log.oura.info("Code exchange: HTTP \(response.statusCode)")
         guard (200..<300).contains(response.statusCode) else {
             throw OuraError.http(status: response.statusCode, body: String(decoding: data.prefix(300), as: UTF8.self))
         }
@@ -56,7 +61,10 @@ actor OuraTokenStore {
 
     /// A valid access token, refreshing first if it's about to expire.
     func accessToken(forceRefresh: Bool = false) async throws -> String {
-        guard let tokens = load() else { throw OuraError.notConnected }
+        guard let tokens = load() else {
+            Log.oura.error("No tokens in the keychain")
+            throw OuraError.notConnected
+        }
         if !forceRefresh && !tokens.needsRefresh() { return tokens.accessToken }
         return try await refresh(tokens).accessToken
     }
@@ -68,7 +76,9 @@ actor OuraTokenStore {
         let task = Task { [credentials, transport] () throws -> OuraTokens in
             let request = OuraOAuth.tokenRequest(.refreshToken(refreshToken), credentials: credentials)
             let (data, response) = try await transport.send(request)
+            Log.oura.info("Token refresh: HTTP \(response.statusCode)")
             guard (200..<300).contains(response.statusCode) else {
+                Log.oura.error("Token refresh failed: \(String(decoding: data.prefix(200), as: UTF8.self), privacy: .public)")
                 // 400/401 here means the refresh token is dead: you need to reconnect.
                 throw response.statusCode < 500 ? OuraError.unauthorized
                     : OuraError.http(status: response.statusCode, body: "")
@@ -122,10 +132,6 @@ final class OuraAccount {
 
     func disconnect() async {
         await tokens.clear()
-        isConnected = false
-    }
-
-    func markDisconnected() {
         isConnected = false
     }
 

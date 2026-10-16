@@ -9,10 +9,11 @@ public enum OuraOAuth {
     public static let authorizeURL = URL(string: "https://cloud.ouraring.com/oauth/authorize")!
     public static let tokenURL = URL(string: "https://api.ouraring.com/oauth/token")!
     /// Must also be ticked on the app at cloud.ouraring.com/oauth/applications.
-    /// `stress` covers daily stress and resilience; `heart_health` covers VO2 max.
-    /// Without them those endpoints 403 and the app silently goes without.
+    /// `stress` covers daily stress and resilience; `heart_health` covers VO2 max;
+    /// `spo2` (not `spo2Daily`) covers daily SpO2. Without them those endpoints
+    /// refuse (403, or 401 naming the scope) and the app silently goes without.
     public static let scopes = [
-        "email", "personal", "daily", "heartrate", "workout", "tag", "session", "spo2Daily",
+        "email", "personal", "daily", "heartrate", "workout", "tag", "session", "spo2",
         "stress", "heart_health",
     ]
 

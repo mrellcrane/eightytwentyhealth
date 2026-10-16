@@ -48,9 +48,19 @@ final class HealthKitService {
         ]
     }
 
+    /// True once iOS has shown the permission sheet for everything we use. After that,
+    /// asking again shows nothing; changes happen in the Health app. (Whether you
+    /// allowed *reading* is private by design, so "asked" is all we can know.)
+    func hasAskedForAuthorization() async -> Bool {
+        guard isAvailable else { return false }
+        let status = try? await store.statusForAuthorizationRequest(toShare: shareTypes, read: readTypes)
+        return status == .unnecessary
+    }
+
     func requestAuthorization() async throws {
         guard isAvailable else { return }
         try await store.requestAuthorization(toShare: shareTypes, read: readTypes)
+        Log.health.info("Authorization request finished")
     }
 
     // MARK: Reading

@@ -115,15 +115,22 @@ struct SettingsView: View {
 
     private var healthSection: some View {
         Section {
-            Button("Allow Apple Health access") {
-                Task { await model.connectHealth() }
+            if model.healthAsked == true {
+                Label("Connected", systemImage: "checkmark.circle.fill").foregroundStyle(.green)
+                Link("Change access in the Health app", destination: URL(string: "x-apple-health://")!)
+            } else {
+                Button("Allow Apple Health access") {
+                    Task { await model.connectHealth() }
+                }
+                .disabled(!model.healthKit.isAvailable)
             }
-            .disabled(!model.healthKit.isAvailable)
         } header: {
             Text("Apple Health")
         } footer: {
-            Text("Reads steps, workouts, VO2 max, mindful minutes and moods you log in the Health app. Writes your check-ins, meditations and runs, so Apple Health holds a second copy.")
+            Text("Reads steps, workouts, VO2 max, mindful minutes and moods you log in the Health app. Writes your check-ins, meditations and runs, so Apple Health holds a second copy."
+                + (model.healthAsked == true ? " To change what 80/20 can read or write: Health app > your profile picture > Apps > 80/20." : ""))
         }
+        .task { await model.refreshHealthStatus() }
     }
 
     // MARK: Backups
