@@ -65,13 +65,9 @@ struct AskView: View {
                 }
             }
             .sheet(item: $logging) { item in
-                InterventionLogSheet(
-                    title: item.step.intervention?.title ?? item.step.title,
-                    kind: item.step.intervention?.logsAs ?? item.step.activityKind,
-                    interventionID: item.step.intervention?.id,
-                    defaultMinutes: Double(max(item.step.minutes, 1)),
-                    note: item.step.intervention == nil ? item.step.title : nil
-                )
+                stepLogSheet(item) {
+                    coach.markStepLogged(turn: item.turn, step: item.index, modelContext: context)
+                }
             }
             .onAppear {
                 if coach.conversation == nil { focus = .question }
@@ -251,7 +247,9 @@ struct AskView: View {
                 VStack(alignment: .leading, spacing: 12) {
                     QuestionBubble(text: turn.question)
                     if let reply = turn.reply {
-                        ReplyView(reply: reply, library: savedStudies.map(\.study)) { step in logging = LoggableStep(step: step) }
+                        ReplyView(reply: reply, library: savedStudies.map(\.study), logged: turn.logged ?? []) { step, number in
+                            logging = LoggableStep(step: step, turn: index, index: number)
+                        }
                         StudyLookupPanel(turn: index, studies: turn.studies)
                     }
                 }
@@ -311,6 +309,21 @@ struct AskView: View {
 private struct LoggableStep: Identifiable {
     let id = UUID()
     let step: CoachReply.Step
+    let turn: Int
+    let index: Int
+}
+
+/// "Did it" on a coach step: the log sheet, prefilled from the step. Shared by
+/// the Ask screen and Coach history.
+private func stepLogSheet(_ item: LoggableStep, onLogged: @escaping () -> Void) -> InterventionLogSheet {
+    InterventionLogSheet(
+        title: item.step.intervention?.title ?? item.step.title,
+        kind: item.step.intervention?.logsAs ?? item.step.activityKind,
+        interventionID: item.step.intervention?.id,
+        defaultMinutes: Double(max(item.step.minutes, 1)),
+        note: item.step.intervention == nil ? item.step.title : nil,
+        onLogged: onLogged
+    )
 }
 
 struct QuestionBubble: View {
@@ -342,8 +355,10 @@ struct ReplyView: View {
     let reply: CoachReply
     /// Saved studies, so Claude's citations of them link to the paper.
     var library: [Study] = []
-    /// Nil hides the "Did it" buttons (history).
-    var onDidIt: ((CoachReply.Step) -> Void)?
+    /// Steps already logged, to mark them done.
+    var logged: [CoachConversation.Turn.LoggedStep] = []
+    /// "Did it" on a step, with its index. Nil hides the buttons.
+    var onDidIt: ((CoachReply.Step, Int) -> Void)?
 
     var body: some View {
         VStack(alignment: .leading, spacing: 14) {
@@ -354,7 +369,9 @@ struct ReplyView: View {
             }
             Text(reply.summary)
             ForEach(Array(reply.steps.enumerated()), id: \.offset) { index, step in
-                StepCard(number: index + 1, step: step, library: library, onDidIt: onDidIt.map { action -> () -> Void in { action(step) } })
+                StepCard(number: index + 1, step: step, library: library,
+                         loggedAt: logged.last { $0.step == index }?.at,
+                         onDidIt: onDidIt.map { action -> () -> Void in { action(step, index) } })
             }
             if !reply.avoid.isEmpty {
                 Label(reply.avoid, systemImage: "hand.raised").font(.subheadline)
@@ -370,6 +387,8 @@ struct StepCard: View {
     let number: Int
     let step: CoachReply.Step
     var library: [Study] = []
+    /// When you last logged this step, if you did.
+    var loggedAt: Date?
     var onDidIt: (() -> Void)?
 
     var body: some View {
@@ -386,9 +405,14 @@ struct StepCard: View {
             Text(step.how)
             Text(step.why).font(.subheadline).foregroundStyle(.secondary)
             source(checked)
+            if let loggedAt {
+                Label("Logged \(loggedAt.formatted(.dateTime.weekday().hour().minute()))", systemImage: "checkmark.circle.fill")
+                    .font(.subheadline.bold())
+                    .foregroundStyle(.green)
+            }
             HStack {
                 if let onDidIt {
-                    Button("Did it", systemImage: "checkmark.circle", action: onDidIt)
+                    Button(loggedAt == nil ? "Did it" : "Log again", systemImage: "checkmark.circle", action: onDidIt)
                 }
                 if let checked {
                     NavigationLink("Details") { InterventionDetailView(intervention: checked) }
@@ -435,19 +459,23 @@ struct StepCard: View {
 struct CoachLogView: View {
     let log: CoachLog
     @Environment(AppModel.self) private var model
+    @Environment(\.modelContext) private var context
     @State private var continuing = false
+    @State private var logging: LoggableStep?
 
     var body: some View {
         ScrollView {
             VStack(alignment: .leading, spacing: 20) {
-                ForEach(Array(log.turns.enumerated()), id: \.offset) { _, turn in
+                ForEach(Array(log.turns.enumerated()), id: \.offset) { turnIndex, turn in
                     VStack(alignment: .leading, spacing: 12) {
                         Text(turn.askedAt, format: .dateTime.weekday().month().day().hour().minute())
                             .font(.caption)
                             .foregroundStyle(.secondary)
                         QuestionBubble(text: turn.question)
                         if let reply = turn.reply {
-                            ReplyView(reply: reply, library: turn.studies ?? [])
+                            ReplyView(reply: reply, library: turn.studies ?? [], logged: turn.logged ?? []) { step, number in
+                                logging = LoggableStep(step: step, turn: turnIndex, index: number)
+                            }
                         } else {
                             Text("No answer came back.").foregroundStyle(.secondary)
                         }
@@ -475,6 +503,11 @@ struct CoachLogView: View {
             }
         }
         .sheet(isPresented: $continuing) { AskView() }
+        .sheet(item: $logging) { item in
+            stepLogSheet(item) {
+                model.coach.markStepLogged(turn: item.turn, step: item.index, in: log, modelContext: context)
+            }
+        }
     }
 }
 

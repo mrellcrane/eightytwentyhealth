@@ -247,6 +247,8 @@ struct InterventionLogSheet: View {
     let defaultMinutes: Double
     /// Saved with the log. For coach steps outside the catalog, the step's title.
     let note: String?
+    /// Called once the log is saved (marks the coach step as done).
+    var onLogged: (() -> Void)? = nil
 
     @Environment(AppModel.self) private var model
     @Environment(\.dismiss) private var dismiss
@@ -303,6 +305,7 @@ struct InterventionLogSheet: View {
                                 intensityBefore: before,
                                 intensityAfter: after
                             )
+                            onLogged?()
                             dismiss()
                         }
                     }

@@ -96,6 +96,12 @@ final class ActivityLog {
 
     var activityKind: ActivityKind? { ActivityKind(rawValue: kind) }
 
+    /// For the Mental bar's Practices: a mental practice, or anything logged from
+    /// the catalog or a coach step that matched it.
+    var countsAsPractice: Bool {
+        activityKind?.isMentalPractice == true || Intervention.find(interventionID) != nil
+    }
+
     /// "Run", the intervention's title, or for coach steps that fit no kind, the step (kept in the note).
     var displayTitle: String {
         if let intervention = Intervention.find(interventionID) { return intervention.title }

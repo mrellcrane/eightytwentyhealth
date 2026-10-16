@@ -210,6 +210,29 @@ final class CoachService {
         )
     }
 
+    // MARK: Did it
+
+    /// Marks a step as logged on its conversation, current or from history.
+    func markStepLogged(turn: Int, step: Int, in log: CoachLog? = nil, modelContext: ModelContext) {
+        let now = Date()
+        if log == nil || log?.id == logID {
+            conversation?.markLogged(step: step, turn: turn, at: now)
+            persist(modelContext)
+        } else if let log {
+            var turns = log.turns
+            guard turns.indices.contains(turn) else { return }
+            turns[turn].markLogged(step: step, at: now)
+            log.turnsData = CoachRecord.encodeTurns(turns)
+            log.updatedAt = now
+            do {
+                try modelContext.save()
+            } catch {
+                Log.coach.error("Couldn't save a logged step: \(error.localizedDescription)")
+            }
+        }
+        Log.coach.info("Step logged from the coach (turn \(turn + 1), step \(step + 1))")
+    }
+
     // MARK: Studies
 
     /// Your saved studies, not deleted.

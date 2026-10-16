@@ -95,6 +95,29 @@ public struct CoachConversation: Equatable, Sendable {
         public var replyText: String?
         /// Studies from "Look up studies" on this answer. Shown with it, never sent back to Claude.
         public var studies: [Study]?
+        /// Steps of this answer you logged with "Did it", and when.
+        public var logged: [LoggedStep]?
+
+        public struct LoggedStep: Codable, Equatable, Sendable {
+            /// Index into `reply.steps`.
+            public var step: Int
+            public var at: Date
+
+            public init(step: Int, at: Date) {
+                self.step = step
+                self.at = at
+            }
+        }
+
+        /// When step `index` was last logged, if ever.
+        public func loggedAt(step index: Int) -> Date? {
+            logged?.last { $0.step == index }?.at
+        }
+
+        public mutating func markLogged(step index: Int, at date: Date) {
+            guard let reply, reply.steps.indices.contains(index) else { return }
+            logged = (logged ?? []) + [LoggedStep(step: index, at: date)]
+        }
 
         public init(question: String, askedAt: Date, stamp: String? = nil, reply: CoachReply? = nil, replyText: String? = nil,
                     studies: [Study]? = nil) {
@@ -152,6 +175,11 @@ public struct CoachConversation: Equatable, Sendable {
         guard awaitingReply else { return }
         turns[turns.count - 1].reply = reply
         turns[turns.count - 1].replyText = text
+    }
+
+    public mutating func markLogged(step: Int, turn index: Int, at date: Date) {
+        guard turns.indices.contains(index) else { return }
+        turns[index].markLogged(step: step, at: date)
     }
 
     public mutating func attachStudies(_ studies: [Study], toTurn index: Int) {

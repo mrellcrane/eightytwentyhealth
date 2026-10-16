@@ -212,6 +212,35 @@ final class StudyLookupTests: XCTestCase {
         XCTAssertNil(CoachRecord.decodeTurns(Data(old.utf8)).first?.studies, "Turns saved before lookups still load")
     }
 
+    func testDidItIsRememberedOnTheStepButNeverSentToClaude() throws {
+        var conversation = CoachConversation(context: "CTX", question: "Tired", askedAt: t0)
+        conversation.markLogged(step: 0, turn: 0, at: t0)
+        XCTAssertNil(conversation.turns[0].logged, "Nothing to log before there's an answer")
+        conversation.record(CoachRequestTests.sampleReply, text: CoachRequestTests.sampleText)
+        let before = conversation.messages
+        conversation.markLogged(step: 0, turn: 0, at: t0)
+        conversation.markLogged(step: 5, turn: 0, at: t0)
+        conversation.markLogged(step: 0, turn: 3, at: t0)
+        conversation.markLogged(step: 0, turn: 0, at: t0.addingTimeInterval(60))
+        XCTAssertEqual(conversation.messages, before)
+        XCTAssertEqual(conversation.turns[0].logged?.count, 2)
+        XCTAssertEqual(conversation.turns[0].loggedAt(step: 0), t0.addingTimeInterval(60))
+        XCTAssertNil(conversation.turns[0].loggedAt(step: 1))
+
+        let turns = CoachRecord.decodeTurns(CoachRecord.encodeTurns(conversation.turns))
+        XCTAssertEqual(turns, conversation.turns)
+        let old = #"[{"question":"Q","askedAt":"2026-10-14T08:00:00Z"}]"#
+        XCTAssertNil(CoachRecord.decodeTurns(Data(old.utf8)).first?.logged)
+    }
+
+    func testNatureAndKindnessCountAsPractices() {
+        XCTAssertTrue(ActivityKind.nature.isMentalPractice)
+        XCTAssertTrue(ActivityKind.kindness.isMentalPractice)
+        XCTAssertFalse(ActivityKind.nap.isMentalPractice)
+        XCTAssertFalse(ActivityKind.alcohol.isMentalPractice)
+        XCTAssertFalse(ActivityKind.other.isMentalPractice, "A coach step only counts through its catalog id")
+    }
+
     func testBackupKeepsStudiesAndOlderBackupsStillLoad() throws {
         var doc = BackupDocument(exportedAt: t0, appVersion: nil, moods: [], gratitude: [], activities: [])
         XCTAssertTrue(doc.isEmpty)

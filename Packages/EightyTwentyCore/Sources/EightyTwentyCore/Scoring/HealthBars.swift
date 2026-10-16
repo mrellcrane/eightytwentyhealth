@@ -114,7 +114,8 @@ public struct BarDisplay: Equatable, Sendable {
 /// - Sleep, readiness, HRV, resting HR: the night that ended on the morning of D.
 /// - Steps and daytime stress: D-1, the last *complete* day.
 /// - Mood: average of D's check-ins, falling back to D-1's.
-/// - Practices: days in D-6...D with a gratitude entry, meditation or breathwork.
+/// - Practices: days in D-6...D with a gratitude entry or a mental practice
+///   (`ActivityKind.isMentalPractice`, or anything logged from the catalog or the coach).
 public struct HealthBarsCalculator: Sendable {
     public var weights: BarWeights
     public var stepGoal: Double

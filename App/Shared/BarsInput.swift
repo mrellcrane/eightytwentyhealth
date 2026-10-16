@@ -16,7 +16,7 @@ struct BarsInput {
         let liveMoods = moods.filter { $0.deletedAt == nil }
             .map { SelfReportBuilder.Mood(timestamp: $0.timestamp, valence: $0.valence) }
         let practices = gratitude.filter { $0.deletedAt == nil }.map(\.date)
-            + activities.filter { $0.deletedAt == nil && $0.activityKind?.isMentalPractice == true }.map(\.timestamp)
+            + activities.filter { $0.deletedAt == nil && $0.countsAsPractice }.map(\.timestamp)
         self.reports = SelfReportBuilder.build(moods: liveMoods, practiceTimestamps: practices)
     }
 

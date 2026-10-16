@@ -123,10 +123,14 @@ public enum ActivityKind: String, Codable, CaseIterable, Sendable, Identifiable 
         }
     }
 
-    /// Counts toward the "Practices" component of the Mental bar.
+    /// Counts toward the "Practices" component of the Mental bar: the evidence-backed
+    /// mental practices, including time in nature and acts of kindness (see the catalog).
+    /// Any log made from the catalog or a coach step that matched it counts too
+    /// (`interventionID`, checked where practices are counted).
     public var isMentalPractice: Bool {
         switch self {
-        case .meditation, .breathwork, .yoga, .reframe, .journaling, .selfCompassion, .relaxation: return true
+        case .meditation, .breathwork, .yoga, .reframe, .journaling, .selfCompassion, .relaxation, .nature, .kindness:
+            return true
         default: return false
         }
     }

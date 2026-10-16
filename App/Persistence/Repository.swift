@@ -70,7 +70,7 @@ struct Repository {
         let date = start.startDate()
         let moods = moods(since: date).map { SelfReportBuilder.Mood(timestamp: $0.timestamp, valence: $0.valence) }
         let practices = gratitude(since: date).map(\.date)
-            + activities(since: date).filter { $0.activityKind?.isMentalPractice == true }.map(\.timestamp)
+            + activities(since: date).filter(\.countsAsPractice).map(\.timestamp)
         return SelfReportBuilder.build(moods: moods, practiceTimestamps: practices)
     }
 
