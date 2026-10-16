@@ -87,6 +87,12 @@ public enum TrainingAdvisor {
         if runDays.contains(c.today) { return .alreadyRan }
         guard let plan = c.plan else { return .run(miles: nil, note: nil) }
         let guidance = plan.guidance(runs: c.runs, checkIns: c.checkIns, today: c.today)
+        if guidance.week.kind == .beforePlan {
+            let starts = TrainingCalendar.label(plan.start)
+            return .rest(TrainingAdvice(title: "No running until \(starts)",
+                                        detail: "Your plan starts then. Swim, bike, hike, or Orangetheory with power-walking on the tread."),
+                         why: "plan starts \(starts)")
+        }
         if guidance.week.signal == .red {
             return .rest(TrainingAdvice(title: "Cross-train, no running",
                                         detail: "Red this week. Easy bike, swim or walk, 30 to 40 min."), why: "red week")

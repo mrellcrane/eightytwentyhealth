@@ -71,6 +71,12 @@ public enum TrainingCalendar {
     public static func shortName(_ day: DayKey) -> String {
         ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"][weekdayNumber(day) - 1]
     }
+
+    /// "Mon Oct 19".
+    public static func label(_ day: DayKey) -> String {
+        let months = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"]
+        return "\(shortName(day)) \(months[day.month - 1]) \(day.day)"
+    }
 }
 
 /// A weekly mileage plan that grows slowly and listens to how runs felt.
@@ -188,17 +194,16 @@ public struct RunningPlan: Equatable, Sendable {
     public func guidance(runs: [RunEntry], checkIns: [DayKey: RunSignal], today: DayKey) -> Guidance {
         let monday = TrainingCalendar.monday(of: today)
         let all = weeks(runs: runs, checkIns: checkIns, today: today, weeksAhead: 1)
-        let week: Week
-        let nextWeek: Week?
         if monday < start {
+            // Starting next week means resting until then, whatever is left of this week's miles.
             let summary = Self.summary(runs: runs, checkIns: checkIns, week: monday)
-            week = Week(start: monday, target: startMiles, kind: .beforePlan, actual: summary.miles, runs: summary.count, signal: summary.signal)
-            nextWeek = all.first
-        } else {
-            let index = all.firstIndex { $0.start == monday } ?? 0
-            week = all[index]
-            nextWeek = index + 1 < all.count ? all[index + 1] : nil
+            let resting = Week(start: monday, target: startMiles, kind: .beforePlan, actual: summary.miles, runs: summary.count, signal: summary.signal)
+            return Guidance(week: resting, nextWeek: all.first, planned: [],
+                            headline: "No running until your plan starts \(TrainingCalendar.label(start)). Swim, bike, hike, or Orangetheory with power-walking on the tread.")
         }
+        let index = all.firstIndex { $0.start == monday } ?? 0
+        let week = all[index]
+        let nextWeek = index + 1 < all.count ? all[index + 1] : nil
 
         let remaining = max(0, week.target - week.actual)
         if week.signal == .red {

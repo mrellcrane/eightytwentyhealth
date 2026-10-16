@@ -188,7 +188,8 @@ public enum CoachBriefing {
             let guidance = plan.guidance(runs: s.runs, checkIns: s.checkIns, today: today)
             let week = guidance.week
             out.append(Self.runningRules)
-            out.append("Plan started the week of \(plan.start.rawValue) at \(RunningPlan.format(plan.startMiles)) mi.")
+            let verb = today < plan.start ? "starts" : "started"
+            out.append("Plan \(verb) the week of \(plan.start.rawValue) at \(RunningPlan.format(plan.startMiles)) mi.")
             let done = RunningPlan.format(week.actual)
             let target = RunningPlan.format(week.target)
             out.append("This week (from \(week.start.rawValue)): \(done) of \(target) mi in \(week.runs) of 3 runs. \(week.kind.note). \(guidance.headline)")

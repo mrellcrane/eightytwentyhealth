@@ -15,6 +15,7 @@ final class RunningPlanTests: XCTestCase {
         XCTAssertEqual(TrainingCalendar.monday(of: day(10, 18)), day(10, 12), "Sunday belongs to the week before")
         XCTAssertEqual(TrainingCalendar.monday(of: day(10, 19)), day(10, 19))
         XCTAssertEqual(TrainingCalendar.shortName(day(10, 24)), "Sat")
+        XCTAssertEqual(TrainingCalendar.label(day(10, 19)), "Mon Oct 19")
         XCTAssertTrue(TrainingCalendar.isWeekend(day(10, 25)))
         XCTAssertEqual(RunningPlan(start: day(10, 21), startMiles: 11).start, day(10, 19), "Snaps to Monday")
     }
@@ -48,13 +49,14 @@ final class RunningPlanTests: XCTestCase {
         XCTAssertEqual(weeks[2].kind, .repeated)
     }
 
-    func testBeforeThePlanAThreeRunWeekIsDone() {
-        let runs = [RunEntry(day: day(10, 12), miles: 3), RunEntry(day: day(10, 13), miles: 3.5), RunEntry(day: day(10, 14), miles: 4.2)]
+    func testNoRunningBeforeThePlanStarts() {
+        // Miles left this week don't matter: starting Monday means resting until then.
+        let runs = [RunEntry(day: day(10, 12), miles: 3)]
         let guidance = plan.guidance(runs: runs, checkIns: [:], today: day(10, 16))
         XCTAssertEqual(guidance.week.kind, .beforePlan)
-        XCTAssertEqual(guidance.week.actual, 10.7, accuracy: 1e-9)
+        XCTAssertEqual(guidance.week.actual, 3)
         XCTAssertTrue(guidance.planned.isEmpty)
-        XCTAssertTrue(guidance.headline.hasPrefix("This week's running is done"))
+        XCTAssertEqual(guidance.headline, "No running until your plan starts Mon Oct 19. Swim, bike, hike, or Orangetheory with power-walking on the tread.")
         XCTAssertEqual(guidance.nextWeek?.start, day(10, 19))
         XCTAssertEqual(guidance.nextWeek?.target, 11)
     }
@@ -114,6 +116,13 @@ final class TrainingAdvisorTests: XCTestCase {
     func testCardioOnAPlannedDay() {
         let advice = TrainingAdvisor.advise(.cardio, context(today: day(10, 19)))
         XCTAssertEqual(advice.title, "Easy run, 3.5 mi")
+    }
+
+    func testNoRunBeforeThePlanStarts() {
+        let advice = TrainingAdvisor.advise(.cardio, context(today: day(10, 16), runs: [RunEntry(day: day(10, 12), miles: 3)]))
+        XCTAssertEqual(advice.title, "No running until Mon Oct 19")
+        let both = TrainingAdvisor.advise(.both, context(today: day(10, 16), strength: [day(10, 13)]))
+        XCTAssertTrue(both.detail.hasSuffix("instead of a run (plan starts Mon Oct 19)."))
     }
 
     func testCardioAfterARedCheckIn() {
