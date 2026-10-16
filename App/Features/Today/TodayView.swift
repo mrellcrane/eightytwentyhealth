@@ -15,6 +15,10 @@ struct TodayView: View {
     @AppStorage(PrefKey.bedtimeMinutes) private var bedtimeMinutes = 22 * 60 + 15
     @AppStorage(PrefKey.energyNow) private var energyNow = 0
     @AppStorage(PrefKey.energyNowAt) private var energyNowAt = 0.0
+    @AppStorage(PrefKey.trainingGoal) private var trainingGoal = TrainingGoal.both.rawValue
+    @AppStorage(PrefKey.runPlanStart) private var planStart = ""
+    @AppStorage(PrefKey.runPlanStartMiles) private var planStartMiles = 0.0
+    @AppStorage(PrefKey.runCheckIns) private var checkInsRaw = ""
 
     @State private var showingMood = false
     @State private var showingGratitude = false
@@ -40,6 +44,8 @@ struct TodayView: View {
 
                 quickActions
 
+                trainingCard(input: input)
+
                 let steps = nextSteps(physical: physical, mental: mental)
                 if !steps.isEmpty {
                     VStack(alignment: .leading, spacing: 10) {
@@ -60,6 +66,15 @@ struct TodayView: View {
             .padding()
         }
         .navigationTitle("Today")
+        .toolbar {
+            ToolbarItem(placement: .topBarTrailing) {
+                NavigationLink {
+                    CoachView()
+                } label: {
+                    Label("Chat", systemImage: "sparkles")
+                }
+            }
+        }
         .refreshable { await model.sync.sync(context: context) }
         .sheet(isPresented: $showingMood) { MoodCheckInView() }
         .sheet(isPresented: $showingGratitude) { GratitudeView() }
@@ -109,13 +124,49 @@ struct TodayView: View {
             }
             .buttonStyle(.plain)
             NavigationLink {
-                RunView()
+                RunningView()
             } label: {
                 QuickActionLabel(title: "Run", systemImage: "figure.run")
             }
             .buttonStyle(.plain)
         }
         .fixedSize(horizontal: false, vertical: true)
+    }
+
+    /// Today's session for the goal you pick, from your running plan, recent lifting and readiness.
+    private func trainingCard(input: BarsInput) -> some View {
+        let training = TrainingInput(healthRuns: model.healthRuns, activities: activities)
+        let today = DayKey(date: .now)
+        let context = TrainingContext(
+            today: today,
+            runs: training.runs,
+            checkIns: RunCheckIns.decode(checkInsRaw),
+            plan: RunPlanSettings.plan(start: planStart, miles: planStartMiles),
+            strengthDays: training.strengthDays,
+            readiness: input.sensors[today]?.readinessScore
+        )
+        let advice = TrainingAdvisor.advise(TrainingGoal(rawValue: trainingGoal) ?? .both, context)
+        return VStack(alignment: .leading, spacing: 10) {
+            Text("Today's training").font(.title3.bold())
+            Picker("Goal", selection: $trainingGoal) {
+                ForEach(TrainingGoal.allCases) { goal in
+                    Text(goal.title).tag(goal.rawValue)
+                }
+            }
+            .pickerStyle(.segmented)
+            NavigationLink {
+                RunningView()
+            } label: {
+                VStack(alignment: .leading, spacing: 4) {
+                    Text(advice.title).font(.headline)
+                    Text(advice.detail).font(.subheadline).foregroundStyle(.secondary)
+                }
+                .frame(maxWidth: .infinity, alignment: .leading)
+                .padding()
+                .background(.background.secondary, in: RoundedRectangle(cornerRadius: 12))
+            }
+            .buttonStyle(.plain)
+        }
     }
 
     /// Plain nudges about missing data. The ranked, evidence-backed steps live on the Mental screen.
@@ -143,20 +194,45 @@ struct TodayView: View {
         return steps
     }
 
-    @ViewBuilder
+    /// One line per source. The full error text lives in Settings.
     private var syncStatus: some View {
-        VStack(alignment: .leading, spacing: 4) {
-            if model.sync.isSyncing {
-                ProgressView("Syncing...")
-            } else if let last = model.sync.lastSyncedAt {
-                Text("Synced \(last, style: .relative) ago")
-            }
-            if let error = model.sync.lastError {
-                Text(error).foregroundStyle(.red)
-            }
+        let sync = model.sync
+        return VStack(alignment: .leading, spacing: 4) {
+            syncLine("Oura", SourceSyncStatus(
+                connected: model.oura.isConnected, syncing: sync.isSyncing,
+                lastSynced: sync.ouraSyncedAt, lastTryFailed: sync.ouraFailed
+            ))
+            // Nil means not checked yet; only a definite "never asked" reads as not connected.
+            syncLine("Apple Health", SourceSyncStatus(
+                connected: model.healthKit.isAvailable && model.healthAsked != false, syncing: sync.isSyncing,
+                lastSynced: sync.healthSyncedAt, lastTryFailed: sync.healthFailed
+            ))
         }
         .font(.caption)
         .foregroundStyle(.secondary)
+    }
+
+    private func syncLine(_ source: String, _ status: SourceSyncStatus) -> some View {
+        HStack(spacing: 4) {
+            Text(source).bold()
+            switch status {
+            case .notConnected:
+                Text("not connected")
+            case .syncing:
+                Text("syncing...")
+            case .neverSynced:
+                Text("not synced yet")
+            case .synced(let at):
+                Text("synced \(at, style: .relative) ago")
+            case .failed(let lastSynced):
+                if let lastSynced {
+                    Text("failed, last synced \(lastSynced, style: .relative) ago").foregroundStyle(.red)
+                } else {
+                    Text("sync failed, see Settings").foregroundStyle(.red)
+                }
+            }
+        }
+        .lineLimit(1)
     }
 }
 

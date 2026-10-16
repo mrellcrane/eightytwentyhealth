@@ -8,6 +8,8 @@
 #   APPLE_TEAM_ID                           10-character team ID
 #   OURA_CLIENT_ID, OURA_CLIENT_SECRET      from cloud.ouraring.com/oauth/applications
 #   SENTRY_DSN                              optional; Sentry project DSN, sends app logs to sentry.io
+#   SENTRY_AUTH_TOKEN                       optional; Sentry organization auth token, uploads dSYMs so
+#                                           crashes and hangs show function names and lines
 name: iOS
 
 on:
@@ -76,6 +78,54 @@ jobs:
           tail -5 build.log
           grep -q "BUILD SUCCEEDED" build.log
 
+      # Each run is a fresh Mac with no signing identity, so automatic signing makes a new
+      # "Apple Development" certificate through the API key every time, and Apple caps how
+      # many an account can hold. Earlier runs' certificates are dead weight (their private
+      # keys left with those machines), so revoke them first. Only certificates named
+      # "Created via API" are touched; logs show counts only, since this repo is public.
+      - name: Revoke development certificates left by earlier runs
+        if: steps.mode.outputs.testflight == 'true'
+        continue-on-error: true
+        run: |
+          set -euo pipefail
+          export KEY_PATH="$RUNNER_TEMP/cleanup_key.p8"
+          printf '%s\n' "$ASC_KEY_P8" > "$KEY_PATH"
+          ruby <<'RUBY'
+          require "json"
+          require "net/http"
+          require "openssl"
+
+          b64 = ->(s) { [s].pack("m0").tr("+/", "-_").delete("=") }
+          key = OpenSSL::PKey::EC.new(File.read(ENV.fetch("KEY_PATH")))
+          now = Time.now.to_i
+          header = b64.(JSON.generate(alg: "ES256", kid: ENV.fetch("ASC_KEY_ID"), typ: "JWT"))
+          claims = b64.(JSON.generate(iss: ENV.fetch("ASC_ISSUER_ID"), iat: now, exp: now + 600, aud: "appstoreconnect-v1"))
+          der = key.sign(OpenSSL::Digest::SHA256.new, "#{header}.#{claims}")
+          # JWT wants the raw 64-byte r||s, not OpenSSL's DER.
+          r, s = OpenSSL::ASN1.decode(der).value.map { |n| n.value.to_s(2).rjust(32, "\x00") }
+          jwt = "#{header}.#{claims}.#{b64.(r + s)}"
+
+          http = Net::HTTP.new("api.appstoreconnect.apple.com", 443)
+          http.use_ssl = true
+          list = Net::HTTP::Get.new("/v1/certificates?filter%5BcertificateType%5D=DEVELOPMENT,IOS_DEVELOPMENT&limit=200")
+          list["Authorization"] = "Bearer #{jwt}"
+          response = http.request(list)
+          abort "Listing certificates failed: HTTP #{response.code}" unless response.code == "200"
+
+          certificates = JSON.parse(response.body).fetch("data")
+          stale = certificates.select do |c|
+            attributes = c.fetch("attributes")
+            [attributes["name"], attributes["displayName"]].compact.any? { |n| n.include?("Created via API") }
+          end
+          revoked = stale.count do |c|
+            delete = Net::HTTP::Delete.new("/v1/certificates/#{c.fetch("id")}")
+            delete["Authorization"] = "Bearer #{jwt}"
+            http.request(delete).code == "204"
+          end
+          puts "Development certificates: #{certificates.size}. Revoked #{revoked} of #{stale.size} left by earlier CI runs."
+          RUBY
+          rm -f "$KEY_PATH"
+
       - name: Archive and upload to TestFlight
         if: steps.mode.outputs.testflight == 'true'
         run: |
@@ -136,3 +186,20 @@ jobs:
 
           rm -f "$KEY_PATH"
           echo "Uploaded build $BUILD_NUMBER. It shows up in TestFlight after Apple finishes processing (usually 5 to 15 minutes)."
+
+      # Runs after the TestFlight upload, so a failure here can't keep a build off TestFlight.
+      - name: Upload dSYMs to Sentry
+        if: steps.mode.outputs.testflight == 'true'
+        env:
+          SENTRY_AUTH_TOKEN: ${{ secrets.SENTRY_AUTH_TOKEN }}
+          SENTRY_PROJECT: apple-ios
+        run: |
+          set -euo pipefail
+          if [ -z "$SENTRY_AUTH_TOKEN" ]; then
+            echo "::notice::No SENTRY_AUTH_TOKEN secret: skipping dSYM upload, so Sentry stack traces stay unsymbolicated."
+            exit 0
+          fi
+          DSYMS="$RUNNER_TEMP/EightyTwenty.xcarchive/dSYMs"
+          ls "$DSYMS"
+          brew install getsentry/tools/sentry-cli
+          sentry-cli debug-files upload --include-sources "$DSYMS"

@@ -99,11 +99,13 @@ Displayed value = 60/25/15 weighted average of the last three days' readings, so
 
 ## Mental screen and the Claude coach
 
+There are two Claude features, kept apart on purpose: the **coach** on the Mental screen ("What's going on?": structured steps, the checked catalog, study lookup, saved history; `claude-opus-5-5`) and the **chat** behind the sparkles on Today (open-ended, streamed, sees the running plan and patterns; `claude-haiku-5-5`, see the Chat row in the code map). They share one API key (`ClaudeKey`, Keychain, this device only).
+
 Tap the Mental bar on Today. The screen has the bar (tap for its components), a **What's going on?** card that opens the coach, two ranked lists of evidence-backed steps, past conversations, and the 988 line.
 
 ### Intervention catalog
 
-`Coach/InterventionCatalog.swift`, 12 entries. Each has an id, title, minutes, timing, steps, targets (Mental components), the activity kind it logs as, the main button's action, sensible hours, and one `Evidence`: citation, DOI, grade (A meta-analysis, B one RCT, C observational), effect size, outcome phrase and a plain-English finding. **Every effect size and DOI was checked against the paper's abstract or results text** (October 2026); entries whose dose or effect couldn't be confirmed were left out (music, and cyclic sighing's own trial, which reports no standardized effect).
+`Coach/InterventionCatalog.swift`, 12 entries. Each has an id, title, minutes, timing, steps, `fits` (the needs from today's data it helps with), the activity kind it logs as, the main button's action, sensible hours, and one `Evidence`: citation, DOI, grade (A meta-analysis, B one RCT, C observational), effect size, outcome phrase and a plain-English finding. **Every effect size and DOI was checked against the paper's abstract or results text** (October 2026); entries whose dose or effect couldn't be confirmed were left out (music, and cyclic sighing's own trial, which reports no standardized effect).
 
 - **Feel better now** (`.rightAway`, measured right after one session): brisk walk, time in nature, thought reframe (CBT), 10-minute nap.
 - **Build it up** (`.overWeeks`): cyclic sighing, mindfulness meditation, progressive muscle relaxation, three good things, self-compassion, acts of kindness, regular exercise, expressive writing.
@@ -161,6 +163,8 @@ Below it, "How long and how often" (Basso 2019; Parsons 2017: people in 8-week c
 - **Lag on purpose**: what you did on day D vs sleep ending the morning of D+1.
 - Binary inputs (meditated yes/no): difference in mean outcome with a bootstrap confidence interval. Continuous inputs (bedtime, minutes): Spearman correlation.
 - **Guardrails**: 21+ days total and 7+ days in each group; Benjamini-Hochberg correction across all pairs (test 50 pairs and 2 will "work" by luck); test suite includes a no-real-effect dataset that must produce zero findings.
+- **Carryover**: HRV, sleep and steps lean on yesterday, so n days are worth fewer independent ones. p-values use an effective sample size from both series' lag-1 autocorrelation (Bretherton et al. 1999). In simulation this takes the false-alarm rate for two drifting, unrelated series from 23% back to 5%.
+- **Built** (`Patterns/Stats`, `Patterns/PatternFinder`, shown in Insights): Spearman r for every pair, yes/no inputs also get with/without averages. Experiments and feeding the recommendation blend are still to come.
 - **Experiments**: "no caffeine after 2pm for 14 days" with a before/during comparison. Closer to cause and effect than mining correlations.
 - Confirmed personal effects feed the recommendation blend.
 
@@ -175,7 +179,10 @@ Below it, "How long and how often" (Basso 2019; Parsons 2017: people in 8-week c
 | Sync | | `Services/Sync/SyncService`, `BackgroundRefresh` |
 | Backup | `Backup/BackupDocument` (format, merge, pruning) | `Services/Backup/BackupService`, `Persistence/Repository` |
 | Run | `Run/RunTracker`, `Run/Polyline` | `Services/Location/RunRecorder`, `Features/Run` |
+| Training | `Training/RunningPlan` (weekly miles, green/yellow/red), `Training/TrainingAdvisor` (cardio/strength/both today), `Training/RunScreenshotParser` | `Features/Run/RunningView`, `Shared/TrainingInput`, `Services/ScreenshotReader`, Today's training card |
 | Meditation | `Meditation/MeditationTimer`, `Meditation/MeditationGuide` (styles, plan, findings) | `Features/Meditation`, `Services/Notifications` |
+| Patterns | `Patterns/Stats`, `Patterns/PatternFinder` | `Features/Insights` |
+| Chat | `Coach/CoachBriefing` (system prompt + data snapshot, app links) | `Services/Coach/CoachSession` (Messages API, streamed, `claude-haiku-5-5`), `Features/Coach/CoachView`; notes in Settings |
 | Mood | `Mood/MoodScale` | `Features/Log` |
 | Morning brief | `Briefing/MorningBrief` | `AppModel` (send/retry), `Services/Notifications` |
 | Interventions | `Coach/Intervention` (estimate, personal blend, ranker), `Coach/InterventionCatalog` | `Features/Mental/MentalView`, `InterventionViews` |

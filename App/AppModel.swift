@@ -19,7 +19,10 @@ final class AppModel {
     /// navigate away, and there's only ever one GPS session.
     let runRecorder: RunRecorder
     let meditation: MeditationSession
+    /// The Mental screen's coach: structured steps, checked research, study lookup.
     let coach: CoachService
+    /// Open-ended chat with Claude Haiku about your data (the sparkles button on Today).
+    let chat: CoachSession
 
     /// Shown as an alert after something non-fatal goes wrong (e.g. Health write denied).
     var notice: String? {
@@ -27,6 +30,8 @@ final class AppModel {
     }
     /// Whether iOS has already shown the Health permission sheet. Nil until checked.
     private(set) var healthAsked: Bool?
+    /// Running workouts from Apple Health over the last 120 days. Refreshed on foreground.
+    private(set) var healthRuns: [HealthKitRun] = []
 
     init(container: ModelContainer) {
         let oura = OuraAccount()
@@ -40,6 +45,7 @@ final class AppModel {
         self.runRecorder = RunRecorder(usesMiles: Units.defaultUsesMiles)
         self.meditation = MeditationSession()
         self.coach = CoachService()
+        self.chat = CoachSession()
     }
 
     var context: ModelContext { container.mainContext }
@@ -48,7 +54,9 @@ final class AppModel {
 
     func onForeground() async {
         await applyReminderSettings()
+        await refreshHealthStatus()
         await sync.syncIfStale(context: context)
+        await refreshRuns()
         markMorningBriefSeenIfLooking()
         await backup.backupIfDue(context: context)
         BackgroundRefresh.schedule()
@@ -77,6 +85,62 @@ final class AppModel {
         } catch {
             notice = "Apple Health: \(error.localizedDescription)"
         }
+    }
+
+    // MARK: Running
+
+    func refreshRuns() async {
+        let end = Date.now
+        let start = Calendar.current.date(byAdding: .day, value: -120, to: end) ?? end
+        healthRuns = await healthKit.runs(from: start, to: end)
+        Log.health.info("Runs from Health: \(healthRuns.count)")
+    }
+
+    /// A run Apple Health doesn't have: a Strava screenshot, treadmill miles.
+    func logManualRun(miles: Double, on date: Date) {
+        context.insert(ActivityLog(timestamp: date, kind: .run, distanceMeters: miles * RunningPlan.metersPerMile, source: .manual))
+        save()
+        Log.app.info("Run added by hand")
+    }
+
+    // MARK: Coach
+
+    /// Everything the coach gets told about you, read fresh when a chat starts.
+    func coachSnapshot() -> CoachBriefing.Snapshot {
+        let snapshots = (try? context.fetch(FetchDescriptor<DailySnapshot>())) ?? []
+        let moods = (try? context.fetch(FetchDescriptor<MoodEntry>())) ?? []
+        let gratitude = ((try? context.fetch(FetchDescriptor<GratitudeEntry>())) ?? []).filter { $0.deletedAt == nil }
+        let activities = ((try? context.fetch(FetchDescriptor<ActivityLog>())) ?? []).filter { $0.deletedAt == nil }
+        let input = BarsInput(snapshots: snapshots, moods: moods, gratitude: gratitude, activities: activities)
+        let training = TrainingInput(healthRuns: healthRuns, activities: activities)
+
+        var logged: [DayKey: Set<ActivityKind>] = [:]
+        for log in activities {
+            if let kind = log.activityKind { logged[DayKey(date: log.timestamp), default: []].insert(kind) }
+        }
+        let today = DayKey(date: .now)
+        let firstLog = (activities.map(\.timestamp) + gratitude.map(\.date)).min()
+        let patterns = PatternFinder.find(
+            in: PatternData(sensors: input.sensors, reports: input.reports, activities: logged,
+                            loggingStart: firstLog.map { DayKey(date: $0) }),
+            days: DayKey.range(from: today.adding(days: -120), through: today)
+        )
+
+        let defaults = UserDefaults.standard
+        return CoachBriefing.Snapshot(
+            now: .now,
+            bars: [input.display(.physical), input.display(.mental)],
+            sensors: input.sensors,
+            reports: input.reports,
+            activities: logged,
+            runs: training.runs,
+            checkIns: RunCheckIns.decode(defaults.string(forKey: PrefKey.runCheckIns) ?? ""),
+            plan: RunPlanSettings.plan(start: defaults.string(forKey: PrefKey.runPlanStart) ?? "",
+                                       miles: defaults.double(forKey: PrefKey.runPlanStartMiles)),
+            strengthDays: training.strengthDays,
+            patterns: patterns,
+            notes: defaults.string(forKey: PrefKey.coachNotes) ?? ""
+        )
     }
 
     // MARK: Bars

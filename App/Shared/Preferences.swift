@@ -23,6 +23,14 @@ enum PrefKey {
     /// Counts for `RankingSignals.currentEnergyWindow`.
     static let energyNow = "energyNow"
     static let energyNowAt = "energyNowAt"
+    /// Running plan: first Monday (yyyy-MM-dd) and that week's miles. Empty until set up.
+    static let runPlanStart = "runPlanStart"
+    static let runPlanStartMiles = "runPlanStartMiles"
+    /// JSON [yyyy-MM-dd: green/yellow/red], one per run day.
+    static let runCheckIns = "runCheckIns"
+    static let trainingGoal = "trainingGoal"
+    /// What you want the coach to know (history, goals). Sent with each chat, never logged.
+    static let coachNotes = "coachNotes"
 
     /// Registered at launch so `@AppStorage` defaults and direct UserDefaults reads agree.
     static let defaults: [String: Any] = [

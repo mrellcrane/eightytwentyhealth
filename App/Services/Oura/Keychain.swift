@@ -1,7 +1,8 @@
 import Foundation
 import Security
 
-/// Tiny Keychain wrapper for the Oura tokens and the Claude API key.
+/// Tiny Keychain wrapper for the Oura tokens and the Claude API key (one key,
+/// shared by the Mental screen coach and the chat; see `ClaudeKey`).
 ///
 /// Stored "this device only" on purpose: Oura refresh tokens are single-use, so
 /// two phones sharing one token would knock each other out. On a new phone you

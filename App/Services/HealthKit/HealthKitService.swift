@@ -10,6 +10,13 @@ struct HealthKitMood: Sendable {
     let labels: [String]
 }
 
+/// A running workout from any app (Apple Fitness, this app's recorder).
+struct HealthKitRun: Sendable {
+    let uuid: UUID
+    let start: Date
+    let meters: Double
+}
+
 struct HealthKitDailyExtras {
     var steps: [DayKey: Double] = [:]
     var vo2Max: [DayKey: Double] = [:]
@@ -34,6 +41,7 @@ final class HealthKitService {
             HKQuantityType(.vo2Max),
             HKCategoryType(.mindfulSession),
             HKObjectType.workoutType(),
+            HKQuantityType(.distanceWalkingRunning),
             HKSampleType.stateOfMindType(),
         ]
     }
@@ -74,6 +82,21 @@ final class HealthKitService {
         extras.mindfulMinutes = (try? await dailyDurationMinutes(of: HKCategoryType(.mindfulSession), from: start, to: end)) ?? [:]
         extras.workoutMinutes = (try? await dailyDurationMinutes(of: HKObjectType.workoutType(), from: start, to: end)) ?? [:]
         return extras
+    }
+
+    /// Running workouts with their distance, from every app including this one: the
+    /// running plan dedupes against our own log by Health UUID.
+    func runs(from start: Date, to end: Date) async -> [HealthKitRun] {
+        guard isAvailable else { return [] }
+        let workouts = (try? await samples(of: HKObjectType.workoutType(), from: start, to: end)) ?? []
+        let distance = HKQuantityType(.distanceWalkingRunning)
+        return workouts.compactMap { sample in
+            guard let workout = sample as? HKWorkout, workout.workoutActivityType == .running else { return nil }
+            let meters = workout.statistics(for: distance)?.sumQuantity()?.doubleValue(for: .meter())
+                ?? workout.totalDistance?.doubleValue(for: .meter())
+            guard let meters, meters > 0 else { return nil }
+            return HealthKitRun(uuid: workout.uuid, start: workout.startDate, meters: meters)
+        }
     }
 
     /// Moods you logged in Apple's Health app (or another app), for import.

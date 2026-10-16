@@ -37,7 +37,7 @@ public enum ActivityKind: String, Codable, CaseIterable, Sendable, Identifiable 
         case .breathwork: return "Breathwork"
         case .run: return "Run"
         case .walk: return "Walk"
-        case .workout: return "Workout"
+        case .workout: return "Strength"
         case .yoga: return "Yoga"
         case .sunlight: return "Morning sunlight"
         case .nature: return "Time in nature"

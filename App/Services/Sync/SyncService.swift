@@ -17,6 +17,13 @@ final class SyncService {
 
     private(set) var lastSyncedAt: Date? = UserDefaults.standard.object(forKey: "lastSyncedAt") as? Date
 
+    /// Per source, for the one line each on Today: the last sync that worked,
+    /// and whether the latest try failed (details stay in `lastError`).
+    private(set) var ouraSyncedAt: Date? = UserDefaults.standard.object(forKey: "ouraSyncedAt") as? Date
+    private(set) var healthSyncedAt: Date? = UserDefaults.standard.object(forKey: "healthSyncedAt") as? Date
+    private(set) var ouraFailed = false
+    private(set) var healthFailed = false
+
     /// Bump when `OuraDayAssembler` changes how it reads history, so cached days
     /// get rebuilt once. v2: a short morning "sleep" no longer counts as the night.
     private static let backfillKey = "ouraBackfilled.v2"
@@ -56,6 +63,9 @@ final class SyncService {
 
         var sensors: [DayKey: SensorDay] = [:]
         var errors: [String] = []
+        var ouraOK = false
+        var healthOK = healthKit.isAvailable
+        var saved = true
 
         // 1. Oura
         if oura.isConnected {
@@ -65,6 +75,7 @@ final class SyncService {
                 if days == Self.initialHistoryDays { ouraBackfilled = true }
                 try repository.insertImported(OuraActivityMapper.activities(from: bundle.sessions))
                 try repository.insertImported(OuraActivityMapper.activities(from: bundle.tags))
+                ouraOK = true
             } catch OuraError.unauthorized, OuraError.notConnected {
                 Log.sync.error("Oura auth failed during sync; disconnecting")
                 await oura.disconnect()
@@ -98,6 +109,7 @@ final class SyncService {
         do {
             try repository.upsert(sensors)
         } catch {
+            saved = false
             errors.append("Saving: \(error.localizedDescription)")
         }
 
@@ -106,6 +118,7 @@ final class SyncService {
         do {
             try repository.insertImported(moods)
         } catch {
+            healthOK = false
             errors.append("Mood import: \(error.localizedDescription)")
         }
 
@@ -119,6 +132,18 @@ final class SyncService {
         if errors.isEmpty || !sensors.isEmpty {
             lastSyncedAt = .now
             UserDefaults.standard.set(lastSyncedAt, forKey: "lastSyncedAt")
+        }
+
+        let now = Date()
+        ouraFailed = oura.isConnected && !(ouraOK && saved)
+        if ouraOK && saved {
+            ouraSyncedAt = now
+            UserDefaults.standard.set(now, forKey: "ouraSyncedAt")
+        }
+        healthFailed = healthKit.isAvailable && !(healthOK && saved)
+        if healthOK && saved {
+            healthSyncedAt = now
+            UserDefaults.standard.set(now, forKey: "healthSyncedAt")
         }
     }
 

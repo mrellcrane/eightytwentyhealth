@@ -22,6 +22,7 @@ struct SettingsView: View {
     @AppStorage(PrefKey.workEndMinutes) private var workEndMinutes = 16 * 60
     @AppStorage(PrefKey.workWeekdaysOnly) private var workWeekdaysOnly = true
 
+    @AppStorage(PrefKey.coachNotes) private var coachNotes = ""
     @State private var connecting = false
     @State private var latestBackupURL: URL?
     @State private var importing = false
@@ -32,6 +33,7 @@ struct SettingsView: View {
             ouraSection
             healthSection
             ClaudeKeySection()
+            coachSection
             backupSection
             sleepAndMorningSection
             workSection
@@ -136,6 +138,20 @@ struct SettingsView: View {
                 + (model.healthAsked == true ? " To change what 80/20 can read or write: Health app > your profile picture > Apps > 80/20." : ""))
         }
         .task { await model.refreshHealthStatus() }
+    }
+
+    // MARK: Coach
+
+    /// Notes for the chat. The API key lives in `ClaudeKeySection`, shared by both coaches.
+    private var coachSection: some View {
+        Section {
+            TextEditor(text: $coachNotes)
+                .frame(minHeight: 120)
+        } header: {
+            Text("Notes for the chat")
+        } footer: {
+            Text("Your history, injuries, goals, anything the chat (the sparkles on Today) should keep in mind. They stay on this iPhone and go to Claude with each chat.")
+        }
     }
 
     // MARK: Backups

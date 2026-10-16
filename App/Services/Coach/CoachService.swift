@@ -2,21 +2,30 @@ import Foundation
 import SwiftData
 import EightyTwentyCore
 
-/// Your Claude API key, in this phone's Keychain. Never in the app binary (the repo is public).
+/// Your Claude API key, in this phone's Keychain. Never in the app binary (the repo
+/// is public). One key for both coaches: the Mental screen's and the chat.
 enum ClaudeKey {
     static let service = "eightytwenty.claude"
     private static let account = "apiKey"
+    /// Where the chat kept its key before the two shared one. Still read, so a key
+    /// pasted there works everywhere.
+    private static let chatAccount = "anthropic-api-key"
 
     static func load() -> String {
-        Keychain.data(for: account, service: service).map { String(decoding: $0, as: UTF8.self) } ?? ""
+        let key = Keychain.data(for: account, service: service).map { String(decoding: $0, as: UTF8.self) } ?? ""
+        if !key.isEmpty { return key }
+        return Keychain.data(for: chatAccount).map { String(decoding: $0, as: UTF8.self) } ?? ""
     }
 
     static func save(_ key: String) -> Bool {
-        Keychain.set(Data(key.utf8), for: account, service: service)
+        guard Keychain.set(Data(key.utf8), for: account, service: service) else { return false }
+        Keychain.delete(chatAccount)
+        return true
     }
 
     static func remove() {
         Keychain.delete(account, service: service)
+        Keychain.delete(chatAccount)
     }
 }
 
@@ -28,7 +37,13 @@ enum ClaudeKey {
 @MainActor
 @Observable
 final class CoachService {
-    private(set) var hasKey: Bool
+    /// Read from the Keychain each time: the chat can save or remove the shared key too.
+    /// `keyVersion` is only there so views here redraw after a save or remove.
+    var hasKey: Bool {
+        _ = keyVersion
+        return !ClaudeKey.load().isEmpty
+    }
+    private var keyVersion = 0
     private(set) var conversation: CoachConversation?
     /// The `CoachLog` that holds `conversation`.
     private(set) var logID: UUID?
@@ -45,7 +60,6 @@ final class CoachService {
     private let client: CoachClient
 
     init(transport: HTTPTransport = URLSessionTransport()) {
-        hasKey = !ClaudeKey.load().isEmpty
         client = CoachClient(transport: transport, apiKey: { ClaudeKey.load() })
     }
 
@@ -55,14 +69,14 @@ final class CoachService {
     func saveKey(_ key: String) -> Bool {
         let trimmed = key.trimmingCharacters(in: .whitespacesAndNewlines)
         guard !trimmed.isEmpty, ClaudeKey.save(trimmed) else { return false }
-        hasKey = true
+        keyVersion += 1
         Log.coach.info("API key saved")
         return true
     }
 
     func removeKey() {
         ClaudeKey.remove()
-        hasKey = false
+        keyVersion += 1
         Log.coach.info("API key removed")
     }
 

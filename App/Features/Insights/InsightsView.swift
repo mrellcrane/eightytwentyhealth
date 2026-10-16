@@ -3,15 +3,16 @@ import SwiftData
 import Charts
 import EightyTwentyCore
 
-/// Phase 1: trends and raw pictures. Phase 3 adds the correlation engine,
-/// which needs ~3 weeks of logging before it says anything.
+/// Trends, raw pictures, and personal patterns (`PatternFinder`), which need
+/// 3 weeks of data for a pair before they say anything.
 struct InsightsView: View {
     @Query private var snapshots: [DailySnapshot]
     @Query(filter: #Predicate<MoodEntry> { $0.deletedAt == nil }) private var moods: [MoodEntry]
     @Query(filter: #Predicate<GratitudeEntry> { $0.deletedAt == nil }) private var gratitude: [GratitudeEntry]
     @Query(filter: #Predicate<ActivityLog> { $0.deletedAt == nil }) private var activities: [ActivityLog]
 
-    private static let patternDaysNeeded = 21
+    private static let patternWindowDays = 120
+    private static let patternsShown = 5
 
     var body: some View {
         let input = BarsInput(snapshots: snapshots, moods: moods, gratitude: gratitude, activities: activities)
@@ -27,20 +28,33 @@ struct InsightsView: View {
                 Text("Your bars, last 30 days")
             }
 
+            let patterns = PatternFinder.find(
+                in: patternData(input: input),
+                days: DayKey.range(from: today.adding(days: -Self.patternWindowDays), through: today)
+            )
             Section {
                 let moodDays = input.moodDays()
-                VStack(alignment: .leading, spacing: 8) {
-                    ProgressView(value: Double(min(moodDays, Self.patternDaysNeeded)), total: Double(Self.patternDaysNeeded))
-                    Text(moodDays >= Self.patternDaysNeeded
-                         ? "Enough data. Pattern finding arrives in the next build."
-                         : "\(moodDays) of \(Self.patternDaysNeeded) days with a mood check-in. Patterns unlock after that.")
+                if moodDays < PatternFinder.minimumDays {
+                    Text("Mood pairs need \(PatternFinder.minimumDays) days with a check-in: \(moodDays) so far.")
                         .font(.subheadline)
+                        .foregroundStyle(.secondary)
                 }
-                .padding(.vertical, 4)
+                if patterns.isEmpty {
+                    Text("A pair shows up here once it has \(PatternFinder.minimumDays) days of data.")
+                        .font(.subheadline)
+                        .foregroundStyle(.secondary)
+                } else {
+                    ForEach(patterns.prefix(Self.patternsShown)) { PatternRow(pattern: $0) }
+                    if patterns.count > Self.patternsShown {
+                        DisclosureGroup("\(patterns.count - Self.patternsShown) more pairs") {
+                            ForEach(patterns.dropFirst(Self.patternsShown)) { PatternRow(pattern: $0) }
+                        }
+                    }
+                }
             } header: {
                 Text("Personal patterns")
             } footer: {
-                Text("Fewer days than this and any \"pattern\" is mostly luck.")
+                Text("r is Spearman's correlation, from -1 to 1. p allows for days running into each other; adjusted p also corrects for testing \(patterns.count) pairs at once. \"Holds up\" means adjusted p under 0.05. A pattern, not proof of cause.")
             }
 
             Section {
@@ -87,11 +101,7 @@ struct InsightsView: View {
 
     private func bedtimeChart(input: BarsInput, days: [DayKey]) -> some View {
         let points: [BedtimePoint] = days.compactMap { day in
-            guard let sensor = input.sensors[day], let bedtime = sensor.bedtimeStart, let hrv = sensor.averageHRV else { return nil }
-            // Hours relative to midnight: 22:30 -> -1.5, 01:02 -> 1.03.
-            let c = Calendar.current.dateComponents([.hour, .minute], from: bedtime)
-            var hours = Double(c.hour ?? 0) + Double(c.minute ?? 0) / 60
-            if hours > 12 { hours -= 24 }
+            guard let sensor = input.sensors[day], let hours = sensor.bedtimeHoursFromMidnight(), let hrv = sensor.averageHRV else { return nil }
             return BedtimePoint(day: day, hoursFromMidnight: hours, hrv: hrv)
         }
         // Fit the axis to your actual bedtimes (at least 9p-2a), one label per hour.
@@ -125,6 +135,20 @@ struct InsightsView: View {
         }
     }
 
+    private func patternData(input: BarsInput) -> PatternData {
+        var logged: [DayKey: Set<ActivityKind>] = [:]
+        for log in activities {
+            if let kind = log.activityKind { logged[DayKey(date: log.timestamp), default: []].insert(kind) }
+        }
+        let firstLog = (activities.map(\.timestamp) + gratitude.map(\.date)).min()
+        return PatternData(
+            sensors: input.sensors,
+            reports: input.reports,
+            activities: logged,
+            loggingStart: firstLog.map { DayKey(date: $0) }
+        )
+    }
+
     private static func clockLabel(_ hoursFromMidnight: Double) -> String {
         let hour = (Int(hoursFromMidnight.rounded()) + 24) % 24
         switch hour {
@@ -133,6 +157,40 @@ struct InsightsView: View {
         case 13...23: return "\(hour - 12)p"
         default: return "\(hour)a"
         }
+    }
+}
+
+private struct PatternRow: View {
+    let pattern: PersonalPattern
+
+    var body: some View {
+        VStack(alignment: .leading, spacing: 4) {
+            HStack(alignment: .firstTextBaseline) {
+                Text("\(pattern.input.title) → \(pattern.outcome.title)")
+                    .font(.subheadline.weight(.medium))
+                Spacer()
+                Text(String(format: "r %+.2f", pattern.r))
+                    .font(.subheadline.weight(.semibold).monospacedDigit())
+            }
+            .foregroundStyle(pattern.holdsUp ? HierarchicalShapeStyle.primary : .secondary)
+            Text(pattern.summary)
+                .font(.caption)
+            HStack(spacing: 4) {
+                if pattern.holdsUp {
+                    Image(systemName: "checkmark.seal.fill").foregroundStyle(.green)
+                    Text("Holds up ·")
+                }
+                Text("p \(PersonalPattern.formatP(pattern.p)) · adj. \(PersonalPattern.formatP(pattern.adjustedP)) · \(daysText)")
+            }
+            .font(.caption.monospacedDigit())
+            .foregroundStyle(.secondary)
+        }
+        .padding(.vertical, 2)
+    }
+
+    private var daysText: String {
+        let independent = Int(pattern.effectiveDays.rounded())
+        return independent < pattern.days ? "\(pattern.days) days, worth \(independent)" : "\(pattern.days) days"
     }
 }
 
