@@ -56,6 +56,10 @@
 	<string>80/20 saves your mood check-ins, meditations and runs to Apple Health so you have a second copy of everything.</string>
 	<key>NSLocationWhenInUseUsageDescription</key>
 	<string>80/20 uses GPS while you record a run to measure distance, pace and your route.</string>
+	<!-- Never requested (runs use While Using + a background activity session), but
+	     App Store validation expects it alongside the location background mode. -->
+	<key>NSLocationAlwaysAndWhenInUseUsageDescription</key>
+	<string>80/20 only uses your location while you record a run, including when the screen is locked.</string>
 
 	<!-- Background: GPS during runs, morning Oura sync, CloudKit sync pushes -->
 	<key>UIBackgroundModes</key>

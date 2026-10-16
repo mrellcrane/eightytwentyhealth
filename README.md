@@ -18,7 +18,15 @@ See [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md) for the full design.
 
 ## Setup
 
-Xcode 16+, iOS 18+, paid developer account (for CloudKit).
+**Fastest:** let Claude Code on your Mac do it. It follows [docs/LOCAL_SETUP.md](docs/LOCAL_SETUP.md), drives your Chrome for the Apple and Oura pages, builds to your phone and sets up TestFlight:
+
+```sh
+git clone https://github.com/mrellcrane/eightytwentyhealth.git ~/Developer/eightytwentyhealth
+cd ~/Developer/eightytwentyhealth && git checkout claude/inspiring-goodall-huc7gh
+claude --chrome "Follow docs/LOCAL_SETUP.md"
+```
+
+**By hand:** Xcode 16+, iOS 18+, paid developer account (for CloudKit).
 
 1. **Oura app** (one time, about 2 minutes). The Oura connector in Claude uses its own registration, which this app can't reuse, and Oura retired personal tokens. At <https://cloud.ouraring.com/oauth/applications> create a new application: any name and description, Redirect URI `eightytwenty://oauth-callback`. Copy the client ID and secret.
 2. **Secrets:**
