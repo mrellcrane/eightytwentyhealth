@@ -19,16 +19,19 @@ final class MeditationSession {
         startedAt = now
         timer.start(at: now)
         scheduleBells(notifications)
+        Log.meditation.info("Started, interval bell \(bellMinutes > 0 ? "on" : "off")")
     }
 
     func pause(notifications: NotificationService) {
         timer.pause(at: .now)
         notifications.cancelMeditationBells()
+        Log.meditation.info("Paused")
     }
 
     func resume(notifications: NotificationService) {
         timer.resume(at: .now)
         scheduleBells(notifications)
+        Log.meditation.info("Resumed")
     }
 
     /// Called every second by the view. Returns true the moment the session completes.
@@ -41,20 +44,28 @@ final class MeditationSession {
         next.update(at: now)
         guard next != timer else { return false }
         timer = next
-        return next.state == .completed
+        guard next.state == .completed else { return false }
+        Log.meditation.info("Completed")
+        return true
     }
 
     func endEarly(notifications: NotificationService) {
         timer.end(at: .now)
         notifications.cancelMeditationBells()
+        Log.meditation.info("Ended early")
     }
 
     func log(using model: AppModel) async {
-        guard loggedMinutes == nil, let startedAt, let minutes = timer.loggableMinutes(at: .now) else { return }
+        guard loggedMinutes == nil, let startedAt else { return }
+        guard let minutes = timer.loggableMinutes(at: .now) else {
+            Log.meditation.info("Under a minute, not logged")
+            return
+        }
         loggedMinutes = minutes
         // If the session finished while the phone was locked, "now" is later than
         // the real end; the sat minutes from the start are the honest record.
         await model.logMeditation(start: startedAt, end: startedAt.addingTimeInterval(minutes * 60), minutes: minutes)
+        Log.meditation.info("Logged")
     }
 
     func reset() {
@@ -108,7 +119,11 @@ struct MeditationView: View {
         .onChange(of: session.state) { _, state in
             UIApplication.shared.isIdleTimerDisabled = state == .running
         }
-        .onDisappear { UIApplication.shared.isIdleTimerDisabled = false }
+        .onAppear { Log.meditation.info("Opened, \(session.state)") }
+        .onDisappear {
+            UIApplication.shared.isIdleTimerDisabled = false
+            Log.meditation.info("Closed, \(session.state)")
+        }
     }
 
     private func ring(at now: Date) -> some View {

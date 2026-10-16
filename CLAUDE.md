@@ -22,9 +22,10 @@ Personal iOS app (SwiftUI, SwiftData + CloudKit, HealthKit, Oura API v2). One us
 
 The app sends its log lines and errors to Sentry (`App/Shared/Log.swift`). Use them to find and confirm bugs before changing code.
 
-- `Log.<category>.info / warning / error("...")`. Categories: app, oura, sync, health, backup. `error` also opens a Sentry issue.
+- `Log.<category>.info / warning / error("...")`. Categories: app, oura, sync, health, backup, meditation. `error` also opens a Sentry issue.
 - **Never log health values, tokens, notes, or anything the user wrote.** Status codes, counts, endpoint names and error descriptions are fine.
 - Environments: `debug` (Xcode builds), `testflight`, `production`.
+- TestFlight crashes and hangs show function names only if CI uploaded that build's dSYMs, which needs the `SENTRY_AUTH_TOKEN` Actions secret (a Sentry organization auth token). Xcode builds don't upload them.
 
 Querying (org and project come from the environment; the auth token is either `$SENTRY_AUTH_TOKEN` or injected for sentry.io by the environment's network secret). The network secret must be scoped to the path `/api/0/` (zero, not the letter o); otherwise every call returns 401 `Authentication credentials were not provided.` If a `jq` below fails with `Cannot iterate over null` or `Cannot index string`, the API returned an error object: rerun without `jq` to read it.
 

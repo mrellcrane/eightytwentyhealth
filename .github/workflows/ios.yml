@@ -8,6 +8,8 @@
 #   APPLE_TEAM_ID                           10-character team ID
 #   OURA_CLIENT_ID, OURA_CLIENT_SECRET      from cloud.ouraring.com/oauth/applications
 #   SENTRY_DSN                              optional; Sentry project DSN, sends app logs to sentry.io
+#   SENTRY_AUTH_TOKEN                       optional; Sentry organization auth token, uploads dSYMs so
+#                                           crashes and hangs show function names and lines
 name: iOS
 
 on:
@@ -136,3 +138,20 @@ jobs:
 
           rm -f "$KEY_PATH"
           echo "Uploaded build $BUILD_NUMBER. It shows up in TestFlight after Apple finishes processing (usually 5 to 15 minutes)."
+
+      # Runs after the TestFlight upload, so a failure here can't keep a build off TestFlight.
+      - name: Upload dSYMs to Sentry
+        if: steps.mode.outputs.testflight == 'true'
+        env:
+          SENTRY_AUTH_TOKEN: ${{ secrets.SENTRY_AUTH_TOKEN }}
+          SENTRY_PROJECT: apple-ios
+        run: |
+          set -euo pipefail
+          if [ -z "$SENTRY_AUTH_TOKEN" ]; then
+            echo "::notice::No SENTRY_AUTH_TOKEN secret: skipping dSYM upload, so Sentry stack traces stay unsymbolicated."
+            exit 0
+          fi
+          DSYMS="$RUNNER_TEMP/EightyTwenty.xcarchive/dSYMs"
+          ls "$DSYMS"
+          brew install getsentry/tools/sentry-cli
+          sentry-cli debug-files upload --include-sources "$DSYMS"
