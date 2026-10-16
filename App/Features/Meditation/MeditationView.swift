@@ -36,10 +36,17 @@ final class MeditationSession {
     }
 
     /// Called every second by the view. Returns true the moment the session completes.
+    ///
+    /// Writes `timer` only when it actually changes. Every write re-renders the
+    /// screen, which used to restart the TimelineView, which ticked again: a loop
+    /// that froze the app as soon as Meditate opened. (Same fix as 40d3c92 on
+    /// claude/busy-hawking-5jpn3w.)
     func tick(at now: Date) -> Bool {
-        let wasRunning = timer.state == .running
-        timer.update(at: now)
-        return wasRunning && timer.state == .completed
+        var next = timer
+        next.update(at: now)
+        guard next != timer else { return false }
+        timer = next
+        return next.state == .completed
     }
 
     func endEarly(notifications: NotificationService) {
@@ -78,6 +85,9 @@ struct MeditationView: View {
     @AppStorage(PrefKey.energyNow) private var energyNow = 0
     @AppStorage(PrefKey.energyNowAt) private var energyNowAt = 0.0
     @State private var selectedStyle: MeditationStyle = .breath
+    /// Fixed anchor for the clock. `.periodic(from: .now, ...)` made a new schedule on
+    /// every re-render, which fired `onChange(of: context.date)` again straight away.
+    @State private var clockStart = Date()
 
     @Query private var snapshots: [DailySnapshot]
     @Query(filter: #Predicate<MoodEntry> { $0.deletedAt == nil }) private var moods: [MoodEntry]
@@ -95,33 +105,34 @@ struct MeditationView: View {
         // Worked out once per data change, not on every timer tick.
         let plan = currentPlan()
         let practiced = practicedDays()
-        TimelineView(.periodic(from: .now, by: 1)) { context in
-            ScrollView {
-                VStack(spacing: 28) {
+        ScrollView {
+            VStack(spacing: 28) {
+                // Only the ring redraws every second; the rest of the screen doesn't.
+                TimelineView(.periodic(from: clockStart, by: 1)) { context in
                     ring(at: context.date)
-                        .padding(.top, 8)
-                    if session.state != .ready {
-                        Text(session.style.title).font(.headline).foregroundStyle(.secondary)
-                    }
-                    controls
-                    if session.state == .ready {
-                        settings
-                        planCard(plan, practiced: practiced)
-                        guideSection("How long and how often",
-                                     intro: "Daily beats long, and expect changes over weeks, not days.",
-                                     findings: MeditationGuide.dose)
-                        guideSection("What the research says",
-                                     intro: "Mindfulness meditation unless noted. Grade A is a meta-analysis, B one randomized trial.",
-                                     findings: MeditationGuide.findings + MeditationGuide.styles)
-                    }
+                        .onChange(of: context.date) { _, now in
+                            if session.tick(at: now) {
+                                Task { await session.log(using: model) }
+                            }
+                        }
                 }
-                .padding()
-            }
-            .onChange(of: context.date) { _, now in
-                if session.tick(at: now) {
-                    Task { await session.log(using: model) }
+                .padding(.top, 8)
+                if session.state != .ready {
+                    Text(session.style.title).font(.headline).foregroundStyle(.secondary)
+                }
+                controls
+                if session.state == .ready {
+                    settings
+                    planCard(plan, practiced: practiced)
+                    guideSection("How long and how often",
+                                 intro: "Daily beats long, and expect changes over weeks, not days.",
+                                 findings: MeditationGuide.dose)
+                    guideSection("What the research says",
+                                 intro: "Mindfulness meditation unless noted. Grade A is a meta-analysis, B one randomized trial.",
+                                 findings: MeditationGuide.findings + MeditationGuide.styles)
                 }
             }
+            .padding()
         }
         .navigationTitle("Meditate")
         .navigationBarTitleDisplayMode(.inline)
