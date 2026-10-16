@@ -132,5 +132,6 @@ Starter catalog candidates: mindfulness meditation (Goyal 2014, JAMA Intern Med)
 | Training | `Training/RunningPlan` (weekly miles, green/yellow/red), `Training/TrainingAdvisor` (cardio/strength/both today), `Training/RunScreenshotParser` | `Features/Run/RunningView`, `Shared/TrainingInput`, `Services/ScreenshotReader`, Today's training card |
 | Meditation | `Meditation/MeditationTimer` | `Features/Meditation`, `Services/Notifications` |
 | Patterns | `Patterns/Stats`, `Patterns/PatternFinder` | `Features/Insights` |
+| Coach | `Coach/CoachBriefing` (system prompt + data snapshot, app links) | `Services/Coach/CoachSession` (Messages API, streamed, `claude-haiku-5-5`), `Features/Coach/CoachView`; key in Keychain, notes in Settings |
 | Mood | `Mood/MoodScale` | `Features/Log` |
 | Morning brief | `Briefing/MorningBrief` | `AppModel` (send/retry), `Services/Notifications` |

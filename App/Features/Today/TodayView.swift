@@ -64,6 +64,15 @@ struct TodayView: View {
             .padding()
         }
         .navigationTitle("Today")
+        .toolbar {
+            ToolbarItem(placement: .topBarTrailing) {
+                NavigationLink {
+                    CoachView()
+                } label: {
+                    Label("Coach", systemImage: "sparkles")
+                }
+            }
+        }
         .refreshable { await model.sync.sync(context: context) }
         .sheet(isPresented: $showingMood) { MoodCheckInView() }
         .sheet(isPresented: $showingGratitude) { GratitudeView() }

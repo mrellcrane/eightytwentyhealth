@@ -1,7 +1,8 @@
 import Foundation
 import Security
 
-/// Tiny Keychain wrapper for the Oura tokens.
+/// Tiny Keychain wrapper for the Oura tokens (and the coach's Anthropic API key,
+/// under the same service name so nothing already stored moves).
 ///
 /// Stored "this device only" on purpose: Oura refresh tokens are single-use, so
 /// two phones sharing one token would knock each other out. On a new phone you

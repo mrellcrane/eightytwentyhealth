@@ -19,6 +19,8 @@ struct SettingsView: View {
     @AppStorage(PrefKey.windDownLeadMinutes) private var windDownLeadMinutes = 45
     @AppStorage(PrefKey.morningBriefOn) private var morningBriefOn = true
 
+    @AppStorage(PrefKey.coachNotes) private var coachNotes = ""
+    @State private var hasCoachKey = CoachSession.hasKey
     @State private var connecting = false
     @State private var latestBackupURL: URL?
     @State private var importing = false
@@ -28,6 +30,7 @@ struct SettingsView: View {
         Form {
             ouraSection
             healthSection
+            coachSection
             backupSection
             sleepAndMorningSection
             remindersSection
@@ -131,6 +134,30 @@ struct SettingsView: View {
                 + (model.healthAsked == true ? " To change what 80/20 can read or write: Health app > your profile picture > Apps > 80/20." : ""))
         }
         .task { await model.refreshHealthStatus() }
+    }
+
+    // MARK: Coach
+
+    private var coachSection: some View {
+        Section {
+            TextEditor(text: $coachNotes)
+                .frame(minHeight: 120)
+            if hasCoachKey {
+                Button("Remove Claude API key", role: .destructive) {
+                    CoachSession.deleteKey()
+                    hasCoachKey = CoachSession.hasKey
+                }
+            } else {
+                Text("Add your Claude API key the first time you open Coach (the sparkles on Today).")
+                    .font(.footnote)
+                    .foregroundStyle(.secondary)
+            }
+        } header: {
+            Text("Coach")
+        } footer: {
+            Text("Notes for your coach: your history, injuries, goals, anything it should keep in mind. They stay on this iPhone and go to Claude with each chat.")
+        }
+        .onAppear { hasCoachKey = CoachSession.hasKey }
     }
 
     // MARK: Backups
