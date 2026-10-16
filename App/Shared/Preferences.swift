@@ -19,6 +19,10 @@ enum PrefKey {
     static let workStartMinutes = "workStartMinutes"
     static let workEndMinutes = "workEndMinutes"
     static let workWeekdaysOnly = "workWeekdaysOnly"
+    /// "Energy right now", 1-5 (0 = not rated), and when, as seconds since 1970.
+    /// Counts for `RankingSignals.currentEnergyWindow`.
+    static let energyNow = "energyNow"
+    static let energyNowAt = "energyNowAt"
 
     /// Registered at launch so `@AppStorage` defaults and direct UserDefaults reads agree.
     static let defaults: [String: Any] = [

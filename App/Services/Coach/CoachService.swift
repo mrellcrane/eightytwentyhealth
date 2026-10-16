@@ -133,6 +133,13 @@ final class CoachService {
 
     func makeContext(checkIn: CoachContext.CheckIn?, modelContext: ModelContext, now: Date = .now) -> CoachContext {
         let defaults = UserDefaults.standard
+        // A recent "energy right now" rating counts as part of what you're reporting.
+        var checkIn = checkIn
+        if checkIn?.energy == nil, let energy = Recommendations.storedEnergy(now: now) {
+            var merged = checkIn ?? CoachContext.CheckIn()
+            merged.energy = energy.level
+            checkIn = merged
+        }
         let input = BarsInput(
             snapshots: (try? modelContext.fetch(FetchDescriptor<DailySnapshot>())) ?? [],
             moods: (try? modelContext.fetch(FetchDescriptor<MoodEntry>())) ?? [],
@@ -217,6 +224,6 @@ final class CoachService {
 extension ActivityLog {
     var interventionLog: InterventionLog {
         InterventionLog(interventionID: interventionID, title: displayTitle, timestamp: timestamp,
-                        intensityBefore: intensityBefore, intensityAfter: intensityAfter)
+                        intensityBefore: intensityBefore, intensityAfter: intensityAfter, kind: activityKind)
     }
 }

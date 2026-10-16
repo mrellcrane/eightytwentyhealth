@@ -13,6 +13,8 @@ struct TodayView: View {
 
     @AppStorage(PrefKey.windDownOn) private var windDownOn = true
     @AppStorage(PrefKey.bedtimeMinutes) private var bedtimeMinutes = 22 * 60 + 15
+    @AppStorage(PrefKey.energyNow) private var energyNow = 0
+    @AppStorage(PrefKey.energyNowAt) private var energyNowAt = 0.0
 
     @State private var showingMood = false
     @State private var showingGratitude = false
@@ -51,20 +53,7 @@ struct TodayView: View {
                     }
                 }
 
-                if let top = topPick(mental: mental) {
-                    VStack(alignment: .leading, spacing: 10) {
-                        Text("Your 80/20 right now").font(.title3.bold())
-                        NavigationLink {
-                            InterventionDetailView(intervention: top.intervention, personal: top.personal)
-                        } label: {
-                            InterventionRow(ranked: top)
-                                .frame(maxWidth: .infinity, alignment: .leading)
-                                .padding()
-                                .background(.background.secondary, in: RoundedRectangle(cornerRadius: 12))
-                        }
-                        .buttonStyle(.plain)
-                    }
-                }
+                topPicks(input: input, mental: mental)
 
                 syncStatus
             }
@@ -83,12 +72,30 @@ struct TodayView: View {
         }
     }
 
-    /// The best "feel better now" step for this hour, ranked like the Mental screen.
-    private func topPick(mental: BarDisplay) -> RankedIntervention? {
-        let personal = PersonalEffect.compute(activities.map(\.interventionLog))
-        return InterventionRanker.rank(mental: mental.today, personal: personal,
-                                       hour: Calendar.current.component(.hour, from: .now))
-            .first { $0.intervention.timing == .rightAway }
+    /// The three best steps for right now, ranked from today's data like the Mental screen.
+    private func topPicks(input: BarsInput, mental: BarDisplay) -> some View {
+        let signals = Recommendations.signals(input: input, mental: mental, moods: moods, activities: activities,
+                                              energy: Recommendations.energy(level: energyNow, at: energyNowAt))
+        let picks = Recommendations.rank(signals, activities: activities).filter { !$0.doneToday }.prefix(3)
+        return VStack(alignment: .leading, spacing: 10) {
+            Text("Your 80/20 right now").font(.title3.bold())
+            EnergyNowPicker()
+            ForEach(Array(picks), id: \.intervention.id) { item in
+                NavigationLink {
+                    InterventionDetailView(intervention: item.intervention, personal: item.personal)
+                } label: {
+                    InterventionRow(ranked: item)
+                        .frame(maxWidth: .infinity, alignment: .leading)
+                        .padding()
+                        .background(.background.secondary, in: RoundedRectangle(cornerRadius: 12))
+                }
+                .buttonStyle(.plain)
+            }
+            NavigationLink { MentalView() } label: {
+                Label("Why these, and everything else", systemImage: "list.bullet")
+                    .font(.subheadline)
+            }
+        }
     }
 
     private var quickActions: some View {

@@ -54,6 +54,11 @@ struct AskView: View {
                         }
                         .disabled(coach.isThinking)
                     }
+                } else {
+                    // Up here so the keyboard never covers it.
+                    ToolbarItem(placement: .confirmationAction) {
+                        Button("Ask", action: ask).disabled(!canAsk)
+                    }
                 }
             }
             .sheet(item: $logging) { item in
@@ -79,6 +84,14 @@ struct AskView: View {
                       text: $question, axis: .vertical)
                 .lineLimit(4...10)
                 .focused($focus, equals: .question)
+                .submitLabel(.send)
+                .onChange(of: question) { _, text in
+                    // Return sends instead of starting a new line.
+                    if text.hasSuffix("\n") {
+                        question = String(text.dropLast())
+                        ask()
+                    }
+                }
                 .padding(12)
                 .background(.background.secondary, in: RoundedRectangle(cornerRadius: 12))
 
@@ -137,7 +150,7 @@ struct AskView: View {
             }
             .buttonStyle(.borderedProminent)
             .controlSize(.large)
-            .disabled(question.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty || !coach.hasKey)
+            .disabled(!canAsk)
 
             DisclosureGroup("What Claude sees", isExpanded: $showingContext) {
                 ContextText(text: preview)
@@ -156,12 +169,17 @@ struct AskView: View {
         return checkIn.isEmpty ? nil : checkIn
     }
 
+    private var canAsk: Bool {
+        coach.hasKey && !question.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty
+    }
+
     private func ask() {
         let text = question.trimmingCharacters(in: .whitespacesAndNewlines)
-        guard !text.isEmpty else { return }
+        guard canAsk, coach.conversation == nil else { return }
         focus = nil
         // The context is built first, so the check-in below doesn't show up twice.
         coach.begin(text, checkIn: checkIn, modelContext: context)
+        if let energy { Recommendations.saveEnergy(energy) }
         if let face {
             let energy = energy
             let emotions = emotions.sorted()
@@ -227,6 +245,13 @@ struct AskView: View {
                     TextField("Follow up, like \"I can't nap at work\"", text: $followUp, axis: .vertical)
                         .lineLimit(1...5)
                         .focused($focus, equals: .followUp)
+                        .submitLabel(.send)
+                        .onChange(of: followUp) { _, text in
+                            if text.hasSuffix("\n") {
+                                followUp = String(text.dropLast())
+                                sendFollowUp()
+                            }
+                        }
                         .padding(10)
                         .background(.background.secondary, in: RoundedRectangle(cornerRadius: 12))
                     Button(action: sendFollowUp) {
@@ -244,7 +269,7 @@ struct AskView: View {
 
     private func sendFollowUp() {
         let text = followUp.trimmingCharacters(in: .whitespacesAndNewlines)
-        guard !text.isEmpty else { return }
+        guard !text.isEmpty, coach.hasKey, coach.conversation?.awaitingReply == false else { return }
         focus = nil
         followUp = ""
         coach.followUp(text, modelContext: context)

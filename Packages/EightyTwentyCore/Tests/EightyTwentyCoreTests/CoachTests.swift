@@ -35,9 +35,7 @@ final class InterventionCatalogTests: XCTestCase {
             XCTAssertFalse(item.summary.isEmpty, item.id)
             XCTAssertFalse(item.steps.isEmpty, item.id)
             XCTAssertFalse(item.steps.contains { $0.isEmpty }, item.id)
-            XCTAssertFalse(item.targets.isEmpty, item.id)
-            XCTAssertTrue(item.targets.isSubset(of: [.mood, .stressBalance, .mentalSleep, .practice]),
-                          "\(item.id) targets a Physical component")
+            XCTAssertFalse(item.fits.isEmpty, item.id)
             XCTAssertGreaterThan(item.minutes, 0, item.id)
             if let hours = item.hours {
                 XCTAssertTrue((0...23).contains(hours.lowerBound) && (0...23).contains(hours.upperBound), item.id)
@@ -90,53 +88,182 @@ final class EffectEstimateTests: XCTestCase {
 }
 
 final class InterventionRankerTests: XCTestCase {
-    func item(_ id: String, effect: Double, minutes: Double = 5, targets: Set<ComponentID>,
-              hours: ClosedRange<Int>? = nil) -> Intervention {
+    func item(_ id: String, effect: Double, minutes: Double = 5, fits: Set<Intervention.Need>,
+              hours: ClosedRange<Int>? = nil, logsAs: ActivityKind = .other) -> Intervention {
         Intervention(
             id: id, title: id, minutes: minutes, timing: .rightAway, summary: "s", steps: ["do it"],
             evidence: .init(citation: "c", doi: "10.1000/x", grade: .a, effectSize: effect, outcome: "less stress", finding: "f"),
-            targets: targets, logsAs: .other, hours: hours
+            fits: fits, logsAs: logsAs, hours: hours
         )
     }
 
-    func mental(_ scores: [ComponentID: Double]) -> BarReading {
-        BarReading(
-            kind: .mental, day: DayKey("2026-10-15")!, value: 70,
-            components: scores.map { ComponentScore(id: $0.key, score: $0.value, weight: 0.25, detail: "") },
-            missing: [], coverage: 1
-        )
-    }
-
-    func testBoostsWhatTargetsTheWeakestComponent() {
-        let catalog = [item("mood", effect: 0.4, targets: [.mood]), item("stress", effect: 0.4, targets: [.stressBalance])]
-        let ranked = InterventionRanker.rank(catalog, mental: mental([.mood: 80, .stressBalance: 40]), personal: [:], hour: 13)
-        XCTAssertEqual(ranked.map(\.intervention.id), ["stress", "mood"])
-        XCTAssertEqual(ranked[0].reason, "Aimed at your stress vs recovery, the lowest part of your Mental bar today")
-        XCTAssertNil(ranked[1].reason)
-        XCTAssertEqual(ranked[0].score / ranked[1].score, InterventionRanker.targetBoost, accuracy: 0.001)
-    }
-
-    func testNoBoostWhenNothingIsLow() {
-        let catalog = [item("mood", effect: 0.4, targets: [.mood]), item("stress", effect: 0.3, targets: [.stressBalance])]
-        let ranked = InterventionRanker.rank(catalog, mental: mental([.mood: 80, .stressBalance: 70]), personal: [:], hour: 13)
-        XCTAssertEqual(ranked.map(\.intervention.id), ["mood", "stress"])
+    func testWithNothingStandingOutItsEffectPerMinute() {
+        let catalog = [item("long", effect: 0.5, minutes: 15, fits: [.lowMood]),
+                       item("short", effect: 0.3, minutes: 5, fits: [.stressed])]
+        let ranked = InterventionRanker.rank(catalog, signals: RankingSignals(hour: 9), personal: [:])
+        XCTAssertEqual(ranked.map(\.intervention.id), ["short", "long"])
         XCTAssertTrue(ranked.allSatisfy { $0.reason == nil })
     }
 
-    func testOffHoursSinks() {
-        let catalog = [item("nap", effect: 0.6, targets: [.mood], hours: 12...16), item("walk", effect: 0.4, targets: [.mood])]
-        XCTAssertEqual(InterventionRanker.rank(catalog, mental: nil, personal: [:], hour: 14).first?.intervention.id, "nap")
-        XCTAssertEqual(InterventionRanker.rank(catalog, mental: nil, personal: [:], hour: 21).first?.intervention.id, "walk")
+    func testWhatYourDataShowsMovesItsStepsUp() {
+        let catalog = [item("reframe", effect: 0.36, fits: [.stressed]),
+                       item("nap", effect: 0.29, minutes: 15, fits: [.lowSleep, .lowEnergy], hours: 12...16)]
+        let tired = RankingSignals(hour: 14, needs: [.init(.lowSleep, "Last night: 5.6 h"), .init(.lowEnergy, "Energy 2 of 5")])
+        let ranked = InterventionRanker.rank(catalog, signals: tired, personal: [:])
+        XCTAssertEqual(ranked.map(\.intervention.id), ["nap", "reframe"])
+        XCTAssertEqual(ranked[0].reason, "Last night: 5.6 h")
+        XCTAssertNil(ranked[1].reason)
+        XCTAssertEqual(ranked[0].score, 10 * InterventionRanker.fitBoost * InterventionRanker.extraFitBoost / 15, accuracy: 0.001)
+        XCTAssertEqual(ranked[1].score, 12 * InterventionRanker.noFitPenalty / 5, accuracy: 0.001)
+
+        let stressed = RankingSignals(hour: 14, needs: [.init(.stressed, "You checked in stressed at 1:10 PM")])
+        XCTAssertEqual(InterventionRanker.rank(catalog, signals: stressed, personal: [:]).first?.intervention.id, "reframe")
     }
 
-    func testPerMinuteAndPersonalResultsCount() {
-        let catalog = [item("long", effect: 0.5, minutes: 15, targets: [.mood]), item("short", effect: 0.3, minutes: 5, targets: [.mood])]
-        XCTAssertEqual(InterventionRanker.rank(catalog, mental: nil, personal: [:], hour: 9).first?.intervention.id, "short")
+    func testOffHoursAndDoneTodaySink() {
+        let catalog = [item("nap", effect: 0.6, fits: [.lowSleep], hours: 12...16),
+                       item("walk", effect: 0.4, fits: [.lowEnergy], logsAs: .walk)]
+        let short = [RankingSignals.Signal(.lowSleep, "short night"), .init(.lowEnergy, "low")]
+        XCTAssertEqual(InterventionRanker.rank(catalog, signals: RankingSignals(hour: 14, needs: short), personal: [:])
+            .first?.intervention.id, "nap")
+        let evening = InterventionRanker.rank(catalog, signals: RankingSignals(hour: 21, needs: short), personal: [:])
+        XCTAssertEqual(evening.first?.intervention.id, "walk")
+        XCTAssertNil(evening.last?.reason, "No reason shown for something that doesn't fit the hour")
 
+        let walked = InterventionRanker.rank(catalog, signals: RankingSignals(hour: 21, needs: short, doneKinds: [.walk]),
+                                             personal: [:])
+        let walk = walked.first { $0.intervention.id == "walk" }
+        XCTAssertEqual(walk?.reason, "Done today")
+        XCTAssertEqual(walk?.doneToday, true)
+    }
+
+    func testHighEnergySinksTheNap() {
+        let catalog = [item("nap", effect: 0.6, fits: [.lowSleep, .lowEnergy], hours: 12...16),
+                       item("walk", effect: 0.4, fits: [.lowEnergy, .lowMood])]
+        XCTAssertEqual(InterventionRanker.rank(catalog, signals: RankingSignals(hour: 14), personal: [:])
+            .first?.intervention.id, "nap")
+        XCTAssertEqual(InterventionRanker.rank(catalog, signals: RankingSignals(hour: 14, energy: 5), personal: [:])
+            .first?.intervention.id, "walk")
+        let shortNight = RankingSignals(hour: 14, needs: [.init(.lowSleep, "5 h")], energy: 5)
+        XCTAssertEqual(InterventionRanker.rank(catalog, signals: shortNight, personal: [:]).first?.intervention.id, "nap",
+                       "A short night still counts even if you feel fine")
+    }
+
+    func testYourOwnResultsCount() {
+        let catalog = [item("long", effect: 0.5, minutes: 15, fits: [.lowMood]),
+                       item("short", effect: 0.3, minutes: 5, fits: [.lowMood])]
         let bad = PersonalEffect(count: 10, averageBefore: 6, averageAfter: 6)
-        let ranked = InterventionRanker.rank(catalog, mental: nil, personal: ["short": bad], hour: 9)
+        let ranked = InterventionRanker.rank(catalog, signals: RankingSignals(hour: 9), personal: ["short": bad])
         XCTAssertEqual(ranked.first?.intervention.id, "long", "Ten tries that did nothing outweigh the research")
         XCTAssertEqual(ranked.first { $0.intervention.id == "short" }?.personal, bad)
+    }
+}
+
+final class RankingSignalsTests: XCTestCase {
+    let calendar = CoachScenario.calendar
+    let today = CoachScenario.today
+
+    func signals(sensors: [DayKey: SensorDay]? = nil, moods: [CoachContext.Mood] = [], logs: [InterventionLog] = [],
+                 energyNow: RankingSignals.EnergyReport? = nil, at now: Date = CoachScenario.now) -> RankingSignals {
+        let sensors = sensors ?? CoachScenario.sensors()
+        let mental = HealthBarsCalculator().reading(.mental, on: today, sensors: sensors, reports: CoachScenario.reports())
+        return RankingSignals.build(now: now, calendar: calendar, sensors: sensors, mental: mental, moods: moods,
+                                    logs: logs, energyNow: energyNow)
+    }
+
+    func reasons(_ signals: RankingSignals) -> [Intervention.Need: String] {
+        Dictionary(uniqueKeysWithValues: signals.needs.map { ($0.need, $0.reason) })
+    }
+
+    func testAGoodDayShowsNothing() {
+        // The 1 PM scenario: good night, steps fine for a desk morning (3,900 in 7.6 h).
+        let result = signals()
+        XCTAssertEqual(result.hour, 13)
+        XCTAssertNil(reasons(result)[.lowSleep])
+        XCTAssertNil(reasons(result)[.lowEnergy])
+        XCTAssertNil(result.energy)
+    }
+
+    func testShortNightAgainstYourUsual() {
+        var sensors = CoachScenario.sensors()
+        sensors[today]?.sleepSeconds = 5.6 * 3600
+        XCTAssertEqual(reasons(signals(sensors: sensors))[.lowSleep], "Last night: 5.6 h asleep vs your usual 7.0 h")
+        sensors[today]?.sleepSeconds = 6.6 * 3600 // under 0.75 h short: normal enough
+        sensors[today]?.sleepScore = 64
+        XCTAssertEqual(reasons(signals(sensors: sensors))[.lowSleep], "Oura sleep score 64 last night")
+    }
+
+    func testEnergyRightNow() {
+        let at = CoachScenario.at(today, 12, 40)
+        let low = signals(energyNow: .init(level: 2, at: at))
+        XCTAssertEqual(reasons(low)[.lowEnergy], "Energy 2 of 5 at 12:40 PM")
+        XCTAssertEqual(low.energy, 2)
+
+        // The newest rating wins, check-in or picker.
+        let moods = [CoachContext.Mood(timestamp: CoachScenario.at(today, 12, 50), valence: 0, energy: 4)]
+        let better = signals(moods: moods, energyNow: .init(level: 2, at: at))
+        XCTAssertNil(reasons(better)[.lowEnergy])
+        XCTAssertEqual(better.energy, 4)
+
+        // A rating from the morning isn't "right now"; readiness takes over.
+        var sensors = CoachScenario.sensors()
+        sensors[today]?.readinessScore = 62
+        let stale = signals(sensors: sensors, energyNow: .init(level: 5, at: CoachScenario.at(today, 7, 0)))
+        XCTAssertNil(stale.energy)
+        XCTAssertEqual(reasons(stale)[.lowEnergy], "Oura readiness 62")
+    }
+
+    func testSedentaryFromStepsSinceWaking() {
+        var sensors = CoachScenario.sensors()
+        sensors[today]?.ouraSteps = 1240 // woke 5:24 AM, 7.6 h ago
+        XCTAssertEqual(reasons(signals(sensors: sensors))[.sedentary], "1,240 steps since you woke at 5:24 AM")
+        XCTAssertNil(reasons(signals(sensors: sensors, at: CoachScenario.at(today, 6, 30)))[.sedentary],
+                     "Too early to call")
+    }
+
+    func testStressAndMoodFromCheckInsFirst() {
+        let moods = [CoachContext.Mood(timestamp: CoachScenario.at(today, 11, 20), valence: -2.0 / 3, energy: 3,
+                                       emotions: ["sad", "stressed", "worried"])]
+        let result = reasons(signals(moods: moods))
+        XCTAssertEqual(result[.stressed], "You checked in stressed, worried at 11:20 AM")
+        XCTAssertEqual(result[.lowMood], "Your 11:20 AM check-in: Unpleasant")
+    }
+
+    func testOuraStressAgainstYourBaseline() {
+        var sensors = CoachScenario.sensors()
+        sensors[today.adding(days: -1)]?.stressHighMinutes = 240
+        sensors[today.adding(days: -1)]?.recoveryHighMinutes = 10
+        XCTAssertEqual(reasons(signals(sensors: sensors))[.stressed],
+                       "Yesterday: 240 min stressed, 10 min recovering (more stress than your usual)")
+    }
+
+    func testDoneTodayByIDOrKind() {
+        let logs = [
+            InterventionLog(interventionID: "reframe", title: "Reframe", timestamp: CoachScenario.at(today, 9, 0),
+                            intensityBefore: nil, intensityAfter: nil, kind: .reframe),
+            InterventionLog(interventionID: nil, title: "Walk", timestamp: CoachScenario.at(today, 12, 0),
+                            intensityBefore: nil, intensityAfter: nil, kind: .walk),
+            InterventionLog(interventionID: "power-nap", title: "Nap", timestamp: CoachScenario.at(today.adding(days: -1), 14, 0),
+                            intensityBefore: nil, intensityAfter: nil, kind: .nap),
+        ]
+        let result = signals(logs: logs)
+        XCTAssertEqual(result.doneIDs, ["reframe"])
+        XCTAssertEqual(result.doneKinds, [.reframe, .walk])
+        XCTAssertTrue(result.isDone(Intervention.find("brisk-walk")!))
+        XCTAssertFalse(result.isDone(Intervention.find("power-nap")!), "Yesterday's nap doesn't count")
+    }
+
+    func testRealCatalogOnATiredAfternoon() {
+        // Short night, energy 2 at 2 PM, desk-bound: the nap and the walk should lead, not the reframe.
+        var sensors = CoachScenario.sensors()
+        sensors[today]?.sleepSeconds = 5.5 * 3600
+        sensors[today]?.ouraSteps = 1500
+        let now = CoachScenario.at(today, 14, 0)
+        let result = signals(sensors: sensors, energyNow: .init(level: 2, at: CoachScenario.at(today, 13, 55)), at: now)
+        let top = InterventionRanker.rank(signals: result, personal: [:])
+            .filter { $0.intervention.timing == .rightAway }
+            .map(\.intervention.id)
+        XCTAssertEqual(Array(top.prefix(2)), ["brisk-walk", "power-nap"], "\(top)")
     }
 }
 

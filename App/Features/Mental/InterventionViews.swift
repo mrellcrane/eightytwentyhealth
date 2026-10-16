@@ -11,6 +11,103 @@ extension Intervention.Grade {
     }
 }
 
+extension Intervention.Need {
+    var systemImage: String {
+        switch self {
+        case .lowSleep: return "bed.double"
+        case .lowEnergy: return "battery.25percent"
+        case .sedentary: return "figure.walk"
+        case .stressed: return "waveform.path.ecg"
+        case .lowMood: return "cloud"
+        case .fewPractices: return "calendar"
+        }
+    }
+}
+
+/// Ranks the catalog for right now from the same data the bars use: last
+/// night, steps since you woke, Oura stress, your check-ins and energy, and
+/// what you've already done today.
+enum Recommendations {
+    static func energy(level: Int, at: Double) -> RankingSignals.EnergyReport? {
+        level > 0 && at > 0 ? RankingSignals.EnergyReport(level: level, at: Date(timeIntervalSince1970: at)) : nil
+    }
+
+    /// The quick rating, if it's still "right now".
+    static func storedEnergy(now: Date = .now) -> RankingSignals.EnergyReport? {
+        let defaults = UserDefaults.standard
+        guard let report = energy(level: defaults.integer(forKey: PrefKey.energyNow),
+                                  at: defaults.double(forKey: PrefKey.energyNowAt)),
+              now.timeIntervalSince(report.at) <= RankingSignals.currentEnergyWindow else { return nil }
+        return report
+    }
+
+    static func saveEnergy(_ level: Int?, at date: Date = .now) {
+        UserDefaults.standard.set(level ?? 0, forKey: PrefKey.energyNow)
+        UserDefaults.standard.set(level == nil ? 0 : date.timeIntervalSince1970, forKey: PrefKey.energyNowAt)
+    }
+
+    static func signals(input: BarsInput, mental: BarDisplay, moods: [MoodEntry], activities: [ActivityLog],
+                        energy: RankingSignals.EnergyReport?) -> RankingSignals {
+        RankingSignals.build(
+            now: .now,
+            sensors: input.sensors,
+            mental: mental.today,
+            moods: moods.map {
+                CoachContext.Mood(timestamp: $0.timestamp, valence: $0.valence, energy: $0.energy, emotions: $0.emotions)
+            },
+            logs: activities.map(\.interventionLog),
+            energyNow: energy
+        )
+    }
+
+    static func rank(_ signals: RankingSignals, activities: [ActivityLog]) -> [RankedIntervention] {
+        InterventionRanker.rank(signals: signals, personal: PersonalEffect.compute(activities.map(\.interventionLog)))
+    }
+}
+
+/// "Energy right now", 1-5. Counts for 3 hours and reorders the recommendations.
+struct EnergyNowPicker: View {
+    @AppStorage(PrefKey.energyNow) private var level = 0
+    @AppStorage(PrefKey.energyNowAt) private var at = 0.0
+
+    var body: some View {
+        VStack(alignment: .leading, spacing: 6) {
+            Text("Energy right now").font(.subheadline.bold())
+            Picker("Energy right now", selection: Binding(
+                get: { isCurrent ? level : 0 },
+                set: { Recommendations.saveEnergy($0 == 0 ? nil : $0) }
+            )) {
+                Text("Skip").tag(0)
+                ForEach(1...5, id: \.self) { value in
+                    Text("\(value)").tag(value)
+                }
+            }
+            .pickerStyle(.segmented)
+        }
+    }
+
+    private var isCurrent: Bool {
+        at > 0 && Date().timeIntervalSince1970 - at <= RankingSignals.currentEnergyWindow
+    }
+}
+
+/// What today's data says, one line per thing that stands out.
+struct DataSignalsView: View {
+    let signals: RankingSignals
+
+    var body: some View {
+        if signals.needs.isEmpty {
+            Text("Nothing in today's data stands out, so these are ranked by research effect per minute.")
+                .font(.caption)
+                .foregroundStyle(.secondary)
+        } else {
+            ForEach(signals.needs, id: \.need) { signal in
+                Label(signal.reason, systemImage: signal.need.systemImage).font(.subheadline)
+            }
+        }
+    }
+}
+
 /// One row in the Mental screen's lists.
 struct InterventionRow: View {
     let ranked: RankedIntervention
@@ -24,7 +121,7 @@ struct InterventionRow: View {
             VStack(alignment: .leading, spacing: 3) {
                 Text(item.title).font(.body)
                 Text(item.headline).font(.subheadline.bold()).foregroundStyle(BarKind.mental.color)
-                Text("\(Int(item.minutes)) min · grade \(item.evidence.grade.rawValue)")
+                Text("\(Int(item.minutes)) min · \(item.timing == .rightAway ? "works right away" : "builds over weeks") · grade \(item.evidence.grade.rawValue)")
                     .font(.caption)
                     .foregroundStyle(.secondary)
                 if let personal = ranked.personal, personal.count >= 3 {

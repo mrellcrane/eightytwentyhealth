@@ -17,9 +17,13 @@ final class SyncService {
 
     private(set) var lastSyncedAt: Date? = UserDefaults.standard.object(forKey: "lastSyncedAt") as? Date
 
+    /// Bump when `OuraDayAssembler` changes how it reads history, so cached days
+    /// get rebuilt once. v2: a short morning "sleep" no longer counts as the night.
+    private static let backfillKey = "ouraBackfilled.v2"
+
     private var ouraBackfilled: Bool {
-        get { UserDefaults.standard.bool(forKey: "ouraBackfilled") }
-        set { UserDefaults.standard.set(newValue, forKey: "ouraBackfilled") }
+        get { UserDefaults.standard.bool(forKey: Self.backfillKey) }
+        set { UserDefaults.standard.set(newValue, forKey: Self.backfillKey) }
     }
 
     private let oura: OuraAccount

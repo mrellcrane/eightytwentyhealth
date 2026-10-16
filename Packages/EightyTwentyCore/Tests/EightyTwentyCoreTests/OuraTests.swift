@@ -30,12 +30,31 @@ func fixtureBundle() throws -> OuraBundle {
 }
 
 final class OuraParsingTests: XCTestCase {
+    func period(_ id: String, type: String, hours: Double, hrv: Double) -> OuraSleepPeriod {
+        OuraSleepPeriod(id: id, day: "2026-09-08", type: type, bedtimeStart: nil, bedtimeEnd: nil, averageHrv: hrv,
+                        averageHeartRate: nil, lowestHeartRate: nil, totalSleepDuration: hours * 3600, timeInBed: nil,
+                        efficiency: nil)
+    }
+
+    func testAFragmentedNightStillCountsButANapDoesNot() {
+        XCTAssertNil(OuraDayAssembler.mainSleepPeriods([period("nap", type: "sleep", hours: 1.14, hrv: 79)])["2026-09-08"])
+        XCTAssertEqual(OuraDayAssembler.mainSleepPeriods([period("night", type: "sleep", hours: 4.5, hrv: 50)])["2026-09-08"]?.id,
+                       "night")
+        XCTAssertEqual(OuraDayAssembler.mainSleepPeriods([period("night", type: "sleep", hours: 4.5, hrv: 50),
+                                                          period("long", type: "long_sleep", hours: 4, hrv: 45)])["2026-09-08"]?.id,
+                       "long")
+    }
+
     func testAssemblesYourOct11() throws {
         let days = OuraDayAssembler.assemble(try fixtureBundle())
         let oct11 = try XCTUnwrap(days[DayKey("2026-10-11")!])
         XCTAssertEqual(oct11.readinessScore, 65)
         XCTAssertEqual(oct11.sleepScore, 71)
         XCTAssertEqual(oct11.averageHRV, 35, "Uses the long_sleep period, not the short one or the deleted one")
+        let oct8 = days[DayKey("2026-10-08")!]
+        XCTAssertNil(oct8?.bedtimeStart, "A morning nap with no long_sleep that day is not the night")
+        XCTAssertNil(oct8?.averageHRV)
+        XCTAssertNil(oct8?.sleepSeconds)
         XCTAssertEqual(oct11.lowestHeartRate, 57)
         XCTAssertEqual(oct11.sleepHours!, 6.98, accuracy: 0.01)
         XCTAssertEqual(oct11.temperatureDeviation, 0.28)

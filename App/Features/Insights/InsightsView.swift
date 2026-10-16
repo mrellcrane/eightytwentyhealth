@@ -94,6 +94,10 @@ struct InsightsView: View {
             if hours > 12 { hours -= 24 }
             return BedtimePoint(day: day, hoursFromMidnight: hours, hrv: hrv)
         }
+        // Fit the axis to your actual bedtimes (at least 9p-2a), one label per hour.
+        let hours = points.map(\.hoursFromMidnight)
+        let lower = min(-3, (hours.min() ?? -3).rounded(.down))
+        let upper = max(2, (hours.max() ?? 2).rounded(.up))
         return Chart(points) { point in
             PointMark(
                 x: .value("Bedtime", point.hoursFromMidnight),
@@ -101,8 +105,9 @@ struct InsightsView: View {
             )
             .foregroundStyle(.indigo)
         }
+        .chartXScale(domain: lower...upper)
         .chartXAxis {
-            AxisMarks(values: [-3, -2, -1, 0, 1, 2]) { value in
+            AxisMarks(values: Array(stride(from: lower, through: upper, by: 1))) { value in
                 AxisGridLine()
                 AxisValueLabel {
                     if let hours = value.as(Double.self) {

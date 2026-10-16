@@ -68,13 +68,19 @@ public enum OuraDayAssembler {
         return days
     }
 
+    /// A "sleep" period shorter than this is a nap, not a night. Without the
+    /// cutoff, a day with no long_sleep (ring off overnight) took a 1-hour
+    /// morning nap as the night: bedtime 8:33 AM, HRV from a nap.
+    static let shortestNight: Double = 3 * 3600
+
     /// The night's main sleep for each day: the "long_sleep" period if there is one,
-    /// otherwise the longest real sleep. Naps, rests and deleted periods are ignored.
+    /// otherwise the longest real sleep of at least 3 hours. Naps, rests and deleted
+    /// periods are ignored.
     static func mainSleepPeriods(_ periods: [OuraSleepPeriod]) -> [String: OuraSleepPeriod] {
         var best: [String: OuraSleepPeriod] = [:]
         for period in periods {
             let type = period.type ?? "sleep"
-            guard type == "long_sleep" || type == "sleep" else { continue }
+            guard type == "long_sleep" || (type == "sleep" && (period.totalSleepDuration ?? 0) >= shortestNight) else { continue }
             guard let current = best[period.day] else {
                 best[period.day] = period
                 continue

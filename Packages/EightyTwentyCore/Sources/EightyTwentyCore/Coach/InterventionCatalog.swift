@@ -35,7 +35,7 @@ extension Intervention {
                 outcome: "more energy",
                 finding: "158 studies (13,101 people): right after one bout of aerobic exercise, energy and positive mood rose by an average effect of 0.47, most consistently at low intensity and for sessions up to 35 minutes. In a small crossover trial, 10 minutes of stair walking raised vigor more than 50 mg of caffeine (Randolph & O'Connor 2017)."
             ),
-            targets: [.mood],
+            fits: [.lowEnergy, .sedentary, .lowMood],
             logsAs: .walk
         ),
         Intervention(
@@ -57,7 +57,7 @@ extension Intervention {
                 outcome: "more positive mood",
                 finding: "20 studies: time in natural settings raised positive mood (SMD 0.61, 95% CI 0.41-0.81) and lowered negative mood (SMD 0.47) compared with built environments. The studies varied a lot and many had a high risk of bias, so treat the size as rough."
             ),
-            targets: [.mood, .stressBalance],
+            fits: [.lowMood, .stressed],
             logsAs: .nature,
             hours: 7...18
         ),
@@ -81,7 +81,7 @@ extension Intervention {
                 outcome: "less negative emotion",
                 finding: "306 experiments: reappraising the situation changed emotions in the intended direction by d = 0.36, and taking another person's perspective by d = 0.45. Distracting yourself had no effect on average (d = 0.00), and controlling the response, such as suppressing it, a small one (d = 0.16)."
             ),
-            targets: [.mood, .stressBalance],
+            fits: [.stressed, .lowMood],
             logsAs: .reframe
         ),
         Intervention(
@@ -103,7 +103,7 @@ extension Intervention {
                 outcome: "more alertness",
                 finding: "11 lab studies (381 adults): a daytime nap improved alertness vs no nap (effect 0.29, 95% CI 0.10-0.48). Brooks & Lack 2006 found 10 minutes the best length: benefits started right away and some lasted 155 minutes, while a 30-minute nap caused grogginess first."
             ),
-            targets: [.mentalSleep, .mood],
+            fits: [.lowSleep, .lowEnergy],
             logsAs: .nap,
             hours: 12...16
         ),
@@ -131,7 +131,7 @@ extension Intervention {
                 outcome: "less stress",
                 finding: "12 randomized trials (785 adults): breathwork lowered self-reported stress vs controls (g = 0.35, 95% CI 0.14-0.55), with similar drops in anxiety (0.32) and depression (0.40). In Balban 2023, 5 minutes a day of cyclic sighing for a month lifted mood more than mindfulness meditation did."
             ),
-            targets: [.stressBalance, .practice],
+            fits: [.stressed, .fewPractices],
             logsAs: .breathwork
         ),
         Intervention(
@@ -154,7 +154,7 @@ extension Intervention {
                 outcome: "less anxiety",
                 finding: "47 trials (3,515 people), all against active control programs: mindfulness programs reduced anxiety by 0.38 (95% CI 0.12-0.64) at 8 weeks and 0.22 at 3-6 months, and depression by 0.30 at 8 weeks. They didn't beat other active treatments such as exercise."
             ),
-            targets: [.stressBalance, .practice],
+            fits: [.stressed, .fewPractices],
             logsAs: .meditation,
             action: .meditationTimer
         ),
@@ -178,7 +178,7 @@ extension Intervention {
                 outcome: "less anxiety",
                 finding: "27 studies of relaxation training (progressive muscle relaxation, applied relaxation, meditation and similar): anxiety fell by d = 0.51 (95% CI 0.46-0.63) compared with control groups. Longer training gave larger effects."
             ),
-            targets: [.stressBalance, .practice],
+            fits: [.stressed, .fewPractices],
             logsAs: .relaxation
         ),
         Intervention(
@@ -200,9 +200,10 @@ extension Intervention {
                 outcome: "fewer depression and anxiety symptoms",
                 finding: "27 studies (3,675 people): gratitude exercises reduced symptoms of depression and anxiety by g = 0.29 after the program and 0.23 at follow-up. The authors call that modest. In Seligman 2005, three good things raised happiness and lowered depressive symptoms for six months."
             ),
-            targets: [.mood, .practice],
+            fits: [.lowMood, .fewPractices],
             logsAs: .journaling,
-            action: .gratitude
+            action: .gratitude,
+            hours: 17...23
         ),
         Intervention(
             id: "self-compassion",
@@ -223,7 +224,7 @@ extension Intervention {
                 outcome: "less stress",
                 finding: "27 randomized trials of self-compassion programs: moderate drops in stress (g = 0.67), depression (0.66) and anxiety (0.57), and a large drop in rumination (1.37). Against active comparison programs the depression effect wasn't significant."
             ),
-            targets: [.mood, .stressBalance, .practice],
+            fits: [.stressed, .lowMood, .fewPractices],
             logsAs: .selfCompassion
         ),
         Intervention(
@@ -245,7 +246,7 @@ extension Intervention {
                 outcome: "more well-being",
                 finding: "27 studies (4,045 people): performing acts of kindness raised the doer's well-being by δ = 0.28 (95% CI 0.16-0.41), a small-to-medium effect."
             ),
-            targets: [.mood],
+            fits: [.lowMood],
             logsAs: .kindness
         ),
         Intervention(
@@ -267,7 +268,7 @@ extension Intervention {
                 outcome: "more energy, less fatigue",
                 finding: "Randomized trials of regular exercise: feelings of energy rose and fatigue fell vs control conditions by δ = 0.37 (95% CI 0.29-0.45). Trials with a placebo control found no effect, so part of this may be expectation."
             ),
-            targets: [.mood],
+            fits: [.lowEnergy, .sedentary],
             logsAs: .walk
         ),
         Intervention(
@@ -290,7 +291,7 @@ extension Intervention {
                 outcome: "better health overall",
                 finding: "146 randomized studies: writing about thoughts and feelings had a small average benefit across psychological and physical health (r = 0.075, about d = 0.15)."
             ),
-            targets: [.mood, .practice],
+            fits: [.stressed, .lowMood, .fewPractices],
             logsAs: .journaling
         ),
     ]

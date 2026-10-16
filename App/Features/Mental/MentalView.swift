@@ -14,15 +14,18 @@ struct MentalView: View {
     @Query(filter: #Predicate<CoachLog> { $0.deletedAt == nil }, sort: \CoachLog.startedAt, order: .reverse)
     private var conversations: [CoachLog]
 
+    @AppStorage(PrefKey.energyNow) private var energyNow = 0
+    @AppStorage(PrefKey.energyNowAt) private var energyNowAt = 0.0
+
     @State private var asking = false
     @State private var showingBar = false
 
     var body: some View {
         let input = BarsInput(snapshots: snapshots, moods: moods, gratitude: gratitude, activities: activities)
         let mental = input.display(.mental)
-        let personal = PersonalEffect.compute(activities.map(\.interventionLog))
-        let ranked = InterventionRanker.rank(mental: mental.today, personal: personal,
-                                             hour: Calendar.current.component(.hour, from: .now))
+        let signals = Recommendations.signals(input: input, mental: mental, moods: moods, activities: activities,
+                                              energy: Recommendations.energy(level: energyNow, at: energyNowAt))
+        let ranked = Recommendations.rank(signals, activities: activities)
 
         List {
             Section {
@@ -39,6 +42,11 @@ struct MentalView: View {
                 }
                     .listRowInsets(EdgeInsets())
                     .listRowBackground(Color.clear)
+            }
+
+            Section("What your data says") {
+                EnergyNowPicker()
+                DataSignalsView(signals: signals)
             }
 
             Section("Feel better now") {
@@ -62,7 +70,7 @@ struct MentalView: View {
             } header: {
                 Text("Build it up")
             } footer: {
-                Text("≈ numbers are research estimates: the study's effect size × 33, roughly the average change against a comparison group. Ranked by that per minute, boosted when it targets the lowest part of your Mental bar. Once you've rated a step 3 times, your own before → after counts too.")
+                Text("≈ numbers are research estimates: the study's effect size × 33, roughly the average change against a comparison group. Ranked by that per minute, then reordered by what today's data shows: last night's sleep, steps since you woke, Oura stress, your check-ins and energy, and what you've already done. Once you've rated a step 3 times, your own before → after counts too.")
             }
 
             if !conversations.isEmpty {

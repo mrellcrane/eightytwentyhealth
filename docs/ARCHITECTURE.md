@@ -114,7 +114,18 @@ Percent shown = effect size × 33, labeled "≈" and "research estimate" (`Effec
 
 Logging a step asks an optional 0-10 "how strong was it" before and after (`ActivityLog.intensityBefore/After`, `interventionID`). Per-intervention averages show once n ≥ 3, and blend into the estimate as `(5 × research + n × yours) / (5 + n)`. Uncontrolled before/after reads high, which the blend tempers.
 
-`InterventionRanker`: expected percent × relevance / minutes. ×1.5 if it targets the weakest Mental component below 65; ×0.3 outside its sensible hours (nap 12-16, nature 7-18). Today shows the top "feel better now" pick for the current hour.
+`InterventionRanker`: expected percent × relevance / minutes, where relevance comes from **today's real data**, not a fixed order. `RankingSignals.build` turns the data into needs, each with the numbers behind it, shown on the Mental screen under "What your data says":
+
+| Need | From | Example reason |
+|---|---|---|
+| Low sleep | last night vs your 30-night median (0.75 h short), else Oura sleep score < 70 | "Last night: 5.6 h asleep vs your usual 7.0 h" |
+| Low energy | your latest energy rating from the last 3 h (≤ 2), else Oura readiness < 70 | "Energy 2 of 5 at 12:40 PM" |
+| Sedentary | steps since you woke, under 300 an hour after 2 h up | "1,240 steps since you woke at 5:24 AM" |
+| Stressed | a stress word in today's check-in, else the stress component below 65 (vs your baseline) | "You checked in stressed at 11:20 AM" |
+| Low mood | today's check-in slightly unpleasant or worse, else the Mood component below 65 | "Your 11:20 AM check-in: Unpleasant" |
+| Few practices | the Practices component below 65 | "Practices: 2 of the last 7 days (target 5)" |
+
+Each catalog entry lists the needs its study outcome supports (`fits`). ×3 if it fits one of today's needs (×1.25 per extra one), ×0.6 if there are needs and it fits none, ×0.3 outside its sensible hours (nap 12-16, nature 7-18, three good things 17-23), ×0.3 for the nap when you rate your energy 4-5 and slept fine, ×0.25 if already done today (by intervention or by activity kind). "Energy right now" (1-5) is a quick picker on Today and the Mental screen; ratings from check-ins and the Ask screen count too. Today shows the top 3 not yet done.
 
 ### The coach
 
