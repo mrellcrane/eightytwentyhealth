@@ -52,6 +52,35 @@ final class CoachLiveTests: XCTestCase {
                        "Still suggesting a nap")
     }
 
+    /// Talks the 1 PM answer through, as the Ask screen's chat does (unstreamed here):
+    /// plain text back, and a second question that leans on the first answer.
+    func testTalkingTheAnswerThrough() async throws {
+        let key = ProcessInfo.processInfo.environment["CLAUDE_COACH_API_KEY"] ?? ""
+        try XCTSkipIf(key.isEmpty, "Set CLAUDE_COACH_API_KEY to run the live chat test")
+        let client = CoachClient(transport: SessionTransport(), apiKey: { key })
+
+        var conversation = CoachConversation(context: CoachScenario.context().render(), question: CoachScenario.question)
+        let first = try await client.reply(to: conversation)
+        conversation.record(first.reply, text: first.text)
+        print("\n===== ANSWER =====\n\(Self.pretty(first.reply))\n")
+
+        var chat = try XCTUnwrap(CoachChat(base: conversation))
+        for question in ["Why that first step? What's the actual research behind it?", "How sure is that? Were they people like me?"] {
+            chat.ask(question, at: "Thu 1:10 PM")
+            let body = CoachChatRequest.body(chat, stream: false)
+            let request = try CoachRequest.urlRequest(body: body, apiKey: key, fallbacks: true, timeout: 120)
+            let started = Date()
+            let (data, response) = try await SessionTransport().send(request)
+            let json = try CoachClient.checked(data, status: response.statusCode)
+            let answer = CoachClient.text(of: json)
+            let cached = json["usage"]?["cache_read_input_tokens"]?.intValue ?? 0
+            print("===== CHAT: \(question) (\(Int(Date().timeIntervalSince(started))) s, \(cached) cached) =====\n\(answer)\n")
+            XCTAssertEqual(json["stop_reason"], "end_turn")
+            XCTAssertFalse(answer.trimmingCharacters(in: .whitespaces).hasPrefix("{"), "Plain text, not JSON")
+            chat.finish(answer)
+        }
+    }
+
     /// Looks up studies on meditation, then asks about meditation again: the
     /// second ask should be answered from the saved studies, with no search.
     func testStudyLookupThenLibrary() async throws {

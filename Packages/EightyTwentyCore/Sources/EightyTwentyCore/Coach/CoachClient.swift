@@ -416,19 +416,22 @@ public struct CoachClient: Sendable {
 
     /// The response JSON, or the matching `CoachError` for an HTTP error.
     static func checked(_ data: Data, status: Int) throws -> JSONValue {
-        let json = try? JSONDecoder().decode(JSONValue.self, from: data)
-        guard (200..<300).contains(status) else {
-            let type = json?["error"]?["type"]?.stringValue
-            let message = json?["error"]?["message"]?.stringValue ?? String(decoding: data.prefix(200), as: UTF8.self)
-            switch (status, type) {
-            case (401, _), (_, "authentication_error"): throw CoachError.unauthorized
-            case (429, _): throw CoachError.rateLimited
-            case (529, _), (_, "overloaded_error"): throw CoachError.overloaded
-            default: throw CoachError.http(status: status, message: message)
-            }
-        }
-        guard let json else { throw CoachError.badReply }
+        guard (200..<300).contains(status) else { throw error(status: status, body: data) }
+        guard let json = try? JSONDecoder().decode(JSONValue.self, from: data) else { throw CoachError.badReply }
         return json
+    }
+
+    /// The `CoachError` for an HTTP error response.
+    public static func error(status: Int, body data: Data) -> CoachError {
+        let json = try? JSONDecoder().decode(JSONValue.self, from: data)
+        let type = json?["error"]?["type"]?.stringValue
+        let message = json?["error"]?["message"]?.stringValue ?? String(decoding: data.prefix(200), as: UTF8.self)
+        switch (status, type) {
+        case (401, _), (_, "authentication_error"): return .unauthorized
+        case (429, _): return .rateLimited
+        case (529, _), (_, "overloaded_error"): return .overloaded
+        default: return .http(status: status, message: message)
+        }
     }
 
     // MARK: Study lookup

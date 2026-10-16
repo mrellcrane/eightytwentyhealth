@@ -275,16 +275,17 @@ final class AppModel {
         }
     }
 
-    /// Saves a finished run. Returns false only if nothing could be saved.
-    func logRun(_ recorder: RunRecorder) async -> Bool {
+    /// Saves a finished run or walk. Returns false only if nothing could be saved.
+    func logRecording(_ recorder: RunRecorder) async -> Bool {
         let tracker = recorder.tracker
         guard let start = tracker.startedAt, let end = tracker.endedAt else { return false }
+        let kind = recorder.activity
         let moving = tracker.movingTime(at: end)
         let polyline = Polyline.encode(tracker.route.map { (latitude: $0.latitude, longitude: $0.longitude) })
 
         let entry = ActivityLog(
             timestamp: start,
-            kind: .run,
+            kind: kind,
             minutes: moving / 60,
             distanceMeters: tracker.distance,
             source: .runRecorder,
@@ -294,7 +295,8 @@ final class AppModel {
         save()
 
         do {
-            entry.healthKitUUID = try await healthKit.saveRun(
+            entry.healthKitUUID = try await healthKit.saveWorkout(
+                kind,
                 start: start,
                 end: end,
                 distanceMeters: tracker.distance,
@@ -302,8 +304,10 @@ final class AppModel {
                 route: recorder.routeLocations
             )
             save()
+            Log.health.info("Recorded \(kind.rawValue) saved to Apple Health")
         } catch {
-            notice = "Run saved here, but not to Apple Health (\(error.localizedDescription))."
+            notice = "\(kind.title) saved here, but not to Apple Health (\(error.localizedDescription))."
+            Log.health.warning("Recorded \(kind.rawValue) not saved to Apple Health: \(error.localizedDescription)")
         }
         return true
     }

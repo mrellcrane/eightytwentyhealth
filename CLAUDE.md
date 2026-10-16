@@ -23,7 +23,7 @@ Personal iOS app (SwiftUI, SwiftData + CloudKit, HealthKit, Oura API v2). One us
     -v /root/.ccr/ca-bundle.crt:/etc/ssl/certs/ca-certificates.crt:ro \
     -v swiftbuild:/tmp/build -v "$PWD":/pkg -w /pkg swift:6.1 swift test --scratch-path /tmp/build
   ```
-- **Coach live tests**: `CoachLiveTests` calls the real Claude API: the owner's 1 PM scenario (both answers printed) and a study lookup on meditation followed by a library match (`--filter CoachLiveTests`). They run only when `CLAUDE_COACH_API_KEY` is set (cloud sessions; never `ANTHROPIC_API_KEY`, which Claude Code itself may read), and are skipped in CI. Never print or write the key. Run them after any change to the coach's system prompt, schema, context or lookup, and read the advice.
+- **Coach live tests**: `CoachLiveTests` calls the real Claude API: the owner's 1 PM scenario (both answers printed), talking that answer through in the chat (two questions), and a study lookup on meditation followed by a library match (`--filter CoachLiveTests`). They run only when `CLAUDE_COACH_API_KEY` is set (cloud sessions; never `ANTHROPIC_API_KEY`, which Claude Code itself may read), and are skipped in CI. Never print or write the key. Run them after any change to the coach's system prompt, schema, context or lookup, and read the advice.
 - **App code** (`App/`) only compiles in CI. Keep changes there small and match the surrounding style.
 - A finished build reaches the owner's phone through TestFlight about 15 minutes after the run goes green. Tell them the build number.
 

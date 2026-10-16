@@ -29,6 +29,8 @@ enum PrefKey {
     /// JSON [yyyy-MM-dd: green/yellow/red], one per run day.
     static let runCheckIns = "runCheckIns"
     static let trainingGoal = "trainingGoal"
+    /// What the recorder records when you open it: run or walk, as an `ActivityKind` raw value.
+    static let recordActivity = "recordActivity"
     /// What you want the coach to know (history, goals). Sent with each chat, never logged.
     static let coachNotes = "coachNotes"
 

@@ -2,7 +2,8 @@ import SwiftUI
 import SwiftData
 import EightyTwentyCore
 
-/// Tell the coach what's going on; get 1-3 things to do, with the science.
+/// Tell the coach what's going on; get 1-3 things to do, with the science. Then
+/// talk it through: the answer is saved, the chat about it isn't.
 struct AskView: View {
     @Environment(AppModel.self) private var model
     @Environment(\.modelContext) private var context
@@ -12,7 +13,7 @@ struct AskView: View {
     @State private var face: Int?
     @State private var energy: Int?
     @State private var emotions: Set<String> = []
-    @State private var followUp = ""
+    @State private var message = ""
     @State private var showingContext = false
     @State private var preview = ""
     @State private var logging: LoggableStep?
@@ -21,24 +22,35 @@ struct AskView: View {
     private var history: [CoachLog]
     @FocusState private var focus: Field?
 
-    private enum Field { case question, followUp }
+    private enum Field { case question, chat }
 
     private var coach: CoachService { model.coach }
 
     var body: some View {
         NavigationStack {
-            ScrollView {
-                VStack(alignment: .leading, spacing: 20) {
-                    if !coach.hasKey { keyPrompt }
-                    if let conversation = coach.conversation {
-                        transcript(conversation)
-                    } else {
-                        compose
+            ScrollViewReader { proxy in
+                ScrollView {
+                    VStack(alignment: .leading, spacing: 20) {
+                        if !coach.hasKey { keyPrompt }
+                        if let conversation = coach.conversation {
+                            transcript(conversation)
+                        } else {
+                            compose
+                        }
+                    }
+                    .padding()
+                    Color.clear.frame(height: 1).id(Self.end)
+                }
+                .scrollDismissesKeyboard(.interactively)
+                .safeAreaInset(edge: .bottom) {
+                    if let conversation = coach.conversation, !conversation.awaitingReply, !coach.isThinking {
+                        chatBar
                     }
                 }
-                .padding()
+                // Follow the chat as it streams in.
+                .onChange(of: coach.chat?.turns.count) { proxy.scrollTo(Self.end, anchor: .bottom) }
+                .onChange(of: coach.chat?.turns.last?.answer) { proxy.scrollTo(Self.end, anchor: .bottom) }
             }
-            .scrollDismissesKeyboard(.interactively)
             .navigationTitle("What's going on?")
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
@@ -53,7 +65,7 @@ struct AskView: View {
                             face = nil
                             energy = nil
                             emotions = []
-                            followUp = ""
+                            message = ""
                         }
                         .disabled(coach.isThinking)
                     }
@@ -73,7 +85,11 @@ struct AskView: View {
                 if coach.conversation == nil { focus = .question }
             }
         }
+        // Closing the screen ends the chat. The answer stays, in Coach history.
+        .onDisappear { coach.endChat() }
     }
+
+    private static let end = "end"
 
     // MARK: Asking
 
@@ -269,40 +285,81 @@ struct AskView: View {
                         .buttonStyle(.bordered)
                         .disabled(!coach.hasKey)
                 }
-            } else {
-                HStack(alignment: .bottom, spacing: 8) {
-                    TextField("Follow up, like \"I can't nap at work\"", text: $followUp, axis: .vertical)
-                        .lineLimit(1...5)
-                        .focused($focus, equals: .followUp)
-                        .submitLabel(.send)
-                        .onChange(of: followUp) { _, text in
-                            if text.hasSuffix("\n") {
-                                followUp = String(text.dropLast())
-                                sendFollowUp()
-                            }
-                        }
-                        .padding(10)
-                        .background(.background.secondary, in: RoundedRectangle(cornerRadius: 12))
-                    Button(action: sendFollowUp) {
-                        Image(systemName: "arrow.up.circle.fill").font(.largeTitle)
-                    }
-                    .disabled(followUp.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty || !coach.hasKey)
-                }
             }
 
             DisclosureGroup("What Claude saw") {
                 ContextText(text: conversation.context)
             }
+
+            if let chat = coach.chat {
+                ForEach(Array(chat.turns.enumerated()), id: \.offset) { _, turn in
+                    ChatQuestionBubble(text: turn.question)
+                    if turn.answer.isEmpty {
+                        HStack(spacing: 10) {
+                            ProgressView()
+                            Text("Thinking...").foregroundStyle(.secondary)
+                        }
+                    } else {
+                        Text(Self.markdown(turn.answer))
+                            .textSelection(.enabled)
+                            .frame(maxWidth: .infinity, alignment: .leading)
+                    }
+                }
+            }
+            if let error = coach.chatError {
+                Text(error).foregroundStyle(.red)
+            }
         }
     }
 
-    private func sendFollowUp() {
-        let text = followUp.trimmingCharacters(in: .whitespacesAndNewlines)
-        guard !text.isEmpty, coach.hasKey, coach.conversation?.awaitingReply == false else { return }
+    // MARK: Talking it through
+
+    private var chatBar: some View {
+        VStack(alignment: .leading, spacing: 6) {
+            if coach.chat == nil {
+                Text("Ask why, dig into the research, or push back. This chat isn't saved; the answer above is.")
+                    .font(.caption)
+                    .foregroundStyle(.secondary)
+            }
+            HStack(alignment: .bottom, spacing: 8) {
+                TextField("Ask about this", text: $message, axis: .vertical)
+                    .lineLimit(1...5)
+                    .focused($focus, equals: .chat)
+                    .submitLabel(.send)
+                    .onChange(of: message) { _, text in
+                        if text.hasSuffix("\n") {
+                            message = String(text.dropLast())
+                            sendMessage()
+                        }
+                    }
+                    .padding(10)
+                    .background(.background.secondary, in: RoundedRectangle(cornerRadius: 12))
+                Button(action: sendMessage) {
+                    Image(systemName: "arrow.up.circle.fill").font(.largeTitle)
+                }
+                .disabled(message.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty || !coach.hasKey || coach.isChatting)
+            }
+        }
+        .padding(.horizontal)
+        .padding(.vertical, 8)
+        .background(.bar)
+    }
+
+    private func sendMessage() {
+        let text = message.trimmingCharacters(in: .whitespacesAndNewlines)
+        guard !text.isEmpty, coach.hasKey, !coach.isChatting else { return }
         focus = nil
-        followUp = ""
-        coach.followUp(text, modelContext: context)
-        Task { await coach.send(modelContext: context) }
+        message = ""
+        Task {
+            let sent = await coach.ask(about: text)
+            if !sent { message = text }
+        }
+    }
+
+    /// Links, bold and italics; line breaks kept. Anything that won't parse shows as plain text.
+    private static func markdown(_ text: String) -> AttributedString {
+        let options = AttributedString.MarkdownParsingOptions(interpretedSyntax: .inlineOnlyPreservingWhitespace)
+        return (try? AttributedString(markdown: text, options: options)) ?? AttributedString(text)
     }
 }
 
@@ -324,6 +381,20 @@ private func stepLogSheet(_ item: LoggableStep, onLogged: @escaping () -> Void) 
         note: item.step.intervention == nil ? item.step.title : nil,
         onLogged: onLogged
     )
+}
+
+/// Your question in the chat, on the right.
+private struct ChatQuestionBubble: View {
+    let text: String
+
+    var body: some View {
+        HStack {
+            Spacer(minLength: 40)
+            Text(text)
+                .padding(12)
+                .background(BarKind.mental.color.opacity(0.12), in: RoundedRectangle(cornerRadius: 12))
+        }
+    }
 }
 
 struct QuestionBubble: View {
@@ -533,7 +604,7 @@ struct ClaudeKeySection: View {
         } header: {
             Text("Claude coach")
         } footer: {
-            Text("Get a key at console.anthropic.com. It stays in this phone's Keychain. Claude is called only when you ask something: it gets what you typed plus \"What Claude sees\" (the time, your work hours and bedtime, both bars, last night's Oura data, your last two days of logs and moods, without mood notes). If Claude's safety filter declines a question, Anthropic retries it on another Claude model. Conversations are saved in the app, synced through iCloud and kept in your backups.")
+            Text("Get a key at console.anthropic.com. It stays in this phone's Keychain. Claude is called only when you ask something: it gets what you typed plus \"What Claude sees\" (the time, your work hours and bedtime, both bars, last night's Oura data, your last two days of logs and moods, without mood notes). If Claude's safety filter declines a question, Anthropic retries it on another Claude model. Questions and answers are saved in the app, synced through iCloud and kept in your backups. Chats about an answer aren't saved.")
         }
     }
 }

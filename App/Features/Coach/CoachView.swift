@@ -183,7 +183,7 @@ private struct CoachDestinationView: View {
     private var content: some View {
         switch link {
         case .running: RunningView()
-        case .recordRun: RunView()
+        case .recordRun: RunView(activity: .run)
         case .meditate: MeditationView()
         case .log: LogView()
         case .insights: InsightsView()

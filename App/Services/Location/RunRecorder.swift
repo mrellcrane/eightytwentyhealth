@@ -2,7 +2,7 @@ import Foundation
 import CoreLocation
 import EightyTwentyCore
 
-/// Strava-style run recording: GPS via CoreLocation's live updates, math via
+/// Strava-style run or walk recording: GPS via CoreLocation's live updates, math via
 /// `RunTracker` (unit tested in the core package).
 ///
 /// `CLBackgroundActivitySession` keeps location flowing with the screen locked,
@@ -16,6 +16,10 @@ final class RunRecorder {
     private(set) var lastLocation: CLLocation?
     /// Stored (not computed from the manager) so the UI updates when you answer the prompt.
     private(set) var isLocationDenied = false
+    /// Run or walk: the same GPS and math, saved as its own kind and Apple Health workout.
+    var activity: ActivityKind = .run
+
+    static let activities: [ActivityKind] = [.run, .walk]
 
     private let manager = CLLocationManager()
     private var updatesTask: Task<Void, Never>?

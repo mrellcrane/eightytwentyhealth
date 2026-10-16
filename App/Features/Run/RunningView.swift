@@ -83,7 +83,7 @@ struct RunningView: View {
                 Button { addingRun = true } label: {
                     Label("Add a run: Strava screenshot or treadmill", systemImage: "plus.circle")
                 }
-                NavigationLink { RunView() } label: {
+                NavigationLink { RunView(activity: .run) } label: {
                     Label("Record a run here", systemImage: "record.circle")
                 }
             } footer: {

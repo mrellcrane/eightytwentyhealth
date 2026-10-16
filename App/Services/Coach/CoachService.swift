@@ -30,7 +30,8 @@ enum ClaudeKey {
 }
 
 /// The Claude coach: builds what Claude sees from your data, keeps the current
-/// conversation, and saves every question and answer as a `CoachLog`.
+/// conversation, and saves every question and answer as a `CoachLog`. Chatting
+/// about an answer afterwards isn't saved: closing the Ask screen ends the chat.
 ///
 /// Logs carry status codes, timings and step counts only: never what you typed,
 /// what Claude said, or the health numbers in the context.
@@ -51,6 +52,12 @@ final class CoachService {
     private(set) var errorMessage: String?
     /// "Look up studies" in progress or failed, by turn of the current conversation.
     private(set) var lookups: [Int: LookupState] = [:]
+    /// Talking the current answer through.
+    private(set) var chat: CoachChat?
+    private(set) var isChatting = false
+    private(set) var chatError: String?
+    /// Changes whenever a chat ends, so an answer still streaming for it is dropped.
+    private var chatID: UUID?
 
     enum LookupState: Equatable {
         case searching
@@ -90,14 +97,7 @@ final class CoachService {
         logID = UUID()
         errorMessage = nil
         lookups = [:]
-        persist(modelContext)
-    }
-
-    func followUp(_ question: String, modelContext: ModelContext) {
-        guard var conversation, !conversation.awaitingReply else { return }
-        conversation.followUp(question.trimmingCharacters(in: .whitespacesAndNewlines), at: Self.stamp(.now))
-        self.conversation = conversation
-        errorMessage = nil
+        endChat()
         persist(modelContext)
     }
 
@@ -107,6 +107,7 @@ final class CoachService {
         logID = log.id
         errorMessage = nil
         lookups = [:]
+        endChat()
     }
 
     /// Opening the coach hours later starts a new conversation; the old one is in Past questions.
@@ -122,6 +123,7 @@ final class CoachService {
         logID = nil
         errorMessage = nil
         lookups = [:]
+        endChat()
     }
 
     /// Sends whatever is waiting for an answer. Also the retry after an error.
@@ -151,6 +153,90 @@ final class CoachService {
             errorMessage = "Couldn't reach Claude: \(error.localizedDescription)"
             Log.coach.warning("Turn \(sent.turns.count) failed after \(Self.seconds(since: started)): \(error.localizedDescription)")
         }
+    }
+
+    // MARK: Chat
+
+    /// Asks about the answer; the first question starts the chat. Returns false if it
+    /// didn't go through, so the view can put the question back.
+    func ask(about question: String) async -> Bool {
+        guard let conversation, !conversation.awaitingReply, !isThinking, !isChatting else { return false }
+        let key = ClaudeKey.load()
+        guard !key.isEmpty else { return false }
+        if chat == nil {
+            // Studies from "Look up studies", so Claude can talk about them.
+            chat = CoachChat(base: conversation, studies: Self.unique(conversation.turns.flatMap { $0.studies ?? [] }))
+            chatID = UUID()
+        }
+        guard let id = chatID else { return false }
+        chat?.ask(question.trimmingCharacters(in: .whitespacesAndNewlines), at: Self.stamp(.now))
+        let turn = chat?.turns.count ?? 0
+        chatError = nil
+        isChatting = true
+        defer { if chatID == id { isChatting = false } }
+        let started = Date()
+        do {
+            let stream = try await streamChat(key: key, id: id)
+            guard chatID == id else { return true }
+            let answer = try stream.answer()
+            chat?.finish(answer)
+            Log.coach.info("Chat turn \(turn) answered in \(Self.seconds(since: started)): stop \(stream.stopReason ?? "none"), \(stream.inputTokens) in, \(stream.cachedTokens) cached, \(stream.outputTokens) out\(stream.fellBack ? ", after a fallback" : "")")
+            return true
+        } catch {
+            // Closed meanwhile: nothing to show or put back.
+            guard chatID == id else { return true }
+            chat?.withdraw()
+            if let error = error as? CoachError {
+                chatError = error.userMessage
+                let summary = "Chat turn \(turn) failed after \(Self.seconds(since: started)): \(Self.logLabel(error))"
+                switch error {
+                case .unauthorized, .rateLimited, .overloaded, .refused: Log.coach.warning(summary)
+                default: Log.coach.error(summary)
+                }
+            } else {
+                chatError = "Couldn't reach Claude: \(error.localizedDescription)"
+                Log.coach.warning("Chat turn \(turn) failed after \(Self.seconds(since: started)): \(error.localizedDescription)")
+            }
+            return false
+        }
+    }
+
+    func endChat() {
+        chat = nil
+        chatID = nil
+        chatError = nil
+        isChatting = false
+    }
+
+    private func streamChat(key: String, id: UUID) async throws -> CoachStream {
+        do {
+            return try await streamChat(key: key, id: id, fallbacks: true)
+        } catch CoachError.http(400, let message) where message.localizedCaseInsensitiveContains("fallback") {
+            // As for answers: if the API ever rejects the fallback beta, go without it.
+            return try await streamChat(key: key, id: id, fallbacks: false)
+        }
+    }
+
+    private func streamChat(key: String, id: UUID, fallbacks: Bool) async throws -> CoachStream {
+        guard let chat else { throw CancellationError() }
+        let request = try CoachChatRequest.urlRequest(chat, apiKey: key, fallbacks: fallbacks)
+        let (bytes, response) = try await URLSession.shared.bytes(for: request)
+        let status = (response as? HTTPURLResponse)?.statusCode ?? 0
+        guard status == 200 else {
+            var body = Data()
+            for try await byte in bytes {
+                body.append(byte)
+                if body.count > 8000 { break }
+            }
+            throw CoachClient.error(status: status, body: body)
+        }
+        var stream = CoachStream()
+        for try await line in bytes.lines {
+            guard chatID == id else { break }
+            let text = try stream.read(line)
+            if !text.isEmpty { self.chat?.receive(text) }
+        }
+        return stream
     }
 
     // MARK: Context

@@ -3,10 +3,14 @@ import UIKit
 import MapKit
 import EightyTwentyCore
 
-/// Record a run like Strava: Start, Pause/Resume, Finish (hold), then Save or Discard.
+/// Record a run or walk like Strava: Start, Pause/Resume, Finish (hold), then Save or Discard.
 struct RunView: View {
+    /// What to record when nothing is in progress. Nil means whatever you picked last.
+    var activity: ActivityKind? = nil
+
     @Environment(AppModel.self) private var model
     @AppStorage(PrefKey.usesMiles) private var usesMiles = Units.defaultUsesMiles
+    @AppStorage(PrefKey.recordActivity) private var lastActivity = ActivityKind.run.rawValue
     @State private var camera: MapCameraPosition = .userLocation(fallback: .automatic)
     @State private var confirmDiscard = false
     @State private var saving = false
@@ -16,22 +20,32 @@ struct RunView: View {
     private var recorder: RunRecorder { model.runRecorder }
     private var unitMeters: Double { Units.meters(usesMiles: usesMiles) }
     private var unit: String { Units.label(usesMiles: usesMiles) }
+    /// "run" or "walk", for buttons.
+    private var noun: String { recorder.activity.title.lowercased() }
+    private var tint: Color { recorder.activity == .walk ? .green : .orange }
 
     var body: some View {
         VStack(spacing: 0) {
             map
                 .frame(maxHeight: recorder.state == .finished ? 260 : .infinity)
+            // Before you start, or after you finish and before saving, in case you picked wrong.
+            if recorder.state == .idle || (recorder.state == .finished && !saved) {
+                activityPicker
+                    .padding(.horizontal)
+                    .padding(.top, 12)
+            }
             TimelineView(.periodic(from: .now, by: 1)) { context in
                 stats(at: context.date)
             }
             controls
                 .padding(.vertical, 24)
         }
-        .navigationTitle("Run")
+        .navigationTitle(recorder.activity.title)
         .navigationBarTitleDisplayMode(.inline)
         .navigationBarBackButtonHidden(recorder.state == .running || recorder.state == .paused)
         .onAppear {
             if recorder.state == .idle {
+                recorder.activity = activity ?? ActivityKind(rawValue: lastActivity) ?? .run
                 recorder.reset(usesMiles: usesMiles)
                 recorder.prepare()
             }
@@ -42,9 +56,24 @@ struct RunView: View {
         .onChange(of: recorder.state) { _, state in
             UIApplication.shared.isIdleTimerDisabled = state == .running
         }
-        .confirmationDialog("Discard this run?", isPresented: $confirmDiscard, titleVisibility: .visible) {
+        .confirmationDialog("Discard this \(noun)?", isPresented: $confirmDiscard, titleVisibility: .visible) {
             Button("Discard", role: .destructive) { recorder.reset(usesMiles: usesMiles); saved = false }
         }
+    }
+
+    private var activityPicker: some View {
+        Picker("Recording", selection: Binding(
+            get: { recorder.activity },
+            set: { kind in
+                recorder.activity = kind
+                lastActivity = kind.rawValue
+            }
+        )) {
+            ForEach(RunRecorder.activities) { kind in
+                Text(kind.title).tag(kind)
+            }
+        }
+        .pickerStyle(.segmented)
     }
 
     // MARK: Map
@@ -55,7 +84,7 @@ struct RunView: View {
             // One line per segment, so a pause doesn't draw a straight line across town.
             ForEach(Array(recorder.tracker.segments.filter { $0.count > 1 }.enumerated()), id: \.offset) { _, segment in
                 MapPolyline(coordinates: segment.map { CLLocationCoordinate2D(latitude: $0.latitude, longitude: $0.longitude) })
-                    .stroke(.orange, lineWidth: 5)
+                    .stroke(tint, lineWidth: 5)
             }
         }
         .mapControls {
@@ -119,7 +148,7 @@ struct RunView: View {
     private var controls: some View {
         switch recorder.state {
         case .idle:
-            RoundButton(title: "Start", systemImage: "play.fill", tint: .orange) {
+            RoundButton(title: "Start", systemImage: "play.fill", tint: tint) {
                 recorder.start()
             }
             .disabled(recorder.isLocationDenied)
@@ -129,7 +158,7 @@ struct RunView: View {
             }
         case .paused:
             HStack(spacing: 40) {
-                RoundButton(title: "Resume", systemImage: "play.fill", tint: .orange) { recorder.resume() }
+                RoundButton(title: "Resume", systemImage: "play.fill", tint: tint) { recorder.resume() }
                 HoldToFinishButton { recorder.finish() }
             }
         case .finished:
@@ -137,7 +166,7 @@ struct RunView: View {
                 VStack(spacing: 12) {
                     Label("Saved to your log and Apple Health", systemImage: "checkmark.circle.fill")
                         .foregroundStyle(.green)
-                    Button("New run") {
+                    Button("New \(noun)") {
                         recorder.reset(usesMiles: usesMiles)
                         saved = false
                         recorder.prepare()
@@ -151,14 +180,14 @@ struct RunView: View {
                     Button {
                         saving = true
                         Task {
-                            saved = await model.logRun(recorder)
+                            saved = await model.logRecording(recorder)
                             saving = false
                         }
                     } label: {
-                        if saving { ProgressView() } else { Text("Save run") }
+                        if saving { ProgressView() } else { Text("Save \(noun)") }
                     }
                     .buttonStyle(.borderedProminent)
-                    .tint(.orange)
+                    .tint(tint)
                     .disabled(saving)
                 }
             }
@@ -166,7 +195,7 @@ struct RunView: View {
     }
 }
 
-/// Finish needs a 1-second hold, so a pocket tap can't end your run.
+/// Finish needs a 1-second hold, so a pocket tap can't end your run or walk.
 struct HoldToFinishButton: View {
     let action: () -> Void
     @State private var holding = false

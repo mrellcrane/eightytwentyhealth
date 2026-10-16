@@ -18,8 +18,8 @@ struct RecordView: View {
                 RunView()
             } label: {
                 RecordRow(
-                    title: "Run",
-                    subtitle: "GPS time, distance, pace and route. Keeps going with the screen locked. Saves a workout to Apple Health.",
+                    title: "Run or walk",
+                    subtitle: "GPS time, distance, pace and route. Keeps going with the screen locked. Saves a workout to Apple Health; only runs count toward your running plan.",
                     systemImage: "figure.run",
                     tint: .orange
                 )

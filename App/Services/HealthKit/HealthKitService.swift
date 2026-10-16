@@ -238,11 +238,13 @@ final class HealthKitService {
         return sample.uuid
     }
 
-    /// Saves a run as an outdoor running workout with its GPS route,
-    /// so it shows up in Apple Fitness/Health (and anything that syncs from Health).
-    func saveRun(start: Date, end: Date, distanceMeters: Double, pauses: [PauseInterval], route: [CLLocation]) async throws -> UUID? {
+    /// Saves a recorded run or walk as an outdoor running or walking workout with its
+    /// GPS route, so it shows up in Apple Fitness/Health (and anything that syncs from Health).
+    /// Only running workouts count toward the running plan (`runs(from:to:)`).
+    func saveWorkout(_ kind: ActivityKind, start: Date, end: Date, distanceMeters: Double, pauses: [PauseInterval],
+                     route: [CLLocation]) async throws -> UUID? {
         let configuration = HKWorkoutConfiguration()
-        configuration.activityType = .running
+        configuration.activityType = kind == .walk ? .walking : .running
         configuration.locationType = .outdoor
 
         let builder = HKWorkoutBuilder(healthStore: store, configuration: configuration, device: .local())

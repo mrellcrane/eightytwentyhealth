@@ -68,4 +68,9 @@ public enum JSONValue: Codable, Equatable, Sendable, ExpressibleByStringLiteral,
         if case .array(let value) = self { return value }
         return nil
     }
+
+    public var intValue: Int? {
+        if case .number(let value) = self { return Int(value) }
+        return nil
+    }
 }
