@@ -144,7 +144,7 @@ sed -n 's/^OURA_CLIENT_SECRET = //p' Config/Secrets.xcconfig | tr -d '\n' | gh s
 gh secret list -R $R
 ```
 
-Only after `gh secret list` shows all six: `rm ~/Downloads/AuthKey_*.p8` (and empty it from the Trash if it went there). It's an admin key to the developer account.
+Only after `gh secret list` shows all six: `rm ~/Downloads/AuthKey_<KEYID>.p8` (only this key's file; other `AuthKey_*.p8` files in Downloads belong to other projects) (and empty it from the Trash if it went there). It's an admin key to the developer account.
 
 ### B4. TestFlight group (Chrome)
 
