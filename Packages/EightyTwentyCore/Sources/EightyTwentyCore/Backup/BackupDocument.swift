@@ -106,9 +106,15 @@ public struct ActivityRecord: Codable, Equatable, Identifiable, Sendable {
     /// Run route as a Google-encoded polyline (see `Polyline`).
     public var routePolyline: String?
     public var deletedAt: Date?
+    /// `Intervention.id` when logged from the catalog or a coach step that matched it.
+    public var interventionID: String?
+    /// 0-10, how strong the problem felt before and after (lower is better).
+    public var intensityBefore: Int?
+    public var intensityAfter: Int?
 
     public init(id: UUID, timestamp: Date, kind: String, minutes: Double?, amount: Double?, distanceMeters: Double?,
-                source: String, externalID: String?, note: String?, routePolyline: String?, deletedAt: Date?) {
+                source: String, externalID: String?, note: String?, routePolyline: String?, deletedAt: Date?,
+                interventionID: String? = nil, intensityBefore: Int? = nil, intensityAfter: Int? = nil) {
         self.id = id
         self.timestamp = timestamp
         self.kind = kind
@@ -120,6 +126,9 @@ public struct ActivityRecord: Codable, Equatable, Identifiable, Sendable {
         self.note = note
         self.routePolyline = routePolyline
         self.deletedAt = deletedAt
+        self.interventionID = interventionID
+        self.intensityBefore = intensityBefore
+        self.intensityAfter = intensityAfter
     }
 }
 

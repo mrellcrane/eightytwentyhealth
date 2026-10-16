@@ -18,6 +18,16 @@ public enum ActivityKind: String, Codable, CaseIterable, Sendable, Identifiable 
     case lateCaffeine
     case lateMeal
     case screensBeforeBed
+    // Mental practices and coach steps, logged from the Mental screen.
+    case reframe
+    case journaling
+    case selfCompassion
+    case relaxation
+    case music
+    case kindness
+    case nap
+    /// A coach step that fits no kind above. Its note says what it was.
+    case other
 
     public var id: String { rawValue }
 
@@ -38,6 +48,14 @@ public enum ActivityKind: String, Codable, CaseIterable, Sendable, Identifiable 
         case .lateCaffeine: return "Caffeine after 2pm"
         case .lateMeal: return "Late meal"
         case .screensBeforeBed: return "Screens in bed"
+        case .reframe: return "Thought reframe"
+        case .journaling: return "Expressive writing"
+        case .selfCompassion: return "Self-compassion"
+        case .relaxation: return "Muscle relaxation"
+        case .music: return "Music"
+        case .kindness: return "Act of kindness"
+        case .nap: return "Nap"
+        case .other: return "Other"
         }
     }
 
@@ -59,6 +77,14 @@ public enum ActivityKind: String, Codable, CaseIterable, Sendable, Identifiable 
         case .lateCaffeine: return "cup.and.saucer"
         case .lateMeal: return "fork.knife"
         case .screensBeforeBed: return "iphone"
+        case .reframe: return "arrow.triangle.2.circlepath"
+        case .journaling: return "book.closed"
+        case .selfCompassion: return "heart.circle"
+        case .relaxation: return "figure.cooldown"
+        case .music: return "music.note"
+        case .kindness: return "gift"
+        case .nap: return "powersleep"
+        case .other: return "checkmark.circle"
         }
     }
 
@@ -86,13 +112,21 @@ public enum ActivityKind: String, Codable, CaseIterable, Sendable, Identifiable 
         case .lateCaffeine: return .occurrence
         case .lateMeal: return .occurrence
         case .screensBeforeBed: return .occurrence
+        case .reframe: return .minutes(default: 10)
+        case .journaling: return .minutes(default: 15)
+        case .selfCompassion: return .minutes(default: 5)
+        case .relaxation: return .minutes(default: 15)
+        case .music: return .minutes(default: 15)
+        case .kindness: return .occurrence
+        case .nap: return .minutes(default: 15)
+        case .other: return .minutes(default: 10)
         }
     }
 
     /// Counts toward the "Practices" component of the Mental bar.
     public var isMentalPractice: Bool {
         switch self {
-        case .meditation, .breathwork, .yoga: return true
+        case .meditation, .breathwork, .yoga, .reframe, .journaling, .selfCompassion, .relaxation: return true
         default: return false
         }
     }
