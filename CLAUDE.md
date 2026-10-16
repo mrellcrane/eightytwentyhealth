@@ -13,6 +13,7 @@ Personal iOS app (SwiftUI, SwiftData + CloudKit, HealthKit, Oura API v2). One us
   gh api repos/$R/actions/runs/$RUN/jobs -q '.jobs[].steps[] | select(.conclusion=="failure") | .name'
   ```
   `gh pr`/`gh issue` (GraphQL) don't work through the cloud proxy; use `gh api` (REST). `gh auth status` reports the token as invalid; ignore it, `gh api` still works.
+- **Signing:** each run makes a throwaway "Created via API" development certificate; the next run revokes the old ones before archiving (Apple caps how many an account holds). If an archive fails with "maximum number of certificates", check that step's output.
 - **Job logs:** `gh api .../actions/jobs/<id>/logs` fails with `Forbidden`, because GitHub redirects log downloads to `*.blob.core.windows.net`, which the cloud network policy blocks. Read logs with the GitHub MCP tool `get_job_logs` instead (`job_id`, `return_content: true`, `tail_lines` ~150 reaches the `Uploaded build N` line).
 - **Core logic is plain Swift** in `Packages/EightyTwentyCore` (no UIKit/HealthKit), with tests. If `swift` is installed (environment setup script; the default cloud image doesn't have it, and then CI is the only test run), run `cd Packages/EightyTwentyCore && swift test` before pushing. Put new logic there, with tests, whenever it doesn't need Apple frameworks.
 - **App code** (`App/`) only compiles in CI. Keep changes there small and match the surrounding style.
