@@ -17,6 +17,8 @@ struct AskView: View {
     @State private var preview = ""
     @State private var logging: LoggableStep?
     @Query(filter: #Predicate<SavedStudy> { $0.deletedAt == nil }) private var savedStudies: [SavedStudy]
+    @Query(filter: #Predicate<CoachLog> { $0.deletedAt == nil }, sort: \CoachLog.startedAt, order: .reverse)
+    private var history: [CoachLog]
     @FocusState private var focus: Field?
 
     private enum Field { case question, followUp }
@@ -160,6 +162,33 @@ struct AskView: View {
                 if showingContext {
                     preview = coach.makeContext(question: question, checkIn: checkIn, modelContext: context).render()
                 }
+            }
+
+            if !history.isEmpty {
+                recent
+            }
+        }
+    }
+
+    /// Your last few questions. Tapping one reopens it here, answers and studies included.
+    private var recent: some View {
+        VStack(alignment: .leading, spacing: 10) {
+            HStack {
+                Text("Coach history").font(.headline)
+                Spacer()
+                NavigationLink("See all (\(history.count))") {
+                    CoachHistoryView { log in coach.resume(log) }
+                }
+                .font(.subheadline)
+            }
+            ForEach(history.prefix(5), id: \.persistentModelID) { log in
+                Button { coach.resume(log) } label: {
+                    PastQuestionRow(log: log)
+                        .frame(maxWidth: .infinity, alignment: .leading)
+                        .padding(12)
+                        .background(.background.secondary, in: RoundedRectangle(cornerRadius: 12))
+                }
+                .buttonStyle(.plain)
             }
         }
     }
@@ -591,6 +620,75 @@ struct StudyLibraryView: View {
         }
         .searchable(text: $search)
         .navigationTitle("Saved studies")
+        .navigationBarTitleDisplayMode(.inline)
+    }
+}
+
+/// One saved conversation in a list: the question, when, and how many follow-ups.
+struct PastQuestionRow: View {
+    let log: CoachLog
+
+    var body: some View {
+        let turns = log.turns
+        VStack(alignment: .leading, spacing: 2) {
+            Text(log.title).lineLimit(2)
+            HStack(spacing: 4) {
+                Text(log.startedAt, format: .dateTime.weekday().month().day().hour().minute())
+                if turns.count > 1 { Text("· \(turns.count - 1) follow-up\(turns.count == 2 ? "" : "s")") }
+                if turns.last?.reply == nil { Text("· no answer") }
+            }
+            .font(.caption)
+            .foregroundStyle(.secondary)
+        }
+    }
+}
+
+/// Every coach question and answer, newest first. Searchable; swipe to delete.
+struct CoachHistoryView: View {
+    /// Set when shown from the Ask screen: picking a conversation reopens it there.
+    /// Otherwise a conversation opens on its own screen.
+    var onOpen: ((CoachLog) -> Void)?
+
+    @Environment(AppModel.self) private var model
+    @Environment(\.dismiss) private var dismiss
+    @Query(filter: #Predicate<CoachLog> { $0.deletedAt == nil }, sort: \CoachLog.startedAt, order: .reverse)
+    private var logs: [CoachLog]
+    @State private var search = ""
+
+    var body: some View {
+        let shown = search.isEmpty ? logs : logs.filter { log in
+            log.turns.contains { $0.question.localizedCaseInsensitiveContains(search) }
+        }
+        List {
+            if logs.isEmpty {
+                Text("Nothing yet. Every question you ask the coach, and its answer, is saved here.")
+                    .foregroundStyle(.secondary)
+            }
+            ForEach(shown, id: \.persistentModelID) { log in
+                Group {
+                    if let onOpen {
+                        Button {
+                            onOpen(log)
+                            dismiss()
+                        } label: {
+                            PastQuestionRow(log: log)
+                        }
+                        .buttonStyle(.plain)
+                    } else {
+                        NavigationLink {
+                            CoachLogView(log: log)
+                        } label: {
+                            PastQuestionRow(log: log)
+                        }
+                    }
+                }
+                .swipeActions {
+                    Button("Delete", role: .destructive) { model.delete(log) }
+                }
+            }
+        }
+        .searchable(text: $search, prompt: "Search your questions")
+        .navigationTitle("Coach history")
         .navigationBarTitleDisplayMode(.inline)
     }
 }

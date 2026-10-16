@@ -45,6 +45,31 @@ struct MentalView: View {
                     .listRowBackground(Color.clear)
             }
 
+            if !conversations.isEmpty || !savedStudies.isEmpty {
+                Section("Coach history") {
+                    ForEach(conversations.prefix(3), id: \.persistentModelID) { log in
+                        NavigationLink {
+                            CoachLogView(log: log)
+                        } label: {
+                            PastQuestionRow(log: log)
+                        }
+                        .swipeActions {
+                            Button("Delete", role: .destructive) { model.delete(log) }
+                        }
+                    }
+                    if conversations.count > 3 {
+                        NavigationLink("See all \(conversations.count) conversations") { CoachHistoryView() }
+                    }
+                    if !savedStudies.isEmpty {
+                        NavigationLink {
+                            StudyLibraryView()
+                        } label: {
+                            Label("Saved studies (\(savedStudies.count))", systemImage: "books.vertical")
+                        }
+                    }
+                }
+            }
+
             Section("What your data says") {
                 EnergyNowPicker()
                 DataSignalsView(signals: signals)
@@ -72,36 +97,6 @@ struct MentalView: View {
                 Text("Build it up")
             } footer: {
                 Text("≈ numbers are research estimates: the study's effect size × 33, roughly the average change against a comparison group. Ranked by that per minute, then reordered by what today's data shows: last night's sleep, steps since you woke, Oura stress, your check-ins and energy, and what you've already done. Once you've rated a step 3 times, your own before → after counts too.")
-            }
-
-            if !savedStudies.isEmpty {
-                Section {
-                    NavigationLink {
-                        StudyLibraryView()
-                    } label: {
-                        Label("Saved studies (\(savedStudies.count))", systemImage: "books.vertical")
-                    }
-                }
-            }
-
-            if !conversations.isEmpty {
-                Section("Past questions") {
-                    ForEach(conversations.prefix(30), id: \.persistentModelID) { log in
-                        NavigationLink {
-                            CoachLogView(log: log)
-                        } label: {
-                            VStack(alignment: .leading, spacing: 2) {
-                                Text(log.title).lineLimit(2)
-                                Text(log.startedAt, format: .dateTime.weekday().month().day().hour().minute())
-                                    .font(.caption)
-                                    .foregroundStyle(.secondary)
-                            }
-                        }
-                        .swipeActions {
-                            Button("Delete", role: .destructive) { model.delete(log) }
-                        }
-                    }
-                }
             }
 
             Section {

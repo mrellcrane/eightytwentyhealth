@@ -10,6 +10,7 @@ struct TodayView: View {
     @Query(filter: #Predicate<MoodEntry> { $0.deletedAt == nil }) private var moods: [MoodEntry]
     @Query(filter: #Predicate<GratitudeEntry> { $0.deletedAt == nil }) private var gratitude: [GratitudeEntry]
     @Query(filter: #Predicate<ActivityLog> { $0.deletedAt == nil }) private var activities: [ActivityLog]
+    @Query(filter: #Predicate<CoachLog> { $0.deletedAt == nil }) private var coachLogs: [CoachLog]
 
     @AppStorage(PrefKey.windDownOn) private var windDownOn = true
     @AppStorage(PrefKey.bedtimeMinutes) private var bedtimeMinutes = 22 * 60 + 15
@@ -40,6 +41,14 @@ struct TodayView: View {
                 AskCard {
                     model.coach.expireIfStale()
                     asking = true
+                }
+                if !coachLogs.isEmpty {
+                    NavigationLink {
+                        CoachHistoryView()
+                    } label: {
+                        Label("Coach history (\(coachLogs.count))", systemImage: "clock.arrow.circlepath")
+                            .font(.subheadline)
+                    }
                 }
 
                 quickActions
