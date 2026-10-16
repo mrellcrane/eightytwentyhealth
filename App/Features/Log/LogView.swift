@@ -63,6 +63,16 @@ struct LogView: View {
                         .swipeActions {
                             Button("Delete", role: .destructive) { delete(item) }
                         }
+                        // Recorded a walk as a run, or the other way round.
+                        .swipeActions(edge: .leading) {
+                            if let log = item.runOrWalk {
+                                let other: ActivityKind = log.activityKind == .run ? .walk : .run
+                                Button("Make it a \(other.title.lowercased())", systemImage: other.systemImage) {
+                                    Task { await model.change(log, to: other) }
+                                }
+                                .tint(other == .walk ? .green : .orange)
+                            }
+                        }
                 }
             }
         }
@@ -107,6 +117,12 @@ enum RecentItem: Identifiable {
         case .gratitude(let g): return g.date
         case .activity(let a): return a.timestamp
         }
+    }
+
+    /// A run or a walk, which can be switched to the other.
+    var runOrWalk: ActivityLog? {
+        guard case .activity(let log) = self, log.activityKind == .run || log.activityKind == .walk else { return nil }
+        return log
     }
 }
 

@@ -195,8 +195,11 @@ final class HealthKitService {
     private func samples(of type: HKSampleType, from start: Date, to end: Date, sources: Set<HKSource>? = nil) async throws -> [HKSample] {
         var predicates = [HKQuery.predicateForSamples(withStart: start, end: end)]
         if let sources { predicates.append(HKQuery.predicateForObjects(from: sources)) }
-        let predicate = NSCompoundPredicate(andPredicateWithSubpredicates: predicates)
-        return try await withCheckedThrowingContinuation { continuation in
+        return try await samples(of: type, matching: NSCompoundPredicate(andPredicateWithSubpredicates: predicates))
+    }
+
+    private func samples(of type: HKSampleType, matching predicate: NSPredicate) async throws -> [HKSample] {
+        try await withCheckedThrowingContinuation { continuation in
             let query = HKSampleQuery(
                 sampleType: type,
                 predicate: predicate,
@@ -243,6 +246,62 @@ final class HealthKitService {
     /// Only running workouts count toward the running plan (`runs(from:to:)`).
     func saveWorkout(_ kind: ActivityKind, start: Date, end: Date, distanceMeters: Double, pauses: [PauseInterval],
                      route: [CLLocation]) async throws -> UUID? {
+        let events = pauses.flatMap { pause in
+            [
+                HKWorkoutEvent(type: .pause, dateInterval: DateInterval(start: pause.start, duration: 0), metadata: nil),
+                HKWorkoutEvent(type: .resume, dateInterval: DateInterval(start: pause.end, duration: 0), metadata: nil),
+            ]
+        }
+        return try await saveWorkout(kind, start: start, end: end, distanceMeters: distanceMeters, events: events, route: route)?.uuid
+    }
+
+    /// Saves a recorded workout again as `kind` (run or walk), with the same times, distance,
+    /// pauses and route, then deletes the original and the distance and route saved with it.
+    /// Health can't change a workout's type in place. Returns the new workout's UUID, or nil
+    /// if the original isn't in Health anymore.
+    func resaveWorkout(_ uuid: UUID, as kind: ActivityKind, distanceMeters: Double) async throws -> UUID? {
+        guard isAvailable,
+              let original = try await samples(of: HKObjectType.workoutType(), matching: HKQuery.predicateForObject(with: uuid))
+                .first as? HKWorkout else { return nil }
+        let routes = try await samples(of: HKSeriesType.workoutRoute(), matching: HKQuery.predicateForObjects(from: original))
+        var locations: [CLLocation] = []
+        for case let route as HKWorkoutRoute in routes {
+            locations += try await self.locations(in: route)
+        }
+        let distances = try await samples(of: HKQuantityType(.distanceWalkingRunning), matching: HKQuery.predicateForObjects(from: original))
+        let events = (original.workoutEvents ?? []).filter { $0.type == .pause || $0.type == .resume }
+
+        // The new one first, so a failure leaves the original as it was.
+        guard let replacement = try await saveWorkout(kind, start: original.startDate, end: original.endDate,
+                                                      distanceMeters: distanceMeters, events: events, route: locations) else { return nil }
+        let doomed: [HKObject] = [original] + (routes as [HKObject]) + (distances as [HKObject])
+        do {
+            try await store.delete(doomed)
+        } catch {
+            // Don't leave it in Health twice.
+            try? await store.delete(replacement)
+            throw error
+        }
+        return replacement.uuid
+    }
+
+    private func locations(in route: HKWorkoutRoute) async throws -> [CLLocation] {
+        let batches = RouteBatches()
+        return try await withCheckedThrowingContinuation { continuation in
+            let query = HKWorkoutRouteQuery(route: route) { _, locations, done, error in
+                if let error {
+                    continuation.resume(throwing: error)
+                } else {
+                    batches.locations += locations ?? []
+                    if done { continuation.resume(returning: batches.locations) }
+                }
+            }
+            store.execute(query)
+        }
+    }
+
+    private func saveWorkout(_ kind: ActivityKind, start: Date, end: Date, distanceMeters: Double, events: [HKWorkoutEvent],
+                             route: [CLLocation]) async throws -> HKWorkout? {
         let configuration = HKWorkoutConfiguration()
         configuration.activityType = kind == .walk ? .walking : .running
         configuration.locationType = .outdoor
@@ -258,12 +317,6 @@ final class HealthKitService {
             )
             _ = try await builder.addSamples([distance])
         }
-        let events = pauses.flatMap { pause in
-            [
-                HKWorkoutEvent(type: .pause, dateInterval: DateInterval(start: pause.start, duration: 0), metadata: nil),
-                HKWorkoutEvent(type: .resume, dateInterval: DateInterval(start: pause.end, duration: 0), metadata: nil),
-            ]
-        }
         if !events.isEmpty {
             _ = try await builder.addWorkoutEvents(events)
         }
@@ -277,8 +330,13 @@ final class HealthKitService {
             _ = try await routeBuilder.insertRouteData(route)
             _ = try await routeBuilder.finishRoute(with: workout, metadata: nil)
         }
-        return workout.uuid
+        return workout
     }
+}
+
+/// A route's points as HealthKit hands them over, a batch at a time on its own queue.
+private final class RouteBatches: @unchecked Sendable {
+    var locations: [CLLocation] = []
 }
 
 /// Our emotion words <-> HealthKit State of Mind labels.

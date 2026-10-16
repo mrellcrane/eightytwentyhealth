@@ -313,6 +313,31 @@ final class AppModel {
         return true
     }
 
+    /// Turns a logged run into a walk, or a walk into a run: here, and in Apple Health,
+    /// where it's saved again as the other kind (a workout's type can't be edited).
+    func change(_ log: ActivityLog, to kind: ActivityKind) async {
+        guard let was = log.activityKind, was != kind else { return }
+        log.kind = kind.rawValue
+        save()
+        Log.app.info("Changed a logged \(was.rawValue) to a \(kind.rawValue)")
+        if let uuid = log.healthKitUUID {
+            do {
+                if let replacement = try await healthKit.resaveWorkout(uuid, as: kind, distanceMeters: log.distanceMeters ?? 0) {
+                    log.healthKitUUID = replacement
+                    save()
+                    Log.health.info("Workout saved again as a \(kind.rawValue)")
+                } else {
+                    Log.health.info("No workout in Health to change")
+                }
+            } catch {
+                notice = "Changed here, but Apple Health still has it as a \(was.title.lowercased()) (\(error.localizedDescription)). You can delete it in the Health app."
+                Log.health.warning("Couldn't change the workout in Health: \(error.localizedDescription)")
+            }
+        }
+        // Runs from Health feed the running plan.
+        await refreshRuns()
+    }
+
     /// Soft delete: hidden everywhere, kept in backups, never re-imported.
     func delete(_ mood: MoodEntry) { mood.deletedAt = .now; save() }
     func delete(_ entry: GratitudeEntry) { entry.deletedAt = .now; save() }
