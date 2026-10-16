@@ -76,3 +76,42 @@ Delete this file once the feature ships; fold the design into `ARCHITECTURE.md`.
   docker run --rm -e CLAUDE_COACH_API_KEY -v "$PWD/Packages/EightyTwentyCore":/pkg -w /pkg swift:6.1 swift test --scratch-path /tmp/build
   ```
 - Push (no `[skip ci]`), watch the run per CLAUDE.md until green, tell the owner the TestFlight build number (100 + run number).
+
+## Research results (checked in the first session)
+
+Checked via web-search extracts of PubMed, journal and publisher pages; full-text fetching and doi.org were blocked by that session's network policy. **VERIFIED** = number and DOI seen on an abstract/publisher record. **PARTLY** = some figure or the DOI only from secondary sources. If the network allows pubmed/doi.org now, re-check the PARTLY ones; otherwise leave PARTLY items out of the catalog or say "approximate".
+
+| Item | Citation, DOI | Effect (metric, outcome, comparison) | Timing | Status |
+|---|---|---|---|---|
+| Breathwork | Fincham 2023, Sci Rep, 10.1038/s41598-022-27247-y | g 0.35 stress (12 RCTs, n=785), 0.32 anxiety, 0.40 depression; vs non-breathwork controls | mostly programs | VERIFIED |
+| Cyclic sighing | Balban 2023, Cell Rep Med, 10.1016/j.xcrm.2022.100895 | 5 min/day x 28 days; breathwork (esp. cyclic sighing) beat mindfulness for daily positive affect (1.91 vs 1.22, all breathwork arms pooled); no standardized ES | per-session pre/post over a month | PARTLY (n 108 vs 111) |
+| Reappraisal (CBT reframe) | Webb, Miles & Sheeran 2012, Psych Bull, 10.1037/a0027600 | d+ 0.36 reappraising the situation (and cognitive change overall); 0.45 perspective-taking; 0.23 reappraising the response; distraction 0.27; dwelling on feelings -0.26 | acute (single instruction) | VERIFIED |
+| Mindfulness program | Goyal 2014, JAMA IM, 10.1001/jamainternmed.2013.13018 | 0.38 anxiety, 0.30 depression at 8 wk vs nonspecific active control | 8-week program | VERIFIED |
+| Brief mindfulness | Schumer 2018, J Consult Clin Psychol, 10.1037/ccp0000324 | g 0.21 negative affect, **0.04 after publication-bias correction** | single session to 2 wk | VERIFIED: don't sell as an in-the-moment fix |
+| Acute exercise, mood | Weinstein 2024, Psychosom Med, 10.1097/PSY.0000000000001321 | g 0.336 mood, 0.497 anxiety, 0.407 depressive symptoms; pre/post within 30 min, no control | acute | VERIFIED (uncontrolled) |
+| Acute exercise, anxiety | Ensari 2015, Depress Anxiety, 10.1002/da.22370 | g 0.16 state anxiety vs control (36 RCTs) | acute | VERIFIED |
+| Single bout, energy | Loy, O'Connor & Dishman 2013, Fatigue, 10.1080/21641846.2013.843266 | energy 0.47; fatigue 0.03 (n.s.) | acute | PARTLY |
+| Stairs vs caffeine | Randolph & O'Connor 2017, Physiol Behav, 10.1016/j.physbeh.2017.03.013 | 10 min stair walking raised vigor more than 50 mg caffeine in sleep-restricted women; short-lived; no ES | acute | PARTLY |
+| Exercise for depression | Noetel 2024, BMJ, 10.1136/bmj-2023-075847 | walking/jogging g 0.62, yoga 0.55, strength 0.49 vs active controls; low certainty | programs | PARTLY |
+| Nature | McMahan & Estes 2015, J Posit Psychol, 10.1080/17439760.2014.994224 | r .31 positive affect, r -.12 negative affect (**r, not d**: d = 2r/sqrt(1-r^2), so .31 is about 0.65) | acute | PARTLY (r values from citing papers) |
+| Music | de Witte 2020, Health Psychol Rev, 10.1080/17437199.2019.1627897 | d .545 psychological stress, .380 physiological (104 RCTs) | mixed | VERIFIED |
+| Relaxation (PMR) | Manzoni 2008, BMC Psychiatry, 10.1186/1471-244X-8-41 | between-group d 0.51 anxiety (19 RCTs) | programs | VERIFIED |
+| Gratitude | Cregg & Cheavens 2021, J Happiness Stud, 10.1007/s10902-020-00236-6 | g 0.29 depression/anxiety post-test (smaller vs active controls) | programs | VERIFIED |
+| Three good things | Seligman 2005, Am Psychol, 10.1037/0003-066X.60.5.410 | lasting happiness gains, fewer depressive symptoms to 6 months; no pooled ES | 1 week of practice | PARTLY |
+| Self-compassion | Ferrari 2019, Mindfulness, 10.1007/s12671-019-01134-6 | g 0.67 stress, 0.66 depression, 0.57 anxiety, 1.37 rumination (27 RCTs) | programs | VERIFIED |
+| Kindness | Curry 2018, J Exp Soc Psychol, 10.1016/j.jesp.2018.02.014 | delta 0.28 giver's well-being | days to weeks | VERIFIED |
+| Expressive writing | Frattaroli 2006, Psych Bull, 10.1037/0033-2909.132.6.823 | r .075 overall | multi-session | VERIFIED: tiny, probably leave out |
+| Behavioral activation | Ekers 2014, PLOS ONE, 10.1371/journal.pone.0100100 | SMD 0.74 depression vs controls | treatment course | VERIFIED: therapy, not a quick action |
+| Affect labeling | Torre & Lieberman 2018, Emotion Review, 10.1177/1754073917742706 | narrative review, no pooled ES | acute | NOT VERIFIED: no meta-analysis |
+| Nap | Brooks & Lack 2006, Sleep, 10.1093/sleep/29.6.831; Dutheil 2021, IJERPH, 10.3390/ijerph181910212 | 10-min nap best in a crossover (n=24, after ~5 h sleep); meta-analysis: alertness 0.29, cognition 0.18; naps before 1 pm worked better | acute | Brooks PARTLY, Dutheil VERIFIED |
+| Caffeine timing | Drake 2013, JCSM, 10.5664/jcsm.3170; Gardiner 2023, Sleep Med Rev, 10.1016/j.smrv.2023.101764 | 400 mg even 6 h before bed cut >1 h of sleep; meta-analysis: coffee (107 mg) at least **8.8 h** before bed, pre-workout dose 13.2 h | n/a | VERIFIED (system prompt now says about 9 h) |
+| Mild dehydration | Armstrong 2012, J Nutr (DOI likely 10.3945/jn.111.142000) | 1.36% body-mass loss: worse fatigue, vigor, mood, more headache; no ES; bottled-water funding | acute | PARTLY |
+
+Suggested catalog mapping (`.rightAway` only where the evidence is acute):
+- Thought reframe: Webb 0.36 "less negative emotion" (that's the "CBT, about 12%" card the owner asked for), rightAway, A.
+- Cyclic sighing: Fincham 0.35 "less stress", finding mentions Balban; rightAway is fair since Balban measured each session, but say the meta-analysis was mostly programs.
+- Music: de Witte 0.545 "less stress", rightAway.
+- Brisk walk: Ensari 0.16 "less anxiety" (controlled) or Loy 0.47 "more energy" (PARTLY). Prefer controlled numbers; never use Weinstein's uncontrolled g as if it were vs control.
+- Nap 10 min: Dutheil 0.29 "more alertness", hours 12...15, rightAway.
+- Nature: McMahan & Estes, convert r to d, rightAway, PARTLY.
+- overWeeks: meditation (Goyal 0.38 anxiety, meditation timer), gratitude (Cregg 0.29, opens GratitudeView), self-compassion (Ferrari 0.67 stress), PMR (Manzoni 0.51 anxiety), kindness (Curry 0.28 well-being).
