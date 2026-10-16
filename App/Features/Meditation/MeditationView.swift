@@ -32,10 +32,16 @@ final class MeditationSession {
     }
 
     /// Called every second by the view. Returns true the moment the session completes.
+    ///
+    /// Writes `timer` only when it actually changes. Every write re-renders the
+    /// screen, which used to restart the TimelineView, which ticked again: a loop
+    /// that froze the app as soon as Meditate opened.
     func tick(at now: Date) -> Bool {
-        let wasRunning = timer.state == .running
-        timer.update(at: now)
-        return wasRunning && timer.state == .completed
+        var next = timer
+        next.update(at: now)
+        guard next != timer else { return false }
+        timer = next
+        return next.state == .completed
     }
 
     func endEarly(notifications: NotificationService) {
@@ -73,11 +79,15 @@ struct MeditationView: View {
     /// Lives on AppModel so a sit survives navigating away from this screen.
     private var session: MeditationSession { model.meditation }
 
+    /// Fixed anchor for the clock. `.periodic(from: .now, ...)` made a new schedule on
+    /// every re-render, which fired `onChange(of: context.date)` again straight away.
+    @State private var clockStart = Date()
+
     private let durations = [3, 5, 10, 15, 20, 30, 45]
     private let bellOptions = [0, 1, 2, 5, 10]
 
     var body: some View {
-        TimelineView(.periodic(from: .now, by: 1)) { context in
+        TimelineView(.periodic(from: clockStart, by: 1)) { context in
             VStack(spacing: 32) {
                 Spacer()
                 ring(at: context.date)

@@ -46,6 +46,7 @@ final class AppModel {
 
     func onForeground() async {
         await applyReminderSettings()
+        await refreshHealthStatus()
         await sync.syncIfStale(context: context)
         markMorningBriefSeenIfLooking()
         await backup.backupIfDue(context: context)

@@ -114,20 +114,45 @@ struct TodayView: View {
         return steps
     }
 
-    @ViewBuilder
+    /// One line per source. The full error text lives in Settings.
     private var syncStatus: some View {
-        VStack(alignment: .leading, spacing: 4) {
-            if model.sync.isSyncing {
-                ProgressView("Syncing...")
-            } else if let last = model.sync.lastSyncedAt {
-                Text("Synced \(last, style: .relative) ago")
-            }
-            if let error = model.sync.lastError {
-                Text(error).foregroundStyle(.red)
-            }
+        let sync = model.sync
+        return VStack(alignment: .leading, spacing: 4) {
+            syncLine("Oura", SourceSyncStatus(
+                connected: model.oura.isConnected, syncing: sync.isSyncing,
+                lastSynced: sync.ouraSyncedAt, lastTryFailed: sync.ouraFailed
+            ))
+            // Nil means not checked yet; only a definite "never asked" reads as not connected.
+            syncLine("Apple Health", SourceSyncStatus(
+                connected: model.healthKit.isAvailable && model.healthAsked != false, syncing: sync.isSyncing,
+                lastSynced: sync.healthSyncedAt, lastTryFailed: sync.healthFailed
+            ))
         }
         .font(.caption)
         .foregroundStyle(.secondary)
+    }
+
+    private func syncLine(_ source: String, _ status: SourceSyncStatus) -> some View {
+        HStack(spacing: 4) {
+            Text(source).bold()
+            switch status {
+            case .notConnected:
+                Text("not connected")
+            case .syncing:
+                Text("syncing...")
+            case .neverSynced:
+                Text("not synced yet")
+            case .synced(let at):
+                Text("synced \(at, style: .relative) ago")
+            case .failed(let lastSynced):
+                if let lastSynced {
+                    Text("failed, last synced \(lastSynced, style: .relative) ago").foregroundStyle(.red)
+                } else {
+                    Text("sync failed, see Settings").foregroundStyle(.red)
+                }
+            }
+        }
+        .lineLimit(1)
     }
 }
 
