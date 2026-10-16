@@ -16,6 +16,7 @@ struct AskView: View {
     @State private var showingContext = false
     @State private var preview = ""
     @State private var logging: LoggableStep?
+    @Query(filter: #Predicate<SavedStudy> { $0.deletedAt == nil }) private var savedStudies: [SavedStudy]
     @FocusState private var focus: Field?
 
     private enum Field { case question, followUp }
@@ -157,7 +158,7 @@ struct AskView: View {
             }
             .onChange(of: showingContext) {
                 if showingContext {
-                    preview = coach.makeContext(checkIn: checkIn, modelContext: context).render()
+                    preview = coach.makeContext(question: question, checkIn: checkIn, modelContext: context).render()
                 }
             }
         }
@@ -217,11 +218,12 @@ struct AskView: View {
 
     private func transcript(_ conversation: CoachConversation) -> some View {
         VStack(alignment: .leading, spacing: 20) {
-            ForEach(Array(conversation.turns.enumerated()), id: \.offset) { _, turn in
+            ForEach(Array(conversation.turns.enumerated()), id: \.offset) { index, turn in
                 VStack(alignment: .leading, spacing: 12) {
                     QuestionBubble(text: turn.question)
                     if let reply = turn.reply {
-                        ReplyView(reply: reply) { step in logging = LoggableStep(step: step) }
+                        ReplyView(reply: reply, library: savedStudies.map(\.study)) { step in logging = LoggableStep(step: step) }
+                        StudyLookupPanel(turn: index, studies: turn.studies)
                     }
                 }
             }
@@ -309,6 +311,8 @@ struct ContextText: View {
 /// Claude's answer: crisis lines first if needed, then the read, the steps, and the caveats.
 struct ReplyView: View {
     let reply: CoachReply
+    /// Saved studies, so Claude's citations of them link to the paper.
+    var library: [Study] = []
     /// Nil hides the "Did it" buttons (history).
     var onDidIt: ((CoachReply.Step) -> Void)?
 
@@ -321,7 +325,7 @@ struct ReplyView: View {
             }
             Text(reply.summary)
             ForEach(Array(reply.steps.enumerated()), id: \.offset) { index, step in
-                StepCard(number: index + 1, step: step, onDidIt: onDidIt.map { action -> () -> Void in { action(step) } })
+                StepCard(number: index + 1, step: step, library: library, onDidIt: onDidIt.map { action -> () -> Void in { action(step) } })
             }
             if !reply.avoid.isEmpty {
                 Label(reply.avoid, systemImage: "hand.raised").font(.subheadline)
@@ -336,6 +340,7 @@ struct ReplyView: View {
 struct StepCard: View {
     let number: Int
     let step: CoachReply.Step
+    var library: [Study] = []
     var onDidIt: (() -> Void)?
 
     var body: some View {
@@ -374,6 +379,11 @@ struct StepCard: View {
                 Label("\(checked.evidence.citation) · checked", systemImage: "checkmark.seal")
             }
             .font(.caption)
+        } else if let saved = StudyLibrary.study(citedAs: step.source, in: library), let url = saved.link {
+            Link(destination: url) {
+                Label("\(step.source) · found by search", systemImage: "checkmark.seal")
+            }
+            .font(.caption)
         } else if !step.source.isEmpty, let url = Self.scholarURL(step.source) {
             Link(destination: url) {
                 Label("\(step.source) · cited by Claude", systemImage: "magnifyingglass")
@@ -408,9 +418,13 @@ struct CoachLogView: View {
                             .foregroundStyle(.secondary)
                         QuestionBubble(text: turn.question)
                         if let reply = turn.reply {
-                            ReplyView(reply: reply)
+                            ReplyView(reply: reply, library: turn.studies ?? [])
                         } else {
                             Text("No answer came back.").foregroundStyle(.secondary)
+                        }
+                        if let studies = turn.studies, !studies.isEmpty {
+                            Text("Studies").font(.headline)
+                            ForEach(studies) { StudyCard(study: $0) }
                         }
                     }
                 }
@@ -459,5 +473,124 @@ struct ClaudeKeySection: View {
         } footer: {
             Text("Get a key at console.anthropic.com. It stays in this phone's Keychain. Claude is called only when you ask something: it gets what you typed plus \"What Claude sees\" (the time, your work hours and bedtime, both bars, last night's Oura data, your last two days of logs and moods, without mood notes). If Claude's safety filter declines a question, Anthropic retries it on another Claude model. Conversations are saved in the app, synced through iCloud and kept in your backups.")
         }
+    }
+}
+
+/// "Look up studies" under an answer: your saved studies first, a web search only when needed.
+struct StudyLookupPanel: View {
+    let turn: Int
+    let studies: [Study]?
+
+    @Environment(AppModel.self) private var model
+    @Environment(\.modelContext) private var context
+
+    var body: some View {
+        let state = model.coach.lookups[turn]
+        VStack(alignment: .leading, spacing: 10) {
+            if let studies {
+                Text("Studies").font(.headline)
+                if studies.isEmpty {
+                    Text("No studies came back for this one.").font(.subheadline).foregroundStyle(.secondary)
+                }
+                ForEach(studies) { StudyCard(study: $0) }
+            }
+
+            switch state {
+            case .searching:
+                HStack(spacing: 10) {
+                    ProgressView()
+                    Text("Searching the research. About a minute.").foregroundStyle(.secondary)
+                }
+            case .failed(let message):
+                Text(message).foregroundStyle(.red)
+                Button("Try again") { lookUp(force: studies != nil) }.buttonStyle(.bordered)
+            case nil:
+                if studies == nil {
+                    Button { lookUp(force: false) } label: {
+                        Label("Look up studies on this", systemImage: "books.vertical")
+                    }
+                    .buttonStyle(.bordered)
+                    .disabled(!model.coach.hasKey)
+                    Text("Checks your saved studies first. A new web search takes about a minute and sends only your question.")
+                        .font(.caption)
+                        .foregroundStyle(.secondary)
+                } else {
+                    Button { lookUp(force: true) } label: {
+                        Label("Search for more", systemImage: "magnifyingglass")
+                    }
+                    .buttonStyle(.bordered)
+                    .disabled(!model.coach.hasKey)
+                }
+            }
+        }
+    }
+
+    private func lookUp(force: Bool) {
+        Task { await model.coach.lookUpStudies(turn: turn, force: force, modelContext: context) }
+    }
+}
+
+/// One study: who, what kind, what it found, and whether its link came from a real search.
+struct StudyCard: View {
+    let study: Study
+
+    var body: some View {
+        VStack(alignment: .leading, spacing: 4) {
+            Text(study.citation).font(.subheadline.bold())
+            Text(study.design).font(.caption).foregroundStyle(.secondary)
+            Text(study.finding).font(.subheadline)
+            HStack {
+                if let link = study.link {
+                    Link(destination: link) {
+                        Label(study.foundBySearch ? "Found by search" : "From Claude's memory, check it",
+                              systemImage: study.foundBySearch ? "checkmark.seal" : "exclamationmark.triangle")
+                    }
+                    .foregroundStyle(study.foundBySearch ? Color.accentColor : Color.orange)
+                }
+                Spacer()
+                Text("Saved \(study.foundAt.formatted(.dateTime.month().day()))").foregroundStyle(.secondary)
+            }
+            .font(.caption)
+        }
+        .padding()
+        .frame(maxWidth: .infinity, alignment: .leading)
+        .background(.background.secondary, in: RoundedRectangle(cornerRadius: 12))
+    }
+}
+
+/// Every study the coach has found for you, by topic. Searchable; swipe to remove.
+struct StudyLibraryView: View {
+    @Environment(AppModel.self) private var model
+    @Query(filter: #Predicate<SavedStudy> { $0.deletedAt == nil }, sort: \SavedStudy.foundAt, order: .reverse)
+    private var saved: [SavedStudy]
+    @State private var search = ""
+
+    var body: some View {
+        let shown = search.isEmpty ? saved : saved.filter {
+            $0.citation.localizedCaseInsensitiveContains(search) || $0.title.localizedCaseInsensitiveContains(search)
+                || $0.topic.localizedCaseInsensitiveContains(search) || $0.keywords.contains { $0.localizedCaseInsensitiveContains(search) }
+        }
+        let topics = Dictionary(grouping: shown, by: \.topic).sorted { $0.key < $1.key }
+        List {
+            if saved.isEmpty {
+                Text("Nothing yet. Tap \"Look up studies on this\" under a coach answer, and what it finds is saved here.")
+                    .foregroundStyle(.secondary)
+            }
+            ForEach(topics, id: \.key) { group in
+                Section(group.key.isEmpty ? "Other" : group.key) {
+                    ForEach(group.value, id: \.persistentModelID) { study in
+                        StudyCard(study: study.study)
+                            .listRowInsets(EdgeInsets(top: 4, leading: 0, bottom: 4, trailing: 0))
+                            .listRowBackground(Color.clear)
+                            .swipeActions {
+                                Button("Remove", role: .destructive) { model.delete(study) }
+                            }
+                    }
+                }
+            }
+        }
+        .searchable(text: $search)
+        .navigationTitle("Saved studies")
+        .navigationBarTitleDisplayMode(.inline)
     }
 }

@@ -52,6 +52,29 @@ final class CoachLiveTests: XCTestCase {
                        "Still suggesting a nap")
     }
 
+    /// Looks up studies on meditation, then asks about meditation again: the
+    /// second ask should be answered from the saved studies, with no search.
+    func testStudyLookupThenLibrary() async throws {
+        let key = ProcessInfo.processInfo.environment["CLAUDE_COACH_API_KEY"] ?? ""
+        try XCTSkipIf(key.isEmpty, "Set CLAUDE_COACH_API_KEY to run the live lookup test")
+        let client = CoachClient(transport: SessionTransport(), apiKey: { key })
+
+        let started = Date()
+        let first = try await client.lookUpStudies("Does meditation actually help with stress and anxiety? How long should I do it?", known: [])
+        print("\n===== LOOKUP (\(Int(Date().timeIntervalSince(started))) s, \(first.searches) searches) =====")
+        print("Topic: \(first.topic) | keywords: \(first.keywords.joined(separator: ", "))")
+        for study in first.studies {
+            print("- \(study.citation) [\(study.foundBySearch ? "found by search" : "NOT in search results")]")
+            print("  \(study.design)\n  \(study.finding)\n  \(study.url)")
+        }
+        XCTAssertFalse(first.studies.isEmpty)
+        XCTAssertTrue(first.studies.contains { $0.foundBySearch }, "At least one study should come straight from the search results")
+
+        let again = StudyLibrary.matches("what kind of meditation should i do for stress", in: first.studies)
+        print("===== ASKED AGAIN: \(again.count) from the library, search needed: \(again.count < StudyLibrary.enoughToSkipSearch) =====\n")
+        XCTAssertGreaterThanOrEqual(again.count, StudyLibrary.enoughToSkipSearch)
+    }
+
     static func pretty(_ reply: CoachReply) -> String {
         var lines = ["Summary: \(reply.summary)"]
         for (index, step) in reply.steps.enumerated() {

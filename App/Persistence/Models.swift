@@ -138,6 +138,46 @@ final class CoachLog {
     }
 }
 
+/// A study from "Look up studies". Saved so the same question cites it back
+/// instead of searching again. Synced and backed up.
+@Model
+final class SavedStudy {
+    /// `Study.id`: the DOI, or the page URL without its scheme.
+    var key: String = ""
+    var citation: String = ""
+    var title: String = ""
+    var url: String = ""
+    var doi: String?
+    var design: String = ""
+    var finding: String = ""
+    var keywords: [String] = []
+    /// True only when its link showed up in that lookup's search results.
+    var foundBySearch: Bool = false
+    var foundAt: Date = Date()
+    var topic: String = ""
+    var deletedAt: Date?
+
+    init(_ study: Study) {
+        key = study.id
+        citation = study.citation
+        title = study.title
+        url = study.url
+        doi = study.doi
+        design = study.design
+        finding = study.finding
+        keywords = study.keywords
+        foundBySearch = study.foundBySearch
+        foundAt = study.foundAt
+        topic = study.topic
+        deletedAt = study.deletedAt
+    }
+
+    var study: Study {
+        Study(id: key, citation: citation, title: title, url: url, doi: doi, design: design, finding: finding,
+              keywords: keywords, foundBySearch: foundBySearch, foundAt: foundAt, topic: topic, deletedAt: deletedAt)
+    }
+}
+
 /// One day of sensor data (cache store). The payload is a JSON-encoded `SensorDay`,
 /// so adding sensor fields never needs a SwiftData migration.
 @Model
@@ -178,7 +218,7 @@ extension JSONDecoder {
 }
 
 enum Stores {
-    static let userModels: [any PersistentModel.Type] = [MoodEntry.self, GratitudeEntry.self, ActivityLog.self, CoachLog.self]
+    static let userModels: [any PersistentModel.Type] = [MoodEntry.self, GratitudeEntry.self, ActivityLog.self, CoachLog.self, SavedStudy.self]
     static let cacheModels: [any PersistentModel.Type] = [DailySnapshot.self]
 
     /// Builds the container. If this throws we show an error screen and never

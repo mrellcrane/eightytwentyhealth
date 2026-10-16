@@ -131,6 +131,7 @@ struct Repository {
         let gratitude = try context.fetch(FetchDescriptor<GratitudeEntry>(sortBy: [SortDescriptor(\.date)]))
         let activities = try context.fetch(FetchDescriptor<ActivityLog>(sortBy: [SortDescriptor(\.timestamp)]))
         let coach = try context.fetch(FetchDescriptor<CoachLog>(sortBy: [SortDescriptor(\.startedAt)]))
+        let studies = try context.fetch(FetchDescriptor<SavedStudy>(sortBy: [SortDescriptor(\.foundAt)]))
         return BackupDocument(
             exportedAt: .now,
             appVersion: appVersion,
@@ -149,7 +150,8 @@ struct Repository {
                                deletedAt: $0.deletedAt, interventionID: $0.interventionID,
                                intensityBefore: $0.intensityBefore, intensityAfter: $0.intensityAfter)
             },
-            coach: coach.map(\.record)
+            coach: coach.map(\.record),
+            studies: studies.map(\.study)
         )
     }
 
@@ -159,13 +161,15 @@ struct Repository {
         let gratitude = try context.fetch(FetchDescriptor<GratitudeEntry>())
         let activities = try context.fetch(FetchDescriptor<ActivityLog>())
         let coach = try context.fetch(FetchDescriptor<CoachLog>())
+        let studies = try context.fetch(FetchDescriptor<SavedStudy>())
         let existingIDs: Set<UUID> = Set(moods.map(\.id)).union(gratitude.map(\.id)).union(activities.map(\.id)).union(coach.map(\.id))
 
         let toInsert = BackupMerge.recordsToInsert(
             from: backup,
             existingIDs: existingIDs,
             existingExternalIDs: Set(activities.compactMap(\.externalID)),
-            existingHealthKitUUIDs: Set(moods.compactMap(\.healthKitUUID))
+            existingHealthKitUUIDs: Set(moods.compactMap(\.healthKitUUID)),
+            existingStudyIDs: Set(studies.map(\.key))
         )
 
         for record in toInsert.moods {
@@ -212,9 +216,13 @@ struct Repository {
             entry.deletedAt = record.deletedAt
             context.insert(entry)
         }
+        for study in toInsert.studies {
+            context.insert(SavedStudy(study))
+        }
         try context.save()
         return RestoreCounts(moods: toInsert.moods.count, gratitude: toInsert.gratitude.count,
-                             activities: toInsert.activities.count, coach: toInsert.coach.count)
+                             activities: toInsert.activities.count, coach: toInsert.coach.count,
+                             studies: toInsert.studies.count)
     }
 }
 
@@ -223,6 +231,7 @@ struct RestoreCounts {
     var gratitude: Int
     var activities: Int
     var coach: Int
+    var studies: Int
 
-    var total: Int { moods + gratitude + activities + coach }
+    var total: Int { moods + gratitude + activities + coach + studies }
 }

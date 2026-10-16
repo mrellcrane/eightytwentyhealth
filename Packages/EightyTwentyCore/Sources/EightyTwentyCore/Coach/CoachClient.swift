@@ -93,13 +93,17 @@ public struct CoachConversation: Equatable, Sendable {
         public var reply: CoachReply?
         /// Claude's exact JSON text, replayed on follow-ups.
         public var replyText: String?
+        /// Studies from "Look up studies" on this answer. Shown with it, never sent back to Claude.
+        public var studies: [Study]?
 
-        public init(question: String, askedAt: Date, stamp: String? = nil, reply: CoachReply? = nil, replyText: String? = nil) {
+        public init(question: String, askedAt: Date, stamp: String? = nil, reply: CoachReply? = nil, replyText: String? = nil,
+                    studies: [Study]? = nil) {
             self.question = question
             self.askedAt = askedAt
             self.stamp = stamp
             self.reply = reply
             self.replyText = replyText
+            self.studies = studies
         }
     }
 
@@ -148,6 +152,17 @@ public struct CoachConversation: Equatable, Sendable {
         guard awaitingReply else { return }
         turns[turns.count - 1].reply = reply
         turns[turns.count - 1].replyText = text
+    }
+
+    public mutating func attachStudies(_ studies: [Study], toTurn index: Int) {
+        guard turns.indices.contains(index) else { return }
+        turns[index].studies = studies
+    }
+
+    /// What to look up for a turn: a follow-up only makes sense with the first question.
+    public func lookupQuestion(forTurn index: Int) -> String {
+        guard turns.indices.contains(index) else { return "" }
+        return index == 0 ? turns[0].question : turns[0].question + "\n" + turns[index].question
     }
 
     /// A follow-up like "I can't nap at work". Stamped with the time, since it may come later.
@@ -199,16 +214,21 @@ public enum CoachRequest {
     public static let fallbackBeta = "server-side-fallback-2026-07-01"
 
     public static func urlRequest(_ conversation: CoachConversation, apiKey: String, fallbacks: Bool = true) throws -> URLRequest {
+        try urlRequest(body: body(conversation, fallbacks: fallbacks), apiKey: apiKey, fallbacks: fallbacks, timeout: 120)
+    }
+
+    /// Headers and body for any coach call (answers and study lookups).
+    public static func urlRequest(body: JSONValue, apiKey: String, fallbacks: Bool, timeout: TimeInterval) throws -> URLRequest {
         var request = URLRequest(url: endpoint)
         request.httpMethod = "POST"
-        request.timeoutInterval = 120
+        request.timeoutInterval = timeout
         request.setValue("application/json", forHTTPHeaderField: "Content-Type")
         request.setValue(apiKey, forHTTPHeaderField: "x-api-key")
         request.setValue("2023-06-01", forHTTPHeaderField: "anthropic-version")
         if fallbacks {
             request.setValue(fallbackBeta, forHTTPHeaderField: "anthropic-beta")
         }
-        request.httpBody = try JSONEncoder().encode(body(conversation, fallbacks: fallbacks))
+        request.httpBody = try JSONEncoder().encode(body)
         return request
     }
 
@@ -282,6 +302,7 @@ public enum CoachRequest {
         - The facts and the catalog below were checked against the papers. Prefer them when they fit.
         - When a step is a catalog entry, set catalogID to its id so the app shows the checked figure. Otherwise use "none". Set logAs to the closest activity kind, or "other".
         - If they've rated things they tried before (0-10, before → after, lower is better), favor what worked for them and say so.
+        - The context may list studies from their library, found by web search on an earlier question. When one fits, cite it, with source written exactly as listed, so the app can link it.
 
         How to write it:
         - Talk to them as "you". A smart friend who knows the research: warm, direct, brief. No therapy-speak, no "it sounds like", no lecturing, no padding.
@@ -345,6 +366,28 @@ public struct CoachClient: Sendable {
     }
 
     public static func parse(_ data: Data, status: Int) throws -> (reply: CoachReply, text: String) {
+        let json = try checked(data, status: status)
+        switch json["stop_reason"]?.stringValue {
+        case "refusal": throw CoachError.refused
+        case "max_tokens": throw CoachError.truncated
+        default: break
+        }
+        guard let reply = try? JSONDecoder().decode(CoachReply.self, from: Data(text(of: json).utf8)) else {
+            throw CoachError.badReply
+        }
+        return (reply, text(of: json))
+    }
+
+    /// Structured output arrives as text blocks; thinking, tool and fallback blocks are skipped.
+    static func text(of json: JSONValue) -> String {
+        (json["content"]?.arrayValue ?? [])
+            .filter { $0["type"]?.stringValue == "text" }
+            .compactMap { $0["text"]?.stringValue }
+            .joined()
+    }
+
+    /// The response JSON, or the matching `CoachError` for an HTTP error.
+    static func checked(_ data: Data, status: Int) throws -> JSONValue {
         let json = try? JSONDecoder().decode(JSONValue.self, from: data)
         guard (200..<300).contains(status) else {
             let type = json?["error"]?["type"]?.stringValue
@@ -357,19 +400,46 @@ public struct CoachClient: Sendable {
             }
         }
         guard let json else { throw CoachError.badReply }
-        switch json["stop_reason"]?.stringValue {
-        case "refusal": throw CoachError.refused
-        case "max_tokens": throw CoachError.truncated
-        default: break
-        }
-        // Structured output arrives as text blocks; thinking and fallback blocks are skipped.
-        let text = (json["content"]?.arrayValue ?? [])
-            .filter { $0["type"]?.stringValue == "text" }
-            .compactMap { $0["text"]?.stringValue }
-            .joined()
-        guard let reply = try? JSONDecoder().decode(CoachReply.self, from: Data(text.utf8)) else {
-            throw CoachError.badReply
-        }
-        return (reply, text)
+        return json
     }
+
+    // MARK: Study lookup
+
+    /// Searches the web for studies on `question`, skipping the ones in `known`.
+    /// Only the question is sent, no health data.
+    public func lookUpStudies(_ question: String, known: [Study], now: Date = Date()) async throws -> StudyLookupResult {
+        let key = try await apiKey()
+        guard !key.isEmpty else { throw CoachError.noKey }
+        do {
+            return try await lookUp(question, known: known, key: key, fallbacks: true, now: now)
+        } catch CoachError.http(400, let message) where message.localizedCaseInsensitiveContains("fallback") {
+            return try await lookUp(question, known: known, key: key, fallbacks: false, now: now)
+        }
+    }
+
+    private func lookUp(_ question: String, known: [Study], key: String, fallbacks: Bool, now: Date) async throws -> StudyLookupResult {
+        var messages: [JSONValue] = [StudyLookupRequest.userMessage(question, known: known)]
+        var seen = StudyLookupRequest.SearchResults()
+        // A long search turn can pause; sending the partial turn back resumes it.
+        for _ in 0...StudyLookupRequest.maxContinuations {
+            let body = StudyLookupRequest.body(messages: messages, fallbacks: fallbacks)
+            let request = try CoachRequest.urlRequest(body: body, apiKey: key, fallbacks: fallbacks,
+                                                      timeout: StudyLookupRequest.timeout)
+            let (data, response) = try await transport.send(request)
+            let json = try Self.checked(data, status: response.statusCode)
+            seen.add(json)
+            switch json["stop_reason"]?.stringValue {
+            case "pause_turn":
+                messages.append(["role": "assistant", "content": json["content"] ?? []])
+            case "refusal":
+                throw CoachError.refused
+            case "max_tokens":
+                throw CoachError.truncated
+            default:
+                return try StudyLookupRequest.parse(Self.text(of: json), seen: seen, now: now)
+            }
+        }
+        throw CoachError.truncated
+    }
+
 }

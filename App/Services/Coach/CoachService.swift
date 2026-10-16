@@ -34,6 +34,13 @@ final class CoachService {
     private(set) var logID: UUID?
     private(set) var isThinking = false
     private(set) var errorMessage: String?
+    /// "Look up studies" in progress or failed, by turn of the current conversation.
+    private(set) var lookups: [Int: LookupState] = [:]
+
+    enum LookupState: Equatable {
+        case searching
+        case failed(String)
+    }
 
     private let client: CoachClient
 
@@ -64,10 +71,11 @@ final class CoachService {
     /// Starts a new conversation. The context is built here, before anything
     /// else gets logged, so it shows the moment you asked.
     func begin(_ question: String, checkIn: CoachContext.CheckIn?, modelContext: ModelContext) {
-        let text = makeContext(checkIn: checkIn, modelContext: modelContext).render()
+        let text = makeContext(question: question, checkIn: checkIn, modelContext: modelContext).render()
         conversation = CoachConversation(context: text, question: question.trimmingCharacters(in: .whitespacesAndNewlines))
         logID = UUID()
         errorMessage = nil
+        lookups = [:]
         persist(modelContext)
     }
 
@@ -84,6 +92,7 @@ final class CoachService {
         conversation = log.record.conversation
         logID = log.id
         errorMessage = nil
+        lookups = [:]
     }
 
     /// Opening the coach hours later starts a new conversation; the old one is in Past questions.
@@ -98,6 +107,7 @@ final class CoachService {
         conversation = nil
         logID = nil
         errorMessage = nil
+        lookups = [:]
     }
 
     /// Sends whatever is waiting for an answer. Also the retry after an error.
@@ -131,7 +141,8 @@ final class CoachService {
 
     // MARK: Context
 
-    func makeContext(checkIn: CoachContext.CheckIn?, modelContext: ModelContext, now: Date = .now) -> CoachContext {
+    func makeContext(question: String, checkIn: CoachContext.CheckIn?, modelContext: ModelContext,
+                     now: Date = .now) -> CoachContext {
         let defaults = UserDefaults.standard
         // A recent "energy right now" rating counts as part of what you're reporting.
         var checkIn = checkIn
@@ -180,8 +191,90 @@ final class CoachService {
             tried: monthLogs
                 .filter { $0.interventionID != nil || $0.intensityBefore != nil || $0.activityKind == .other }
                 .map(\.interventionLog),
+            studies: StudyLibrary.matches(question, in: library(modelContext)),
             usesMiles: defaults.object(forKey: PrefKey.usesMiles) as? Bool ?? Units.defaultUsesMiles
         )
+    }
+
+    // MARK: Studies
+
+    /// Your saved studies, not deleted.
+    func library(_ modelContext: ModelContext) -> [Study] {
+        let saved = (try? modelContext.fetch(FetchDescriptor<SavedStudy>(predicate: #Predicate { $0.deletedAt == nil }))) ?? []
+        return saved.map(\.study)
+    }
+
+    /// Studies for one answer. Your library first: if enough saved studies match,
+    /// they're shown and nothing is searched. Otherwise Claude searches the web
+    /// (only the question is sent), skipping what you already have, and
+    /// everything it finds is saved. `force` searches even with library matches.
+    func lookUpStudies(turn index: Int, force: Bool = false, modelContext: ModelContext) async {
+        guard let conversation, conversation.turns.indices.contains(index), lookups[index] != .searching else { return }
+        let question = conversation.lookupQuestion(forTurn: index)
+        let saved = StudyLibrary.matches(question, in: library(modelContext))
+        let shown = conversation.turns[index].studies ?? []
+
+        if !force, saved.count >= StudyLibrary.enoughToSkipSearch {
+            attach(Self.unique(shown + saved), toTurn: index, modelContext: modelContext)
+            Log.coach.info("Study lookup: \(saved.count) from the library, no search")
+            return
+        }
+
+        let startedFor = logID
+        lookups[index] = .searching
+        let started = Date()
+        do {
+            let result = try await client.lookUpStudies(question, known: Self.unique(shown + saved))
+            store(result.studies, modelContext: modelContext)
+            lookups[index] = nil
+            // You may have moved to another question meanwhile; the studies are saved either way.
+            if logID == startedFor {
+                attach(Self.unique(shown + saved + result.studies), toTurn: index, modelContext: modelContext)
+            }
+            let verified = result.studies.filter(\.foundBySearch).count
+            Log.coach.info("Study lookup in \(Self.seconds(since: started)): \(result.searches) searches, \(result.studies.count) new (\(verified) found by search), \(saved.count) from the library")
+        } catch let error as CoachError {
+            lookups[index] = .failed(error.userMessage)
+            let summary = "Study lookup failed after \(Self.seconds(since: started)): \(Self.logLabel(error))"
+            switch error {
+            case .unauthorized, .rateLimited, .overloaded, .refused, .noKey: Log.coach.warning(summary)
+            default: Log.coach.error(summary)
+            }
+        } catch {
+            lookups[index] = .failed("Couldn't reach Claude: \(error.localizedDescription)")
+            Log.coach.warning("Study lookup failed after \(Self.seconds(since: started)): \(error.localizedDescription)")
+        }
+    }
+
+    private func attach(_ studies: [Study], toTurn index: Int, modelContext: ModelContext) {
+        conversation?.attachStudies(studies, toTurn: index)
+        persist(modelContext)
+    }
+
+    /// Saves new studies; one already saved gains the new keywords instead of a copy.
+    private func store(_ studies: [Study], modelContext: ModelContext) {
+        for study in studies {
+            let key = study.id
+            let existing = try? modelContext.fetch(FetchDescriptor<SavedStudy>(predicate: #Predicate { $0.key == key })).first
+            if let existing {
+                let merged = StudyLibrary.merge([study], into: [existing.study])[0]
+                existing.keywords = merged.keywords
+                existing.foundBySearch = merged.foundBySearch
+                existing.deletedAt = nil
+            } else {
+                modelContext.insert(SavedStudy(study))
+            }
+        }
+        do {
+            try modelContext.save()
+        } catch {
+            Log.coach.error("Couldn't save studies: \(error.localizedDescription)")
+        }
+    }
+
+    private static func unique(_ studies: [Study]) -> [Study] {
+        var seen = Set<String>()
+        return studies.filter { seen.insert($0.id).inserted }
     }
 
     // MARK: Private

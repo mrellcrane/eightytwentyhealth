@@ -247,6 +247,7 @@ final class AppModel {
     func delete(_ entry: GratitudeEntry) { entry.deletedAt = .now; save() }
     func delete(_ log: ActivityLog) { log.deletedAt = .now; save() }
     func delete(_ log: CoachLog) { log.deletedAt = .now; save() }
+    func delete(_ study: SavedStudy) { study.deletedAt = .now; save() }
 
     private func save() {
         do {

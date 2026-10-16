@@ -180,7 +180,7 @@ struct SettingsView: View {
             let counts = try model.backup.restore(from: url, context: context)
             message = counts.total == 0
                 ? "Everything in that file is already here."
-                : "Restored \(counts.moods) moods, \(counts.gratitude) gratitude entries, \(counts.activities) activities and \(counts.coach) coach conversations."
+                : "Restored \(counts.moods) moods, \(counts.gratitude) gratitude entries, \(counts.activities) activities, \(counts.coach) coach conversations and \(counts.studies) studies."
         } catch {
             message = "Couldn't restore: \(error.localizedDescription)"
         }

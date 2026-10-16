@@ -13,6 +13,7 @@ struct MentalView: View {
     @Query(filter: #Predicate<ActivityLog> { $0.deletedAt == nil }) private var activities: [ActivityLog]
     @Query(filter: #Predicate<CoachLog> { $0.deletedAt == nil }, sort: \CoachLog.startedAt, order: .reverse)
     private var conversations: [CoachLog]
+    @Query(filter: #Predicate<SavedStudy> { $0.deletedAt == nil }) private var savedStudies: [SavedStudy]
 
     @AppStorage(PrefKey.energyNow) private var energyNow = 0
     @AppStorage(PrefKey.energyNowAt) private var energyNowAt = 0.0
@@ -71,6 +72,16 @@ struct MentalView: View {
                 Text("Build it up")
             } footer: {
                 Text("≈ numbers are research estimates: the study's effect size × 33, roughly the average change against a comparison group. Ranked by that per minute, then reordered by what today's data shows: last night's sleep, steps since you woke, Oura stress, your check-ins and energy, and what you've already done. Once you've rated a step 3 times, your own before → after counts too.")
+            }
+
+            if !savedStudies.isEmpty {
+                Section {
+                    NavigationLink {
+                        StudyLibraryView()
+                    } label: {
+                        Label("Saved studies (\(savedStudies.count))", systemImage: "books.vertical")
+                    }
+                }
             }
 
             if !conversations.isEmpty {

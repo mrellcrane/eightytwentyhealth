@@ -86,11 +86,14 @@ public struct CoachContext: Equatable, Sendable {
     public var checkIn: CheckIn?
     /// Last 30 days, logged from the Mental screen or a coach step.
     public var tried: [InterventionLog]
+    /// Saved studies that match the question, found by an earlier lookup.
+    public var studies: [Study]
     public var usesMiles: Bool
 
     public init(now: Date, timeZone: TimeZone, work: WorkHours?, bedtimeMinutes: Int?, physical: BarDisplay?,
                 mental: BarDisplay?, today: SensorDay?, yesterday: SensorDay?, activities: [Activity] = [],
-                moods: [Mood] = [], checkIn: CheckIn? = nil, tried: [InterventionLog] = [], usesMiles: Bool = true) {
+                moods: [Mood] = [], checkIn: CheckIn? = nil, tried: [InterventionLog] = [], studies: [Study] = [],
+                usesMiles: Bool = true) {
         self.now = now
         self.timeZone = timeZone
         self.work = work
@@ -103,6 +106,7 @@ public struct CoachContext: Equatable, Sendable {
         self.moods = moods
         self.checkIn = checkIn
         self.tried = tried
+        self.studies = studies
         self.usesMiles = usesMiles
     }
 
@@ -179,6 +183,14 @@ public struct CoachContext: Equatable, Sendable {
                         }
                         return line
                     }.joined(separator: "\n")
+            )
+        }
+
+        let saved = studies.filter { $0.foundBySearch && $0.deletedAt == nil }
+        if !saved.isEmpty {
+            sections.append(
+                "Studies from their library that may fit (found by web search earlier):\n"
+                    + saved.map { "- \($0.citation): \($0.design). \($0.finding)" }.joined(separator: "\n")
             )
         }
 

@@ -14,6 +14,8 @@ public struct BackupDocument: Codable, Equatable, Sendable {
     public var activities: [ActivityRecord]
     /// Coach conversations. Missing in backups from before the coach.
     public var coach: [CoachRecord]
+    /// Studies saved by "Look up studies". Missing in older backups.
+    public var studies: [Study]
 
     public init(
         exportedAt: Date,
@@ -21,7 +23,8 @@ public struct BackupDocument: Codable, Equatable, Sendable {
         moods: [MoodRecord],
         gratitude: [GratitudeRecord],
         activities: [ActivityRecord],
-        coach: [CoachRecord] = []
+        coach: [CoachRecord] = [],
+        studies: [Study] = []
     ) {
         self.version = Self.currentVersion
         self.exportedAt = exportedAt
@@ -30,10 +33,11 @@ public struct BackupDocument: Codable, Equatable, Sendable {
         self.gratitude = gratitude
         self.activities = activities
         self.coach = coach
+        self.studies = studies
     }
 
     enum CodingKeys: String, CodingKey {
-        case version, exportedAt, appVersion, moods, gratitude, activities, coach
+        case version, exportedAt, appVersion, moods, gratitude, activities, coach, studies
     }
 
     public init(from decoder: Decoder) throws {
@@ -45,9 +49,10 @@ public struct BackupDocument: Codable, Equatable, Sendable {
         gratitude = try container.decode([GratitudeRecord].self, forKey: .gratitude)
         activities = try container.decode([ActivityRecord].self, forKey: .activities)
         coach = try container.decodeIfPresent([CoachRecord].self, forKey: .coach) ?? []
+        studies = try container.decodeIfPresent([Study].self, forKey: .studies) ?? []
     }
 
-    public var isEmpty: Bool { moods.isEmpty && gratitude.isEmpty && activities.isEmpty && coach.isEmpty }
+    public var isEmpty: Bool { moods.isEmpty && gratitude.isEmpty && activities.isEmpty && coach.isEmpty && studies.isEmpty }
 
     public static func encoder() -> JSONEncoder {
         let encoder = JSONEncoder()
@@ -158,7 +163,8 @@ public enum BackupMerge {
         from backup: BackupDocument,
         existingIDs: Set<UUID>,
         existingExternalIDs: Set<String>,
-        existingHealthKitUUIDs: Set<UUID> = []
+        existingHealthKitUUIDs: Set<UUID> = [],
+        existingStudyIDs: Set<String> = []
     ) -> BackupDocument {
         var seen = existingIDs
         var seenExternal = existingExternalIDs
@@ -181,6 +187,8 @@ public enum BackupMerge {
         }
 
         let coach = backup.coach.filter { seen.insert($0.id).inserted }
+        var seenStudies = existingStudyIDs
+        let studies = backup.studies.filter { seenStudies.insert($0.id).inserted }
 
         return BackupDocument(
             exportedAt: backup.exportedAt,
@@ -188,7 +196,8 @@ public enum BackupMerge {
             moods: moods,
             gratitude: gratitude,
             activities: activities,
-            coach: coach
+            coach: coach,
+            studies: studies
         )
     }
 }
