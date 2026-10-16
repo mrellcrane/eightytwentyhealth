@@ -113,6 +113,8 @@ Starter catalog candidates: mindfulness meditation (Goyal 2014, JAMA Intern Med)
 - **Lag on purpose**: what you did on day D vs sleep ending the morning of D+1.
 - Binary inputs (meditated yes/no): difference in mean outcome with a bootstrap confidence interval. Continuous inputs (bedtime, minutes): Spearman correlation.
 - **Guardrails**: 21+ days total and 7+ days in each group; Benjamini-Hochberg correction across all pairs (test 50 pairs and 2 will "work" by luck); test suite includes a no-real-effect dataset that must produce zero findings.
+- **Carryover**: HRV, sleep and steps lean on yesterday, so n days are worth fewer independent ones. p-values use an effective sample size from both series' lag-1 autocorrelation (Bretherton et al. 1999). In simulation this takes the false-alarm rate for two drifting, unrelated series from 23% back to 5%.
+- **Built** (`Patterns/Stats`, `Patterns/PatternFinder`, shown in Insights): Spearman r for every pair, yes/no inputs also get with/without averages. Experiments and feeding the recommendation blend are still to come.
 - **Experiments**: "no caffeine after 2pm for 14 days" with a before/during comparison. Closer to cause and effect than mining correlations.
 - Confirmed personal effects feed the recommendation blend.
 
@@ -128,5 +130,6 @@ Starter catalog candidates: mindfulness meditation (Goyal 2014, JAMA Intern Med)
 | Backup | `Backup/BackupDocument` (format, merge, pruning) | `Services/Backup/BackupService`, `Persistence/Repository` |
 | Run | `Run/RunTracker`, `Run/Polyline` | `Services/Location/RunRecorder`, `Features/Run` |
 | Meditation | `Meditation/MeditationTimer` | `Features/Meditation`, `Services/Notifications` |
+| Patterns | `Patterns/Stats`, `Patterns/PatternFinder` | `Features/Insights` |
 | Mood | `Mood/MoodScale` | `Features/Log` |
 | Morning brief | `Briefing/MorningBrief` | `AppModel` (send/retry), `Services/Notifications` |
