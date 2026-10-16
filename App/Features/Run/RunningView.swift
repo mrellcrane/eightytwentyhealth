@@ -50,6 +50,16 @@ struct RunningView: View {
                 }
 
                 Section {
+                    ForEach(plan.outlook(runs: input.runs, checkIns: checkIns, today: today)) { item in
+                        OutlookRow(item: item)
+                    }
+                } header: {
+                    Text("Coming up")
+                } footer: {
+                    Text("Assumes each week goes green. A yellow or short week repeats; a red one drops back to your last green week.")
+                }
+
+                Section {
                     MilesChart(plan: plan, runs: input.runs, checkIns: checkIns, today: today)
                         .frame(height: 200)
                         .padding(.vertical, 8)
@@ -135,17 +145,24 @@ private struct WeekSummary: View {
 
     var body: some View {
         VStack(alignment: .leading, spacing: 8) {
-            HStack(alignment: .firstTextBaseline) {
-                Text("\(RunningPlan.format(guidance.week.actual)) of \(RunningPlan.format(guidance.week.target)) mi")
+            if guidance.week.kind == .beforePlan {
+                // No target yet: the plan's first week is next week.
+                Text("\(RunningPlan.format(guidance.week.actual)) mi this week, \(guidance.week.runs) runs")
                     .font(.title2.bold())
                     .monospacedDigit()
-                Spacer()
-                Text("\(guidance.week.runs) of \(RunningPlan.runsPerWeek) runs")
-                    .font(.subheadline)
-                    .foregroundStyle(.secondary)
+            } else {
+                HStack(alignment: .firstTextBaseline) {
+                    Text("\(RunningPlan.format(guidance.week.actual)) of \(RunningPlan.format(guidance.week.target)) mi")
+                        .font(.title2.bold())
+                        .monospacedDigit()
+                    Spacer()
+                    Text("\(guidance.week.runs) of \(RunningPlan.runsPerWeek) runs")
+                        .font(.subheadline)
+                        .foregroundStyle(.secondary)
+                }
+                ProgressView(value: min(guidance.week.actual, guidance.week.target), total: max(guidance.week.target, 1))
+                    .tint(.orange)
             }
-            ProgressView(value: min(guidance.week.actual, guidance.week.target), total: max(guidance.week.target, 1))
-                .tint(.orange)
             Text(guidance.week.kind.note)
                 .font(.caption)
                 .foregroundStyle(.secondary)
@@ -168,17 +185,37 @@ private struct WeekSummary: View {
             }
         }
 
-        if let next = guidance.nextWeek {
-            Text("Next week: \(RunningPlan.format(next.target)) mi. \(next.kind.note).")
-                .font(.caption)
-                .foregroundStyle(.secondary)
-        }
     }
 
     private func dayLabel(_ day: DayKey) -> String {
         if day == today { return "Today" }
         if day == today.adding(days: 1) { return "Tomorrow" }
         return TrainingCalendar.shortName(day)
+    }
+}
+
+private struct OutlookRow: View {
+    let item: RunningPlan.WeekOutlook
+
+    var body: some View {
+        HStack(alignment: .firstTextBaseline) {
+            VStack(alignment: .leading, spacing: 2) {
+                Text("Week of \(TrainingCalendar.monthDay(item.week.start))")
+                Text("\(item.split.map(RunningPlan.format).joined(separator: " / ")) mi")
+                    .font(.caption)
+                    .foregroundStyle(.secondary)
+                    .monospacedDigit()
+            }
+            Spacer()
+            VStack(alignment: .trailing, spacing: 2) {
+                Text("\(RunningPlan.format(item.week.target)) mi")
+                    .font(.headline)
+                    .monospacedDigit()
+                if item.week.kind == .cutback {
+                    Text("Cutback").font(.caption).foregroundStyle(.secondary)
+                }
+            }
+        }
     }
 }
 

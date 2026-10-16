@@ -61,6 +61,17 @@ final class RunningPlanTests: XCTestCase {
         XCTAssertEqual(guidance.nextWeek?.target, 11)
     }
 
+    func testOutlookMatchesTheTable() {
+        let outlook = plan.outlook(runs: lastWeek, checkIns: [:], today: day(10, 16))
+        XCTAssertEqual(outlook.map(\.week.start), (0..<8).map { day(10, 19).adding(days: 7 * $0) })
+        XCTAssertEqual(outlook.map(\.week.target), [11, 12, 13, 10, 14, 15, 16, 12])
+        XCTAssertEqual(outlook.map(\.split), [
+            [3.5, 3.5, 4], [3.5, 4, 4.5], [4, 4, 5], [3, 3, 4],
+            [4, 4.5, 5.5], [4.5, 4.5, 6], [5, 5, 6], [3.5, 4, 4.5],
+        ])
+        XCTAssertEqual(TrainingCalendar.monthDay(day(11, 9)), "Nov 9")
+    }
+
     func testSpreadsTheWeekWithTheLongRunLast() {
         let guidance = plan.guidance(runs: lastWeek, checkIns: [:], today: day(10, 19))
         XCTAssertEqual(guidance.planned, [

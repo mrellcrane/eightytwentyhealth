@@ -74,8 +74,13 @@ public enum TrainingCalendar {
 
     /// "Mon Oct 19".
     public static func label(_ day: DayKey) -> String {
+        "\(shortName(day)) \(monthDay(day))"
+    }
+
+    /// "Oct 19".
+    public static func monthDay(_ day: DayKey) -> String {
         let months = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"]
-        return "\(shortName(day)) \(months[day.month - 1]) \(day.day)"
+        return "\(months[day.month - 1]) \(day.day)"
     }
 }
 
@@ -140,6 +145,13 @@ public struct RunningPlan: Equatable, Sendable {
         public let isLong: Bool
     }
 
+    public struct WeekOutlook: Identifiable, Sendable {
+        public let week: Week
+        /// A sample split: the shorter runs first, the long run last.
+        public let split: [Double]
+        public var id: String { week.id }
+    }
+
     public struct Guidance: Sendable {
         public let week: Week
         public let nextWeek: Week?
@@ -188,6 +200,25 @@ public struct RunningPlan: Equatable, Sendable {
             weekStart = weekStart.adding(days: 7)
         }
         return weeks
+    }
+
+    /// The weeks after this one, assuming each goes green, with a sample split for each.
+    /// The long run grows from your actual recent long runs.
+    public func outlook(runs: [RunEntry], checkIns: [DayKey: RunSignal], today: DayKey, weeks count: Int = 8) -> [WeekOutlook] {
+        let current = TrainingCalendar.monday(of: today)
+        let future = weeks(runs: runs, checkIns: checkIns, today: today, weeksAhead: count).filter { $0.start > current }
+        var longs: [Double] = [2, 1, 0].map { offset in
+            let weekStart = current.adding(days: -7 * offset)
+            let weekEnd = weekStart.adding(days: 6)
+            return runs.filter { $0.day >= weekStart && $0.day <= weekEnd }.map(\.miles).max() ?? 0
+        }
+        return future.map { week in
+            let recent = longs.suffix(3).max() ?? 0
+            let cap = Self.longRunCap(target: week.target, recentLongest: recent > 0 ? recent : nil)
+            let split = Self.distances(remaining: week.target, count: Self.runsPerWeek, longCap: cap)
+            longs.append(split.last ?? 0)
+            return WeekOutlook(week: week, split: split)
+        }
     }
 
     /// This week's target, what's left, and when to run it.

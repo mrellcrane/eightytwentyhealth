@@ -200,9 +200,11 @@ public enum CoachBriefing {
                 }
                 out.append("Still planned this week: \(planned.joined(separator: ", ")).")
             }
-            if let next = guidance.nextWeek {
-                out.append("Next week: \(RunningPlan.format(next.target)) mi (\(next.kind.note.lowercased())).")
+            let coming = plan.outlook(runs: s.runs, checkIns: s.checkIns, today: today).map { item in
+                let split = item.split.map(RunningPlan.format).joined(separator: "/")
+                return "week of \(item.week.start.rawValue): \(RunningPlan.format(item.week.target)) mi (\(split))"
             }
+            out.append("Coming weeks if each goes green: \(coming.joined(separator: "; ")).")
         } else {
             out.append("No running plan set up yet.")
         }

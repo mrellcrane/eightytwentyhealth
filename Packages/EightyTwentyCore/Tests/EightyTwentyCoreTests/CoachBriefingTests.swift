@@ -47,6 +47,7 @@ final class CoachBriefingTests: XCTestCase {
         XCTAssertTrue(prompt.contains("2026-10-14: ran 4.5 mi"))
         XCTAssertTrue(prompt.contains("Plan starts the week of 2026-10-19 at 11 mi."))
         XCTAssertTrue(prompt.contains("No running until your plan starts Mon Oct 19."))
+        XCTAssertTrue(prompt.contains("Coming weeks if each goes green: week of 2026-10-19: 11 mi (3.5/3.5/4); week of 2026-10-26: 12 mi"))
         XCTAssertTrue(prompt.contains("Runs, last 28 days: 2026-10-14: 4.5 mi, felt green."))
         XCTAssertTrue(prompt.contains("## Gym (strength sessions, last 28 days)\n2026-10-15"))
         XCTAssertTrue(prompt.contains("Strength: "), "One suggestion per goal")
