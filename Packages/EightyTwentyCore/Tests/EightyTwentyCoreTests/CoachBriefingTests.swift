@@ -13,6 +13,7 @@ final class CoachBriefingTests: XCTestCase {
     private func snapshot(plan: RunningPlan?, notes: String = "", withData: Bool = true) -> CoachBriefing.Snapshot {
         var sensors: [DayKey: SensorDay] = [:]
         var runs: [RunEntry] = []
+        var walks: [RunEntry] = []
         if withData {
             var sensor = SensorDay(day: today)
             sensor.readinessScore = 78
@@ -20,11 +21,12 @@ final class CoachBriefingTests: XCTestCase {
             sensor.bedtimeStart = today.startDate(in: Self.utc).addingTimeInterval(-90 * 60)
             sensors[today] = sensor
             runs = [RunEntry(day: today.adding(days: -2), miles: 4.5)]
+            walks = [RunEntry(day: today, miles: 2.1), RunEntry(day: today.adding(days: -1), miles: 0)]
         }
         return CoachBriefing.Snapshot(
             now: today.startDate(in: Self.utc).addingTimeInterval(9 * 3600), calendar: Self.utc, bars: [],
             sensors: sensors, reports: [:], activities: [today: [.meditation, .workout]], runs: runs,
-            checkIns: [today.adding(days: -2): .green], plan: plan, strengthDays: [today.adding(days: -1)],
+            walks: walks, checkIns: [today.adding(days: -2): .green], plan: plan, strengthDays: [today.adding(days: -1)],
             patterns: [], notes: notes
         )
     }
@@ -49,6 +51,8 @@ final class CoachBriefingTests: XCTestCase {
         XCTAssertTrue(prompt.contains("No running until your plan starts Mon Oct 19."))
         XCTAssertTrue(prompt.contains("Coming weeks if each goes green: week of 2026-10-19: 11 mi (3.5/3.5/4); week of 2026-10-26: 12 mi"))
         XCTAssertTrue(prompt.contains("Runs, last 28 days: 2026-10-14: 4.5 mi, felt green."))
+        XCTAssertTrue(prompt.contains("never count toward the plan or its weekly limits"))
+        XCTAssertTrue(prompt.contains("Walks, last 28 days: 2026-10-16: 2.1 mi; 2026-10-15: walk."))
         XCTAssertTrue(prompt.contains("## Gym (strength sessions, last 28 days)\n2026-10-15"))
         XCTAssertTrue(prompt.contains("Strength: "), "One suggestion per goal")
         XCTAssertTrue(prompt.hasSuffix("## In their own words (history, goals, anything they want you to know)\nGoal: a half marathon next spring."))
@@ -59,6 +63,7 @@ final class CoachBriefingTests: XCTestCase {
         XCTAssertTrue(prompt.contains("2026-10-15: no data"))
         XCTAssertTrue(prompt.contains("No running plan set up yet."))
         XCTAssertTrue(prompt.contains("No runs in the last 28 days."))
+        XCTAssertTrue(prompt.contains("Walks, last 28 days: none logged."))
         XCTAssertTrue(prompt.contains("Not enough data yet: a pair needs 21 days."))
         XCTAssertFalse(prompt.contains("In their own words"), "No notes, no section")
     }

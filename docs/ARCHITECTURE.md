@@ -159,6 +159,13 @@ Ask anything (mood, stress, energy, sleep, aches, focus). Optional mood face (sa
 
 Below it, "How long and how often" (Basso 2019; Parsons 2017: people in 8-week courses actually did about 30 min a day, 6 days a week, practice-outcome r = 0.26; Strohmaier 2020: bigger doses didn't predict bigger effects across 203 trials) and "What the research says" (Goyal 2014, Galante 2021, Hoge 2023, Khoury 2015, Rusch 2019, Goldberg 2018, Schumer 2018, Brown 2021 on HRV, Farias 2020 on side effects, plus the breathwork and self-compassion evidence). Every number was checked against the abstract or results text. A sit logs as its style's kind (meditation, breathwork or self-compassion) with the catalog id, so it counts toward personal results and "done today".
 
+## Recording runs and walks
+
+`RunRecorder` (GPS via `CLLocationUpdate.liveUpdates(.fitness)`, math in `Run/RunTracker`) records a run or a walk; you pick before starting or after finishing. A walk saves as a Walk log and an outdoor walking workout in Apple Health, and walks never count toward the running plan or its weekly limits (`TrainingInput` keeps them apart; the coach's briefing and the Running screen list them separately).
+
+- **Lock Screen and Dynamic Island**: a Live Activity (`RecordingWidgets` extension, `RecordingAttributes` shared with the app) shows time, distance and average pace. The clock ticks on its own; distance updates at most every 5 seconds, right away on pause, resume and each distance update. Ended on finish, and at launch if one was left behind.
+- **Distance updates** (`Run/DistanceCues`, tested): every 0.25, 0.5, 1 or 2 mi or km (default 1), a notification like "2 miles in 18:40 / Average 9:20 /mi. Last mile 9:45.", also read out loud by default (`CueAnnouncer`, ducking music; the `audio` background mode lets it speak with the screen locked). The bell on the recorder changes it, mid-recording too.
+
 ## Phase 3: correlation engine
 
 - **Daily feature table**: one row per day. Inputs: logged activities, bedtime, mood, gratitude, Oura tags. Outcomes: that night's sleep and HRV, next-day readiness, next-day mood.
@@ -180,7 +187,7 @@ Below it, "How long and how often" (Basso 2019; Parsons 2017: people in 8-week c
 | Health | | `Services/HealthKit/HealthKitService` |
 | Sync | | `Services/Sync/SyncService`, `BackgroundRefresh` |
 | Backup | `Backup/BackupDocument` (format, merge, pruning) | `Services/Backup/BackupService`, `Persistence/Repository` |
-| Run and walk recorder | `Run/RunTracker`, `Run/Polyline` | `Services/Location/RunRecorder`, `Features/Run` |
+| Run and walk recorder | `Run/RunTracker`, `Run/Polyline`, `Run/DistanceCues` | `Services/Location/RunRecorder`, `RecordingLiveActivity`, `CueAnnouncer`, `Features/Run`, `Widgets/` (Live Activity) |
 | Training | `Training/RunningPlan` (weekly miles, green/yellow/red), `Training/TrainingAdvisor` (cardio/strength/both today), `Training/RunScreenshotParser` | `Features/Run/RunningView`, `Shared/TrainingInput`, `Services/ScreenshotReader`, Today's training card |
 | Meditation | `Meditation/MeditationTimer`, `Meditation/MeditationGuide` (styles, plan, findings) | `Features/Meditation`, `Services/Notifications` |
 | Patterns | `Patterns/Stats`, `Patterns/PatternFinder` | `Features/Insights` |

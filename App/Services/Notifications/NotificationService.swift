@@ -17,6 +17,8 @@ final class NotificationService: NSObject, UNUserNotificationCenterDelegate {
     }
 
     static let morningBriefID = "morning.brief"
+    /// Distance updates while recording. One id, so the Lock Screen shows only the latest.
+    static let cueID = "record.cue"
     private static let bellPrefix = "meditation.bell."
     private static let endID = "meditation.end"
 
@@ -56,13 +58,13 @@ final class NotificationService: NSObject, UNUserNotificationCenterDelegate {
         try? await center.add(UNNotificationRequest(identifier: reminder.rawValue, content: content, trigger: trigger))
     }
 
-    /// Delivers right away (used by the morning brief after a background sync).
-    func post(id: String, title: String, body: String) async {
+    /// Delivers right away (the morning brief after a background sync, distance updates).
+    func post(id: String, title: String, body: String, sound: Bool = true) async {
         guard await requestAuthorization() else { return }
         let content = UNMutableNotificationContent()
         content.title = title
         content.body = body
-        content.sound = .default
+        if sound { content.sound = .default }
         try? await center.add(UNNotificationRequest(identifier: id, content: content, trigger: nil))
     }
 

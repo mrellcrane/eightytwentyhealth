@@ -134,6 +134,7 @@ final class AppModel {
             reports: input.reports,
             activities: logged,
             runs: training.runs,
+            walks: training.walks,
             checkIns: RunCheckIns.decode(defaults.string(forKey: PrefKey.runCheckIns) ?? ""),
             plan: RunPlanSettings.plan(start: defaults.string(forKey: PrefKey.runPlanStart) ?? "",
                                        miles: defaults.double(forKey: PrefKey.runPlanStartMiles)),

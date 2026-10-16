@@ -49,6 +49,8 @@ public enum CoachBriefing {
         /// Activity kinds logged per day, from any source.
         public var activities: [DayKey: Set<ActivityKind>]
         public var runs: [RunEntry]
+        /// Walks you logged, with their distance (0 if none). Kept apart from runs.
+        public var walks: [RunEntry]
         public var checkIns: [DayKey: RunSignal]
         public var plan: RunningPlan?
         public var strengthDays: [DayKey]
@@ -58,7 +60,7 @@ public enum CoachBriefing {
 
         public init(now: Date, calendar: Calendar = .current, bars: [BarDisplay], sensors: [DayKey: SensorDay],
                     reports: [DayKey: SelfReportDay], activities: [DayKey: Set<ActivityKind>], runs: [RunEntry],
-                    checkIns: [DayKey: RunSignal], plan: RunningPlan?, strengthDays: [DayKey],
+                    walks: [RunEntry] = [], checkIns: [DayKey: RunSignal], plan: RunningPlan?, strengthDays: [DayKey],
                     patterns: [PersonalPattern], notes: String) {
             self.now = now
             self.calendar = calendar
@@ -67,6 +69,7 @@ public enum CoachBriefing {
             self.reports = reports
             self.activities = activities
             self.runs = runs
+            self.walks = walks
             self.checkIns = checkIns
             self.plan = plan
             self.strengthDays = strengthDays
@@ -228,6 +231,12 @@ public enum CoachBriefing {
             }
             out.append("Runs, last 28 days: \(lines.joined(separator: "; ")).")
         }
+
+        let walks = s.walks.filter { $0.day > today.adding(days: -28) && $0.day <= today }.sorted { $0.day > $1.day }
+        let walkLines = walks.map { walk in
+            walk.miles > 0 ? "\(walk.day.rawValue): \(RunningPlan.format(walk.miles)) mi" : "\(walk.day.rawValue): walk"
+        }
+        out.append("Walks are kept apart from runs and never count toward the plan or its weekly limits, so walking is fine any day, including once this week's runs are done. Walks, last 28 days: \(walkLines.isEmpty ? "none logged" : walkLines.joined(separator: "; ")).")
         return out
     }
 

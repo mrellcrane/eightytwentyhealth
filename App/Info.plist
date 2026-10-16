@@ -64,14 +64,19 @@
 	<key>NSLocationAlwaysAndWhenInUseUsageDescription</key>
 	<string>80/20 only uses your location while you record a run, including when the screen is locked.</string>
 
-	<!-- Background: GPS during runs, morning Oura sync, CloudKit sync pushes -->
+	<!-- Background: GPS during runs, distance updates read out loud with the screen locked,
+	     morning Oura sync, CloudKit sync pushes -->
 	<key>UIBackgroundModes</key>
 	<array>
 		<string>location</string>
+		<string>audio</string>
 		<string>fetch</string>
 		<string>processing</string>
 		<string>remote-notification</string>
 	</array>
+	<!-- A run or walk in progress shows on the Lock Screen (the RecordingWidgets extension) -->
+	<key>NSSupportsLiveActivities</key>
+	<true/>
 	<key>BGTaskSchedulerPermittedIdentifiers</key>
 	<array>
 		<string>$(PRODUCT_BUNDLE_IDENTIFIER).refresh</string>

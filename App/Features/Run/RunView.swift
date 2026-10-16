@@ -11,6 +11,8 @@ struct RunView: View {
     @Environment(AppModel.self) private var model
     @AppStorage(PrefKey.usesMiles) private var usesMiles = Units.defaultUsesMiles
     @AppStorage(PrefKey.recordActivity) private var lastActivity = ActivityKind.run.rawValue
+    @AppStorage(PrefKey.cueEvery) private var cueEvery = 1.0
+    @AppStorage(PrefKey.cueSpeak) private var cueSpeak = true
     @State private var camera: MapCameraPosition = .userLocation(fallback: .automatic)
     @State private var confirmDiscard = false
     @State private var saving = false
@@ -43,6 +45,10 @@ struct RunView: View {
         .navigationTitle(recorder.activity.title)
         .navigationBarTitleDisplayMode(.inline)
         .navigationBarBackButtonHidden(recorder.state == .running || recorder.state == .paused)
+        .toolbar {
+            ToolbarItem(placement: .primaryAction) { updatesMenu }
+        }
+        .onChange(of: cueEvery) { recorder.updateCues() }
         .onAppear {
             if recorder.state == .idle {
                 recorder.activity = activity ?? ActivityKind(rawValue: lastActivity) ?? .run
@@ -59,6 +65,28 @@ struct RunView: View {
         .confirmationDialog("Discard this \(noun)?", isPresented: $confirmDiscard, titleVisibility: .visible) {
             Button("Discard", role: .destructive) { recorder.reset(usesMiles: usesMiles); saved = false }
         }
+    }
+
+    /// How often you hear how far you've gone, and whether it's read out loud.
+    private var updatesMenu: some View {
+        Menu {
+            Picker("Distance updates", selection: $cueEvery) {
+                Text("No updates").tag(0.0)
+                ForEach(DistanceCues.choices, id: \.self) { units in
+                    Text("Every \(DistanceCues.number(units)) \(unit)").tag(units)
+                }
+            }
+            Toggle("Read out loud", isOn: $cueSpeak)
+                .disabled(cueEvery == 0)
+        } label: {
+            Image(systemName: cueEvery > 0 ? "bell.badge" : "bell.slash")
+        }
+        .accessibilityLabel("Distance updates")
+    }
+
+    private var updatesSummary: String {
+        guard cueEvery > 0 else { return "No distance updates. Tap the bell to turn them on." }
+        return "Updates every \(DistanceCues.number(cueEvery)) \(unit)\(cueSpeak ? ", read out loud" : ""). Tap the bell to change."
     }
 
     private var activityPicker: some View {
@@ -103,6 +131,7 @@ struct RunView: View {
                     .foregroundStyle(.red)
             } else if recorder.state == .idle {
                 Text(recorder.gpsQuality).font(.footnote).foregroundStyle(.secondary)
+                Text(updatesSummary).font(.footnote).foregroundStyle(.secondary)
             }
 
             HStack {

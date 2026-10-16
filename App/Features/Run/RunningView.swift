@@ -23,6 +23,21 @@ struct RunningView: View {
         "Ibuprofen around a run can hide the signal, so judge that check-in on the cautious side.",
     ]
 
+    /// Walks don't count toward the plan, so they're shown on their own.
+    @ViewBuilder
+    private func walksThisWeek(_ walks: [RunEntry], today: DayKey) -> some View {
+        let monday = TrainingCalendar.monday(of: today)
+        let week = walks.filter { $0.day >= monday && $0.day <= today }
+        if !week.isEmpty {
+            let miles = week.reduce(0.0) { $0 + $1.miles }
+            let distance = miles > 0 ? ", \(RunningPlan.format(miles)) mi" : ""
+            Label("\(week.count) \(week.count == 1 ? "walk" : "walks")\(distance). Walks don't count toward your running.",
+                  systemImage: "figure.walk")
+                .font(.subheadline)
+                .foregroundStyle(.secondary)
+        }
+    }
+
     var body: some View {
         let input = TrainingInput(healthRuns: model.healthRuns, activities: activities)
         let checkIns = RunCheckIns.decode(checkInsRaw)
@@ -33,6 +48,7 @@ struct RunningView: View {
                 let guidance = plan.guidance(runs: input.runs, checkIns: checkIns, today: today)
                 Section {
                     WeekSummary(guidance: guidance, today: today)
+                    walksThisWeek(input.walks, today: today)
                 } header: {
                     Text("This week")
                 }
@@ -87,7 +103,7 @@ struct RunningView: View {
                     Label("Record a run here", systemImage: "record.circle")
                 }
             } footer: {
-                Text("Apple Fitness runs and runs recorded here come in through Apple Health on their own.")
+                Text("Apple Fitness runs and runs recorded here come in through Apple Health on their own. Walks are kept apart: they never count toward your plan.")
             }
 
             Section {

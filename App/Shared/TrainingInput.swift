@@ -2,8 +2,11 @@ import Foundation
 import EightyTwentyCore
 
 /// Runs and gym sessions from every source, ready for `RunningPlan` and `TrainingAdvisor`.
+/// Walks are kept apart: they never count toward the plan.
 struct TrainingInput {
     let runs: [RunEntry]
+    /// Walks you logged or recorded here, with their distance (0 if none).
+    let walks: [RunEntry]
     let strengthDays: [DayKey]
 
     init(healthRuns: [HealthKitRun], activities: [ActivityLog]) {
@@ -16,6 +19,9 @@ struct TrainingInput {
             runs.append(RunEntry(day: DayKey(date: log.timestamp), miles: meters / RunningPlan.metersPerMile))
         }
         self.runs = runs
+        self.walks = activities
+            .filter { $0.deletedAt == nil && $0.activityKind == .walk }
+            .map { RunEntry(day: DayKey(date: $0.timestamp), miles: ($0.distanceMeters ?? 0) / RunningPlan.metersPerMile) }
         self.strengthDays = activities
             .filter { $0.deletedAt == nil && $0.activityKind == .workout }
             .map { DayKey(date: $0.timestamp) }

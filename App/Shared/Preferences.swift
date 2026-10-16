@@ -31,6 +31,10 @@ enum PrefKey {
     static let trainingGoal = "trainingGoal"
     /// What the recorder records when you open it: run or walk, as an `ActivityKind` raw value.
     static let recordActivity = "recordActivity"
+    /// Distance updates while recording: every this many miles or km (0 = off), and
+    /// whether they're read out loud as well as shown.
+    static let cueEvery = "cueEvery"
+    static let cueSpeak = "cueSpeak"
     /// What you want the coach to know (history, goals). Sent with each chat, never logged.
     static let coachNotes = "coachNotes"
 
@@ -50,6 +54,8 @@ enum PrefKey {
         workStartMinutes: 6 * 60,
         workEndMinutes: 16 * 60,
         workWeekdaysOnly: true,
+        cueEvery: 1.0,
+        cueSpeak: true,
     ]
 
     static func registerDefaults() {
