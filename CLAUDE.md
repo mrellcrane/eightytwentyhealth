@@ -12,8 +12,9 @@ Personal iOS app (SwiftUI, SwiftData + CloudKit, HealthKit, Oura API v2). One us
   gh api repos/$R/actions/runs/$RUN -q '.status + " " + (.conclusion // "")'
   gh api repos/$R/actions/runs/$RUN/jobs -q '.jobs[].steps[] | select(.conclusion=="failure") | .name'
   ```
-  `gh pr`/`gh issue` (GraphQL) don't work through the cloud proxy; use `gh api` (REST).
-- **Core logic is plain Swift** in `Packages/EightyTwentyCore` (no UIKit/HealthKit), with tests. If `swift` is installed (environment setup script), run `cd Packages/EightyTwentyCore && swift test` before pushing. Put new logic there, with tests, whenever it doesn't need Apple frameworks.
+  `gh pr`/`gh issue` (GraphQL) don't work through the cloud proxy; use `gh api` (REST). `gh auth status` reports the token as invalid; ignore it, `gh api` still works.
+- **Job logs:** `gh api .../actions/jobs/<id>/logs` fails with `Forbidden`, because GitHub redirects log downloads to `*.blob.core.windows.net`, which the cloud network policy blocks. Read logs with the GitHub MCP tool `get_job_logs` instead (`job_id`, `return_content: true`, `tail_lines` ~150 reaches the `Uploaded build N` line).
+- **Core logic is plain Swift** in `Packages/EightyTwentyCore` (no UIKit/HealthKit), with tests. If `swift` is installed (environment setup script; the default cloud image doesn't have it, and then CI is the only test run), run `cd Packages/EightyTwentyCore && swift test` before pushing. Put new logic there, with tests, whenever it doesn't need Apple frameworks.
 - **App code** (`App/`) only compiles in CI. Keep changes there small and match the surrounding style.
 - A finished build reaches the owner's phone through TestFlight about 15 minutes after the run goes green. Tell them the build number.
 
@@ -25,19 +26,20 @@ The app sends its log lines and errors to Sentry (`App/Shared/Log.swift`). Use t
 - **Never log health values, tokens, notes, or anything the user wrote.** Status codes, counts, endpoint names and error descriptions are fine.
 - Environments: `debug` (Xcode builds), `testflight`, `production`.
 
-Querying (org and project come from the environment; the auth token is either `$SENTRY_AUTH_TOKEN` or injected for sentry.io by the environment's network secret):
+Querying (org and project come from the environment; the auth token is either `$SENTRY_AUTH_TOKEN` or injected for sentry.io by the environment's network secret). The network secret must be scoped to the path `/api/0/` (zero, not the letter o); otherwise every call returns 401 `Authentication credentials were not provided.` If a `jq` below fails with `Cannot iterate over null` or `Cannot index string`, the API returned an error object: rerun without `jq` to read it.
 
 ```sh
 S=https://sentry.io/api/0
 AUTH=(); [ -n "$SENTRY_AUTH_TOKEN" ] && AUTH=(-H "Authorization: Bearer $SENTRY_AUTH_TOKEN")
 
-# Unresolved issues, last 7 days
-curl -s "${AUTH[@]}" "$S/projects/$SENTRY_ORG/$SENTRY_PROJECT/issues/?query=is:unresolved&statsPeriod=7d" \
+# Unresolved issues, last 7 days (the per-project endpoint only accepts statsPeriod 24h or 14d)
+curl -s "${AUTH[@]}" -G "$S/organizations/$SENTRY_ORG/issues/" \
+  --data-urlencode "query=is:unresolved project:$SENTRY_PROJECT" --data-urlencode statsPeriod=7d \
   | jq -r '.[] | "\(.id)  \(.count)x  last \(.lastSeen)  \(.title)"'
 
 # Latest event of an issue (message, tags, device, release)
 curl -s "${AUTH[@]}" "$S/organizations/$SENTRY_ORG/issues/<ISSUE_ID>/events/latest/" \
-  | jq '{message: .message, tags: .tags, release: .release}'
+  | jq '{message: .message, tags: .tags, release: .release.version}'
 
 # Recent log lines (all levels), newest first
 curl -s "${AUTH[@]}" -G "$S/organizations/$SENTRY_ORG/events/" \
