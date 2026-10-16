@@ -56,7 +56,7 @@ struct RunningView: View {
                 } header: {
                     Text("Coming up")
                 } footer: {
-                    Text("Assumes each week goes green. A yellow or short week repeats; a red one drops back to your last green week.")
+                    Text("The first week holds at about what you've been running, so tendons and bones catch up before miles go up. Then about +1 mi a week, with a lighter week every 4th. Assumes each week goes green; a yellow or short week repeats, a red one drops back to your last green week.")
                 }
 
                 Section {
@@ -211,10 +211,22 @@ private struct OutlookRow: View {
                 Text("\(RunningPlan.format(item.week.target)) mi")
                     .font(.headline)
                     .monospacedDigit()
-                if item.week.kind == .cutback {
-                    Text("Cutback").font(.caption).foregroundStyle(.secondary)
+                if let tag = Self.tag(item.week.kind) {
+                    Text(tag).font(.caption).foregroundStyle(.secondary)
                 }
             }
+        }
+    }
+}
+
+extension OutlookRow {
+    static func tag(_ kind: RunningPlan.Week.Kind) -> String? {
+        switch kind {
+        case .first: return "Hold"
+        case .cutback: return "Cutback"
+        case .repeated: return "Repeat"
+        case .droppedBack: return "Drop back"
+        case .build, .beforePlan: return nil
         }
     }
 }
