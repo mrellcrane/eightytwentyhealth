@@ -93,7 +93,14 @@ public enum Stats {
     static func regularizedIncompleteBeta(a: Double, b: Double, x: Double) -> Double {
         if x <= 0 { return 0 }
         if x >= 1 { return 1 }
-        let front = exp(lgamma(a + b) - lgamma(a) - lgamma(b) + a * log(x) + b * log(1 - x))
+        // Split up: exp/lgamma/log are overloaded, and one long expression times out the type checker.
+        let lnGammaA: Double = lgamma(a)
+        let lnGammaB: Double = lgamma(b)
+        let lnGammaAB: Double = lgamma(a + b)
+        let lnBeta: Double = lnGammaA + lnGammaB - lnGammaAB
+        let lnX: Double = log(x)
+        let lnOneMinusX: Double = log(1 - x)
+        let front: Double = exp(a * lnX + b * lnOneMinusX - lnBeta)
         if x < (a + 1) / (a + b + 2) {
             return front * betaContinuedFraction(a: a, b: b, x: x) / a
         }
@@ -109,21 +116,23 @@ public enum Stats {
         d = 1 / d
         var h = d
         for i in 1...300 {
-            let m = Double(i), m2 = 2 * m
-            var aa = m * (b - m) * x / ((qam + m2) * (a + m2))
+            let m = Double(i)
+            let m2: Double = 2 * m
+            var aa: Double = m * (b - m) * x / ((qam + m2) * (a + m2))
             d = 1 + aa * d
             if abs(d) < tiny { d = tiny }
             c = 1 + aa / c
             if abs(c) < tiny { c = tiny }
             d = 1 / d
             h *= d * c
-            aa = -(a + m) * (qab + m) * x / ((a + m2) * (qap + m2))
+            let numerator: Double = (a + m) * (qab + m) * x
+            aa = -numerator / ((a + m2) * (qap + m2))
             d = 1 + aa * d
             if abs(d) < tiny { d = tiny }
             c = 1 + aa / c
             if abs(c) < tiny { c = tiny }
             d = 1 / d
-            let delta = d * c
+            let delta: Double = d * c
             h *= delta
             if abs(delta - 1) < 1e-15 { break }
         }

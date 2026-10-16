@@ -87,17 +87,27 @@ final class PatternFinderTests: XCTestCase {
 
             var sensor = SensorDay(day: day)
             sensor.bedtimeStart = day.startDate(in: Self.utc).addingTimeInterval(TimeInterval(bedMinutes * 60))
-            sensor.sleepSeconds = (7 + rng.normal() * 0.8) * 3600
-            sensor.averageHRV = 50 + hrvDrift + (plant ? -5 * bed - (alcoholYesterday ? 12 : 0) : 0)
+            let sleepHours: Double = 7 + rng.normal() * 0.8
+            sensor.sleepSeconds = sleepHours * 3600
+            var hrv: Double = 50 + hrvDrift
+            if plant {
+                hrv -= 5 * bed
+                if alcoholYesterday { hrv -= 12 }
+            }
+            sensor.averageHRV = hrv
             sensor.sleepScore = 80 + sleepDrift
             sensor.readinessScore = 75 + readinessDrift
             sensor.ouraSteps = 8000 + stepsDrift
-            sensor.stressHighMinutes = max(0, 60 + rng.normal() * 30)
+            let stress: Double = 60 + rng.normal() * 30
+            sensor.stressHighMinutes = max(0, stress)
             sensors[day] = sensor
 
             // The day itself.
             var report = SelfReportDay(day: day)
-            if rng.uniform() < 0.8 { report.moodValences = [min(1, max(-1, rng.normal() * 0.4))] }
+            if rng.uniform() < 0.8 {
+                let valence: Double = rng.normal() * 0.4
+                report.moodValences = [min(1, max(-1, valence))]
+            }
             report.practiced = rng.uniform() < 0.4
             reports[day] = report
 
@@ -209,8 +219,10 @@ private struct SplitMix64 {
     }
 
     mutating func normal() -> Double {
-        let u1 = 1 - uniform()
-        let u2 = uniform()
-        return (-2 * log(u1)).squareRoot() * cos(2 * .pi * u2)
+        let u1: Double = 1 - uniform()
+        let u2: Double = uniform()
+        let radius: Double = (-2 * log(u1)).squareRoot()
+        let angle: Double = 2 * Double.pi * u2
+        return radius * cos(angle)
     }
 }

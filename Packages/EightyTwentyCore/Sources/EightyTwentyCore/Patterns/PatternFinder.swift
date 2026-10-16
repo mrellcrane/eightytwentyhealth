@@ -240,7 +240,10 @@ extension SensorDay {
     public func bedtimeHoursFromMidnight(calendar: Calendar = .current) -> Double? {
         guard let bedtimeStart else { return nil }
         let c = calendar.dateComponents([.hour, .minute, .second], from: bedtimeStart)
-        let hours = Double(c.hour ?? 0) + Double(c.minute ?? 0) / 60 + Double(c.second ?? 0) / 3600
+        let hour = Double(c.hour ?? 0)
+        let minute = Double(c.minute ?? 0)
+        let second = Double(c.second ?? 0)
+        let hours: Double = hour + minute / 60 + second / 3600
         return hours > 12 ? hours - 24 : hours
     }
 }
