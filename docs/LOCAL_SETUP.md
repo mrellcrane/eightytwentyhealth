@@ -70,7 +70,7 @@ git check-ignore -q Config/Secrets.xcconfig && echo "ignored, good"
 
 If the secret contains `//`, write those characters as `/$()/` (xcconfig treats `//` as a comment).
 
-3. Optional sanity check of the credentials (a fake code should come back as `invalid_grant`, which means the ID and secret are accepted; `invalid_client` means the secret is wrong):
+3. Optional sanity check of the credentials (a fake code should come back as `invalid_request` or `invalid_grant`, which means the ID and secret are accepted; `invalid_client` means the secret is wrong):
 
 ```sh
 curl -s https://api.ouraring.com/oauth/token -d grant_type=authorization_code -d code=check \
