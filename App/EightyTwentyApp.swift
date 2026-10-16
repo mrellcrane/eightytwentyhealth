@@ -7,6 +7,7 @@ struct EightyTwentyApp: App {
     private let launchError: String?
 
     init() {
+        Log.start()
         PrefKey.registerDefaults()
         NotificationService.shared.configure()
         do {
@@ -16,6 +17,7 @@ struct EightyTwentyApp: App {
         } catch {
             model = nil
             launchError = String(describing: error)
+            Log.app.error("Store failed to open: \(String(describing: error))")
         }
     }
 

@@ -21,7 +21,9 @@ final class AppModel {
     let meditation: MeditationSession
 
     /// Shown as an alert after something non-fatal goes wrong (e.g. Health write denied).
-    var notice: String?
+    var notice: String? {
+        didSet { if let notice { Log.app.warning("Notice shown: \(notice)") } }
+    }
     /// Whether iOS has already shown the Health permission sheet. Nil until checked.
     private(set) var healthAsked: Bool?
 

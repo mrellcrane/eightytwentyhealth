@@ -37,6 +37,9 @@
 	<string>$(OURA_CLIENT_ID)</string>
 	<key>OuraClientSecret</key>
 	<string>$(OURA_CLIENT_SECRET)</string>
+	<!-- Sentry DSN (scheme stripped), from Config/Secrets.xcconfig or the SENTRY_DSN CI secret -->
+	<key>SentryDSN</key>
+	<string>$(SENTRY_DSN)</string>
 	<key>CFBundleURLTypes</key>
 	<array>
 		<dict>

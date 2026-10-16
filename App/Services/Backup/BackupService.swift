@@ -58,6 +58,7 @@ final class BackupService {
             lastError = nil
             return localURL
         } catch {
+            Log.backup.error("Backup failed: \(String(describing: error))")
             lastError = error.localizedDescription
             return nil
         }

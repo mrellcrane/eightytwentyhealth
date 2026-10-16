@@ -15,6 +15,9 @@ configFiles:
 packages:
   EightyTwentyCore:
     path: Packages/EightyTwentyCore
+  Sentry:
+    url: https://github.com/getsentry/sentry-cocoa
+    exactVersion: 9.29.2
 
 settings:
   base:
@@ -33,6 +36,8 @@ targets:
           - Info.plist
     dependencies:
       - package: EightyTwentyCore
+      - package: Sentry
+        product: Sentry
       - sdk: HealthKit.framework
     settings:
       base:

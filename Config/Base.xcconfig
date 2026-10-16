@@ -5,6 +5,8 @@ BUNDLE_ID_PREFIX = com.mrellcrane
 DEVELOPMENT_TEAM =
 OURA_CLIENT_ID =
 OURA_CLIENT_SECRET =
+// Sentry DSN without the https:// (xcconfig reads // as a comment). Empty = logs stay on the phone.
+SENTRY_DSN =
 
 // Full setup: HealthKit + iCloud (needs a paid Apple Developer account).
 // Without one, set this to App/EightyTwenty-NoCloud.entitlements in Secrets.xcconfig.

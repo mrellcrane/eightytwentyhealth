@@ -7,6 +7,7 @@
 #   ASC_KEY_ID, ASC_ISSUER_ID, ASC_KEY_P8   App Store Connect API key (Admin role), .p8 file contents
 #   APPLE_TEAM_ID                           10-character team ID
 #   OURA_CLIENT_ID, OURA_CLIENT_SECRET      from cloud.ouraring.com/oauth/applications
+#   SENTRY_DSN                              optional; Sentry project DSN, sends app logs to sentry.io
 name: iOS
 
 on:
@@ -31,6 +32,7 @@ jobs:
       APPLE_TEAM_ID: ${{ secrets.APPLE_TEAM_ID }}
       OURA_CLIENT_ID: ${{ secrets.OURA_CLIENT_ID }}
       OURA_CLIENT_SECRET: ${{ secrets.OURA_CLIENT_SECRET }}
+      SENTRY_DSN: ${{ secrets.SENTRY_DSN }}
     steps:
       - uses: actions/checkout@v5
 
@@ -85,6 +87,7 @@ jobs:
           DEVELOPMENT_TEAM = $APPLE_TEAM_ID
           OURA_CLIENT_ID = $OURA_CLIENT_ID
           OURA_CLIENT_SECRET = $OURA_CLIENT_SECRET
+          SENTRY_DSN = ${SENTRY_DSN#https://}
           EOF
 
           cat > "$RUNNER_TEMP/ExportOptions.plist" <<EOF

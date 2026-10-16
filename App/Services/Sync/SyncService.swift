@@ -68,6 +68,7 @@ final class SyncService {
             } catch OuraError.missingScope(let endpoint) {
                 errors.append("Oura didn't grant access to \(endpoint). Disconnect and reconnect Oura, and allow everything it asks for.")
             } catch {
+                Log.sync.warning("Oura fetch failed: \(String(describing: error))")
                 errors.append("Oura: \(error.localizedDescription)")
             }
         }
@@ -104,7 +105,12 @@ final class SyncService {
             errors.append("Mood import: \(error.localizedDescription)")
         }
 
-        Log.sync.info("Sync done (\(days)-day window): Oura connected=\(self.oura.isConnected), \(sensors.count) days, \(moods.count) Health moods, errors: \(errors.joined(separator: " | "), privacy: .public)")
+        let summary = "Sync done (\(days)-day window): Oura connected=\(oura.isConnected), \(sensors.count) days, \(moods.count) Health moods"
+        if errors.isEmpty {
+            Log.sync.info(summary)
+        } else {
+            Log.sync.error("\(summary), errors: \(errors.joined(separator: " | "))")
+        }
         lastError = errors.isEmpty ? nil : errors.joined(separator: "\n")
         if errors.isEmpty || !sensors.isEmpty {
             lastSyncedAt = .now
@@ -118,7 +124,7 @@ final class SyncService {
         do {
             return try await oura.client().bundle(start: start, end: end)
         } catch OuraError.unauthorized {
-            Log.sync.error("Oura API said 401; forcing a token refresh")
+            Log.sync.warning("Oura API said 401; forcing a token refresh")
             _ = try await oura.tokens.accessToken(forceRefresh: true)
             return try await oura.client().bundle(start: start, end: end)
         }
