@@ -12,7 +12,7 @@ struct MoodCheckInView: View {
     @State private var note = ""
     @State private var saving = false
 
-    private let faces = ["😣", "🙁", "😕", "😐", "🙂", "😊", "😄"]
+    private let faces = MoodFaces.all
 
     var body: some View {
         NavigationStack {

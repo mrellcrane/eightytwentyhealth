@@ -19,6 +19,7 @@ final class AppModel {
     /// navigate away, and there's only ever one GPS session.
     let runRecorder: RunRecorder
     let meditation: MeditationSession
+    let coach: CoachService
 
     /// Shown as an alert after something non-fatal goes wrong (e.g. Health write denied).
     var notice: String? {
@@ -38,6 +39,7 @@ final class AppModel {
         self.sync = SyncService(oura: oura, healthKit: healthKit)
         self.runRecorder = RunRecorder(usesMiles: Units.defaultUsesMiles)
         self.meditation = MeditationSession()
+        self.coach = CoachService()
     }
 
     var context: ModelContext { container.mainContext }
@@ -181,8 +183,12 @@ final class AppModel {
         save()
     }
 
-    func logActivity(_ kind: ActivityKind, minutes: Double?, amount: Double?, at date: Date, note: String?) async {
+    func logActivity(_ kind: ActivityKind, minutes: Double?, amount: Double?, at date: Date, note: String?,
+                     interventionID: String? = nil, intensityBefore: Int? = nil, intensityAfter: Int? = nil) async {
         let entry = ActivityLog(timestamp: date, kind: kind, minutes: minutes, amount: amount, note: note.nilIfBlank)
+        entry.interventionID = interventionID
+        entry.intensityBefore = intensityBefore
+        entry.intensityAfter = intensityAfter
         context.insert(entry)
         save()
         if kind.isMindful, let minutes, minutes > 0 {
@@ -240,6 +246,7 @@ final class AppModel {
     func delete(_ mood: MoodEntry) { mood.deletedAt = .now; save() }
     func delete(_ entry: GratitudeEntry) { entry.deletedAt = .now; save() }
     func delete(_ log: ActivityLog) { log.deletedAt = .now; save() }
+    func delete(_ log: CoachLog) { log.deletedAt = .now; save() }
 
     private func save() {
         do {

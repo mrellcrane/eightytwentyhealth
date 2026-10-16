@@ -15,6 +15,10 @@ enum PrefKey {
     static let morningBriefOn = "morningBriefOn"
     /// Day (yyyy-MM-dd) the morning brief was last sent or made unnecessary.
     static let morningBriefDay = "morningBriefDay"
+    /// Work hours, minutes since midnight. The coach plans around them.
+    static let workStartMinutes = "workStartMinutes"
+    static let workEndMinutes = "workEndMinutes"
+    static let workWeekdaysOnly = "workWeekdaysOnly"
 
     /// Registered at launch so `@AppStorage` defaults and direct UserDefaults reads agree.
     static let defaults: [String: Any] = [
@@ -29,6 +33,9 @@ enum PrefKey {
         morningBriefOn: true,
         meditationMinutes: 10,
         meditationBellMinutes: 0,
+        workStartMinutes: 6 * 60,
+        workEndMinutes: 16 * 60,
+        workWeekdaysOnly: true,
     ]
 
     static func registerDefaults() {

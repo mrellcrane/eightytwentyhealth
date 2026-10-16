@@ -39,7 +39,7 @@ Two SwiftData configurations in one container (`App/Persistence/Models.swift`):
 
 | Store | Contents | Sync | Can be lost? |
 |---|---|---|---|
-| UserData | `MoodEntry`, `GratitudeEntry`, `ActivityLog` | CloudKit private DB | **No.** Protected 3 ways |
+| UserData | `MoodEntry`, `GratitudeEntry`, `ActivityLog`, `CoachLog` | CloudKit private DB | **No.** Protected 3 ways |
 | Cache | `DailySnapshot` (JSON-encoded `SensorDay` per day) | none | Yes, rebuilt by the next sync |
 
 Rules for UserData, because CloudKit enforces them and because this is irreplaceable data:
@@ -49,7 +49,7 @@ Rules for UserData, because CloudKit enforces them and because this is irreplace
 - **Soft deletes only** (`deletedAt`). Deleted entries stay in backups and block re-import of the same Oura tag or Health mood.
 - If the container fails to open, the app shows an error screen and touches nothing.
 
-Oura tokens live in the Keychain, this device only. Oura refresh tokens are single-use, so sharing them across devices would break both. A new phone just reconnects.
+Oura tokens and the Claude API key live in the Keychain, this device only (services `eightytwenty.oura` and `eightytwenty.claude`). Oura refresh tokens are single-use, so sharing them across devices would break both. A new phone just reconnects and pastes the key again.
 
 ### Data safety layers
 
@@ -93,19 +93,42 @@ Displayed value = 60/25/15 weighted average of the last three days' readings, so
 ## Wind-down and morning brief
 
 - **Wind-down**: a daily notification at target bedtime minus lead time (defaults 10:15pm and 45 min), plus a nudge on Today after 8pm. Sleep regularity predicted mortality better than sleep duration in a UK Biobank study of about 60,000 people (Windred 2024, Sleep).
-- **Morning brief** (`MorningBrief` in core, tested): after the background sync finds last night's readiness, one notification with both bars, readiness and HRV, whichever component is furthest below 65 if it's something else, and one rule-based action for that component. Phase 2's recommender replaces the rules.
+- **Morning brief** (`MorningBrief` in core, tested): after the background sync finds last night's readiness, one notification with both bars, readiness and HRV, whichever component is furthest below 65 if it's something else, and one rule-based action for that component.
 - Background refresh asks iOS for "not before 7:15am". If Oura hasn't uploaded the night yet it retries every ~45 minutes until noon, then gives up for the day. Opening the app in the morning with the night's data in counts as having seen it, so you don't get a duplicate.
 - iOS decides when background refresh actually runs, so the brief can be late or skipped. That's a platform limit, not a bug.
 
-## Phase 2: recommendation engine
+## Mental screen and the Claude coach
 
-`interventions.json` in the core package. Each entry: id, title, dose, minutes, target components, effect estimate (effect size or % change), one-line snippet, citation (authors, year, journal, DOI), evidence grade (A meta-analysis of RCTs, B RCT, C observational). Every number and DOI gets verified when the catalog is written.
+Tap the Mental bar on Today. The screen has the bar (tap for its components), a **What's going on?** card that opens the coach, two ranked lists of evidence-backed steps, past conversations, and the 988 line.
 
-- **Expected gain** = effect on component x component weight x room to improve (components below your baseline get boosted, so sleep recommendations rise after a bad night).
-- **Personal blend**: `estimate = (k * research + n * yours) / (k + n)`. Few logs, mostly research; many logs, mostly you.
-- **Rank** by expected gain / minutes, filtered for what's sensible today (no hard workout on a readiness-65 morning).
+### Intervention catalog
 
-Starter catalog candidates: mindfulness meditation (Goyal 2014, JAMA Intern Med), cyclic sighing (Balban 2023, Cell Rep Med), walking/strength/yoga for depression (Noetel 2024, BMJ), gratitude writing (Emmons & McCullough 2003; Seligman 2005), sleep regularity (Windred 2024, Sleep), caffeine timing (Drake 2013, JCSM), alcohol and sleep HRV (Pietilä 2018, JMIR Mental Health), 120 min/week in nature (White 2019, Sci Rep), daily steps (Paluch 2022, Lancet Public Health), social connection (Holt-Lunstad 2010, PLOS Med).
+`Coach/InterventionCatalog.swift`, 12 entries. Each has an id, title, minutes, timing, steps, targets (Mental components), the activity kind it logs as, the main button's action, sensible hours, and one `Evidence`: citation, DOI, grade (A meta-analysis, B one RCT, C observational), effect size, outcome phrase and a plain-English finding. **Every effect size and DOI was checked against the paper's abstract or results text** (October 2026); entries whose dose or effect couldn't be confirmed were left out (music, and cyclic sighing's own trial, which reports no standardized effect).
+
+- **Feel better now** (`.rightAway`, measured right after one session): brisk walk, time in nature, thought reframe (CBT), 10-minute nap.
+- **Build it up** (`.overWeeks`): cyclic sighing, mindfulness meditation, progressive muscle relaxation, three good things, self-compassion, acts of kindness, regular exercise, expressive writing.
+
+Percent shown = effect size × 33, labeled "≈" and "research estimate" (`EffectEstimate`). On the questionnaires these studies use, one SD is about a third of the typical score or more, so d × 33 is a conservative "percent change from the average". Reframe: d = 0.36, so "≈12% less negative emotion".
+
+### Personal results and ranking
+
+Logging a step asks an optional 0-10 "how strong was it" before and after (`ActivityLog.intensityBefore/After`, `interventionID`). Per-intervention averages show once n ≥ 3, and blend into the estimate as `(5 × research + n × yours) / (5 + n)`. Uncontrolled before/after reads high, which the blend tempers.
+
+`InterventionRanker`: expected percent × relevance / minutes. ×1.5 if it targets the weakest Mental component below 65; ×0.3 outside its sensible hours (nap 12-16, nature 7-18). Today shows the top "feel better now" pick for the current hour.
+
+### The coach
+
+Ask anything (mood, stress, energy, sleep, aches, focus). Optional mood face (saved as a check-in with the question as its note), energy 1-5 and feelings. Claude answers with a short read of what's going on and 1-3 steps, each with how, why, effect and source.
+
+- **Request** (`CoachRequest`, raw HTTP, unit tested): `POST /v1/messages`, model `claude-opus-5-5`, `max_tokens` 16000, non-streaming, 120 s timeout, thinking omitted (adaptive by default), `output_config: {effort: "medium", format: {type: "json_schema", schema}}`. The schema's `catalogID` and `logAs` enums come from the catalog ids and `ActivityKind`, so a step can name a checked entry.
+- **Server-side fallback** is on: `"fallbacks": "default"` with `anthropic-beta: server-side-fallback-2026-07-01`. If Claude's safety classifier declines, Anthropic retries on its recommended fallback model. If the API ever 400s mentioning "fallback", the client retries once without it.
+- **Context** (`CoachContext`, rendered as plain text and shown as "What Claude sees"): local time and zone; work hours (setting, default 6:00 AM-4:00 PM weekdays) with "at work, about 3 h left" / day off / done; target bedtime and the **coffee cutoff** 8.8 h before it (Gardiner 2023); both bars with every component; last night (bed and wake times, hours, efficiency, temperature, SpO2); yesterday (active calories, workout minutes, steps, Oura stress); steps so far; activity logs and moods from the last 48 h (no mood notes); today's check-in; things tried in the last 30 days with ratings.
+- **System prompt** (`CoachRequest.systemPrompt`): fit the plan to right now and to work hours, protect tonight's sleep, one action per step, cite only real studies, numbers only when sure, checked facts (post-lunch dip, caffeine and sleep, dehydration, nap length, stair walking) and the catalog summary. Tuned against the owner's real 1 PM case with `CoachLiveTests`.
+- **Follow-ups are append-only.** `CoachConversation` holds the turns; messages are rebuilt from them, with Claude's exact JSON text replayed as a single text block. Thinking blocks aren't replayed (no tools, so nothing needs them, and dropping all of them keeps the preserved-thinking check happy). Follow-ups carry a time stamp.
+- **Citations**: catalog steps show the checked headline and a DOI link, labeled "checked". Anything else is labeled "cited by Claude" with a Google Scholar link to check it. No web search tool.
+- **Safety**: `crisis: true` puts the 988 call/text card first; `seeADoctor` carries red flags (for a headache: sudden or worst-ever, fever or stiff neck, vision changes, confusion, weakness, after a head injury, getting worse). The Mental screen always shows 988.
+- **History**: every question and answer is saved as a `CoachLog` (UserData store, so CloudKit-synced) and as `coach` records in the JSON backup (`CoachRecord`; older backups without the field still import). "Past questions" on the Mental screen lists them; a past conversation can be picked up with a follow-up.
+- **Privacy**: the key is pasted in Settings and kept in the Keychain, never in the binary (public repo). Sentry gets status codes, durations, turn numbers and step counts only (`Log.coach`), never the question, the answer or the context.
 
 ## Phase 3: correlation engine
 
@@ -130,3 +153,5 @@ Starter catalog candidates: mindfulness meditation (Goyal 2014, JAMA Intern Med)
 | Meditation | `Meditation/MeditationTimer` | `Features/Meditation`, `Services/Notifications` |
 | Mood | `Mood/MoodScale` | `Features/Log` |
 | Morning brief | `Briefing/MorningBrief` | `AppModel` (send/retry), `Services/Notifications` |
+| Interventions | `Coach/Intervention` (estimate, personal blend, ranker), `Coach/InterventionCatalog` | `Features/Mental/MentalView`, `InterventionViews` |
+| Coach | `Coach/CoachClient` (request, schema, prompt, parse, conversation, record), `Coach/CoachContext`, `Coach/JSONValue` | `Services/Coach/CoachService`, `Features/Mental/AskView` (ask, reply, history, key) |

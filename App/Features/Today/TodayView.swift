@@ -16,7 +16,8 @@ struct TodayView: View {
 
     @State private var showingMood = false
     @State private var showingGratitude = false
-    @State private var selectedBar: BarKind?
+    @State private var showingPhysical = false
+    @State private var asking = false
 
     var body: some View {
         let input = BarsInput(snapshots: snapshots, moods: moods, gratitude: gratitude, activities: activities)
@@ -25,10 +26,15 @@ struct TodayView: View {
 
         ScrollView {
             VStack(alignment: .leading, spacing: 16) {
-                Button { selectedBar = .physical } label: { HealthBarView(display: physical) }
+                Button { showingPhysical = true } label: { HealthBarView(display: physical) }
                     .buttonStyle(.plain)
-                Button { selectedBar = .mental } label: { HealthBarView(display: mental) }
+                NavigationLink { MentalView() } label: { HealthBarView(display: mental) }
                     .buttonStyle(.plain)
+
+                AskCard {
+                    model.coach.expireIfStale()
+                    asking = true
+                }
 
                 quickActions
 
@@ -45,12 +51,19 @@ struct TodayView: View {
                     }
                 }
 
-                // Phase 2 replaces this with ranked, evidence-backed recommendations.
-                VStack(alignment: .leading, spacing: 6) {
-                    Text("Your 80/20 today").font(.title3.bold())
-                    Text("Coming next: the actions that should move your bars the most per minute, each with the research behind it.")
-                        .font(.subheadline)
-                        .foregroundStyle(.secondary)
+                if let top = topPick(mental: mental) {
+                    VStack(alignment: .leading, spacing: 10) {
+                        Text("Your 80/20 right now").font(.title3.bold())
+                        NavigationLink {
+                            InterventionDetailView(intervention: top.intervention, personal: top.personal)
+                        } label: {
+                            InterventionRow(ranked: top)
+                                .frame(maxWidth: .infinity, alignment: .leading)
+                                .padding()
+                                .background(.background.secondary, in: RoundedRectangle(cornerRadius: 12))
+                        }
+                        .buttonStyle(.plain)
+                    }
                 }
 
                 syncStatus
@@ -61,12 +74,21 @@ struct TodayView: View {
         .refreshable { await model.sync.sync(context: context) }
         .sheet(isPresented: $showingMood) { MoodCheckInView() }
         .sheet(isPresented: $showingGratitude) { GratitudeView() }
-        .sheet(item: $selectedBar) { kind in
+        .sheet(isPresented: $asking) { AskView() }
+        .sheet(isPresented: $showingPhysical) {
             NavigationStack {
-                BarDetailView(display: kind == .physical ? physical : mental)
+                BarDetailView(display: physical)
             }
             .presentationDetents([.medium, .large])
         }
+    }
+
+    /// The best "feel better now" step for this hour, ranked like the Mental screen.
+    private func topPick(mental: BarDisplay) -> RankedIntervention? {
+        let personal = PersonalEffect.compute(activities.map(\.interventionLog))
+        return InterventionRanker.rank(mental: mental.today, personal: personal,
+                                       hour: Calendar.current.component(.hour, from: .now))
+            .first { $0.intervention.timing == .rightAway }
     }
 
     private var quickActions: some View {
@@ -89,7 +111,7 @@ struct TodayView: View {
         .fixedSize(horizontal: false, vertical: true)
     }
 
-    /// Plain nudges about missing data, until real recommendations land in Phase 2.
+    /// Plain nudges about missing data. The ranked, evidence-backed steps live on the Mental screen.
     private func nextSteps(physical: BarDisplay, mental: BarDisplay) -> [String] {
         var steps: [String] = []
         if !model.oura.isConnected {

@@ -64,7 +64,7 @@ final class BackupService {
         }
     }
 
-    func restore(from url: URL, context: ModelContext) throws -> (moods: Int, gratitude: Int, activities: Int) {
+    func restore(from url: URL, context: ModelContext) throws -> RestoreCounts {
         let accessing = url.startAccessingSecurityScopedResource()
         defer { if accessing { url.stopAccessingSecurityScopedResource() } }
         let backup = try BackupDocument.decode(Data(contentsOf: url))

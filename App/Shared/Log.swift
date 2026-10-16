@@ -13,6 +13,7 @@ struct Log {
     static let sync = Log(category: "sync")
     static let health = Log(category: "health")
     static let backup = Log(category: "backup")
+    static let coach = Log(category: "coach")
 
     let category: String
     private let logger: Logger

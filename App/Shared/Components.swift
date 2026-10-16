@@ -88,6 +88,11 @@ struct DeltaText: View {
     }
 }
 
+/// Faces for the 7 steps of `MoodScale`, very unpleasant to very pleasant.
+enum MoodFaces {
+    static let all = ["😣", "🙁", "😕", "😐", "🙂", "😊", "😄"]
+}
+
 /// Wrapping row of chips (emotion words, etc).
 struct FlowLayout: Layout {
     var spacing: CGFloat = 8

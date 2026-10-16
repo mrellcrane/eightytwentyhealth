@@ -13,7 +13,14 @@ Personal iOS app (SwiftUI, SwiftData + CloudKit, HealthKit, Oura API v2). One us
   gh api repos/$R/actions/runs/$RUN/jobs -q '.jobs[].steps[] | select(.conclusion=="failure") | .name'
   ```
   `gh pr`/`gh issue` (GraphQL) don't work through the cloud proxy; use `gh api` (REST).
-- **Core logic is plain Swift** in `Packages/EightyTwentyCore` (no UIKit/HealthKit), with tests. If `swift` is installed (environment setup script), run `cd Packages/EightyTwentyCore && swift test` before pushing. Put new logic there, with tests, whenever it doesn't need Apple frameworks.
+- **Core logic is plain Swift** in `Packages/EightyTwentyCore` (no UIKit/HealthKit), with tests. Run them before pushing. Put new logic there, with tests, whenever it doesn't need Apple frameworks. If `swift` is installed, `cd Packages/EightyTwentyCore && swift test`. If not (swift.org downloads are blocked, Docker Hub works), use the `swift:6.1` image; the CA mount lets the container through the session's TLS proxy:
+  ```sh
+  (sudo dockerd > /tmp/dockerd.log 2>&1 &); sleep 5; docker pull swift:6.1
+  cd Packages/EightyTwentyCore && docker run --rm --network host -e CLAUDE_COACH_API_KEY \
+    -v /root/.ccr/ca-bundle.crt:/etc/ssl/certs/ca-certificates.crt:ro \
+    -v swiftbuild:/tmp/build -v "$PWD":/pkg -w /pkg swift:6.1 swift test --scratch-path /tmp/build
+  ```
+- **Coach live test**: `CoachLiveTests` calls the real Claude API with the owner's 1 PM scenario and prints both answers (`--filter CoachLiveTests`). It runs only when `CLAUDE_COACH_API_KEY` is set (cloud sessions; never `ANTHROPIC_API_KEY`, which Claude Code itself may read), and is skipped in CI. Never print or write the key. Run it after any change to the coach's system prompt, schema or context, and read the advice.
 - **App code** (`App/`) only compiles in CI. Keep changes there small and match the surrounding style.
 - A finished build reaches the owner's phone through TestFlight about 15 minutes after the run goes green. Tell them the build number.
 
@@ -21,8 +28,8 @@ Personal iOS app (SwiftUI, SwiftData + CloudKit, HealthKit, Oura API v2). One us
 
 The app sends its log lines and errors to Sentry (`App/Shared/Log.swift`). Use them to find and confirm bugs before changing code.
 
-- `Log.<category>.info / warning / error("...")`. Categories: app, oura, sync, health, backup. `error` also opens a Sentry issue.
-- **Never log health values, tokens, notes, or anything the user wrote.** Status codes, counts, endpoint names and error descriptions are fine.
+- `Log.<category>.info / warning / error("...")`. Categories: app, oura, sync, health, backup, coach. `error` also opens a Sentry issue.
+- **Never log health values, tokens, notes, or anything the user wrote**, including coach questions, Claude's answers and the coach context. Status codes, counts, durations, endpoint names and error descriptions are fine.
 - Environments: `debug` (Xcode builds), `testflight`, `production`.
 
 Querying (org and project come from the environment; the auth token is either `$SENTRY_AUTH_TOKEN` or injected for sentry.io by the environment's network secret):

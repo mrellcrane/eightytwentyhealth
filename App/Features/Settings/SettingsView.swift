@@ -18,6 +18,9 @@ struct SettingsView: View {
     @AppStorage(PrefKey.bedtimeMinutes) private var bedtimeMinutes = 22 * 60 + 15
     @AppStorage(PrefKey.windDownLeadMinutes) private var windDownLeadMinutes = 45
     @AppStorage(PrefKey.morningBriefOn) private var morningBriefOn = true
+    @AppStorage(PrefKey.workStartMinutes) private var workStartMinutes = 6 * 60
+    @AppStorage(PrefKey.workEndMinutes) private var workEndMinutes = 16 * 60
+    @AppStorage(PrefKey.workWeekdaysOnly) private var workWeekdaysOnly = true
 
     @State private var connecting = false
     @State private var latestBackupURL: URL?
@@ -28,8 +31,10 @@ struct SettingsView: View {
         Form {
             ouraSection
             healthSection
+            ClaudeKeySection()
             backupSection
             sleepAndMorningSection
+            workSection
             remindersSection
 
             Section("Units") {
@@ -165,7 +170,7 @@ struct SettingsView: View {
         } header: {
             Text("Your data")
         } footer: {
-            Text("Mood, gratitude and activity logs sync through iCloud. On top of that, a plain JSON backup is written daily to iCloud Drive and to Files > On My iPhone > 80/20. Restoring only adds missing entries; it never overwrites or deletes.")
+            Text("Mood, gratitude and activity logs and coach conversations sync through iCloud. On top of that, a plain JSON backup is written daily to iCloud Drive and to Files > On My iPhone > 80/20. Restoring only adds missing entries; it never overwrites or deletes.")
         }
     }
 
@@ -173,10 +178,9 @@ struct SettingsView: View {
         do {
             let url = try result.get()
             let counts = try model.backup.restore(from: url, context: context)
-            let total = counts.moods + counts.gratitude + counts.activities
-            message = total == 0
+            message = counts.total == 0
                 ? "Everything in that file is already here."
-                : "Restored \(counts.moods) moods, \(counts.gratitude) gratitude entries and \(counts.activities) activities."
+                : "Restored \(counts.moods) moods, \(counts.gratitude) gratitude entries, \(counts.activities) activities and \(counts.coach) coach conversations."
         } catch {
             message = "Couldn't restore: \(error.localizedDescription)"
         }
@@ -202,6 +206,20 @@ struct SettingsView: View {
         .onChange(of: windDownOn) { updateReminders() }
         .onChange(of: bedtimeMinutes) { updateReminders() }
         .onChange(of: windDownLeadMinutes) { updateReminders() }
+    }
+
+    // MARK: Work hours
+
+    private var workSection: some View {
+        Section {
+            DatePicker("Start", selection: minutesBinding($workStartMinutes), displayedComponents: .hourAndMinute)
+            DatePicker("End", selection: minutesBinding($workEndMinutes), displayedComponents: .hourAndMinute)
+            Toggle("Weekdays only", isOn: $workWeekdaysOnly)
+        } header: {
+            Text("Work hours")
+        } footer: {
+            Text("The coach plans around these: during work it sticks to things you can do at a desk or on a short break.")
+        }
     }
 
     // MARK: Reminders

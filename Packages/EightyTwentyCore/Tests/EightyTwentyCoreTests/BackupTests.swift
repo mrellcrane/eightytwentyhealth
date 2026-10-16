@@ -91,4 +91,48 @@ final class BackupTests: XCTestCase {
         XCTAssertEqual(BackupFiles.filesToPrune(names, keep: 5), [])
         XCTAssertEqual(BackupFiles.filesToPrune(names, keep: 0), [older], "Always keeps at least one")
     }
+
+    func testInterventionFieldsRoundTrip() throws {
+        var doc = sampleDocument()
+        doc.activities.append(
+            ActivityRecord(id: UUID(), timestamp: t0, kind: "breathwork", minutes: 5, amount: nil, distanceMeters: nil,
+                           source: "manual", externalID: nil, note: nil, routePolyline: nil, deletedAt: nil,
+                           interventionID: "cyclic-sighing", intensityBefore: 7, intensityAfter: 4)
+        )
+        let decoded = try BackupDocument.decode(try doc.encoded())
+        XCTAssertEqual(decoded, doc)
+        XCTAssertEqual(decoded.activities.last?.interventionID, "cyclic-sighing")
+        XCTAssertEqual(decoded.activities.last?.intensityBefore, 7)
+        XCTAssertEqual(decoded.activities.last?.intensityAfter, 4)
+    }
+
+    func testCoachConversationsRoundTripAndMerge() throws {
+        var doc = sampleDocument()
+        var conversation = CoachConversation(context: "CTX", question: "Tired at 1pm", askedAt: t0)
+        conversation.record(CoachRequestTests.sampleReply, text: CoachRequestTests.sampleText)
+        conversation.followUp("I can't nap at work", at: "Thu 1:03 PM", askedAt: t0.addingTimeInterval(180))
+        let record = CoachRecord(id: UUID(), conversation: conversation)
+        doc.coach = [record]
+
+        let decoded = try BackupDocument.decode(try doc.encoded())
+        XCTAssertEqual(decoded, doc)
+        XCTAssertEqual(decoded.coach.first?.turns.map(\.question), ["Tired at 1pm", "I can't nap at work"])
+        XCTAssertEqual(decoded.coach.first?.startedAt, t0)
+
+        XCTAssertEqual(BackupMerge.recordsToInsert(from: doc, existingIDs: [], existingExternalIDs: []).coach, [record])
+        XCTAssertTrue(BackupMerge.recordsToInsert(from: doc, existingIDs: [record.id], existingExternalIDs: []).coach.isEmpty)
+    }
+
+    func testActivitiesFromBeforeTheCoachStillImport() throws {
+        let json = """
+        {"version":1,"exportedAt":"2026-10-14T00:00:00Z","moods":[],"gratitude":[],"activities":[
+        {"id":"\(UUID())","timestamp":"2026-10-14T08:00:00Z","kind":"run","minutes":30,"distanceMeters":5000,"source":"runRecorder"}]}
+        """
+        let doc = try BackupDocument.decode(Data(json.utf8))
+        XCTAssertEqual(doc.activities.count, 1)
+        XCTAssertNil(doc.activities[0].interventionID)
+        XCTAssertNil(doc.activities[0].intensityBefore)
+        XCTAssertNil(doc.activities[0].intensityAfter)
+        XCTAssertTrue(doc.coach.isEmpty)
+    }
 }

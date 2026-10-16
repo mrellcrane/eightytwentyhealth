@@ -144,7 +144,7 @@ struct RecentRow: View {
         case .gratitude(let g):
             return g.items.first ?? "Gratitude"
         case .activity(let log):
-            return log.activityKind?.title ?? log.kind.capitalized
+            return log.displayTitle
         }
     }
 
@@ -162,10 +162,14 @@ struct RecentRow: View {
             }
             if let minutes = log.minutes { parts.append("\(Int(minutes.rounded())) min") }
             if let amount = log.amount { parts.append("\(amount.formatted()) \(log.activityKind.flatMap(\.unitLabel) ?? "")") }
+            if let before = log.intensityBefore, let after = log.intensityAfter {
+                parts.append("\(before) → \(after)")
+            }
             if log.source == ActivitySource.ouraTag.rawValue || log.source == ActivitySource.ouraSession.rawValue {
                 parts.append("from Oura")
             }
-            if let note = log.note { parts.append(note) }
+            // For coach steps outside the catalog the note is already the title.
+            if let note = log.note, note != log.displayTitle { parts.append(note) }
             return parts.joined(separator: " · ").nilIfEmpty
         }
     }

@@ -73,6 +73,11 @@ final class ActivityLog {
     var routePolyline: String?
     var healthKitUUID: UUID?
     var deletedAt: Date?
+    /// `Intervention.id` when logged from the Mental screen or a coach step that matched one.
+    var interventionID: String?
+    /// 0-10, how strong the problem felt before and after (lower is better). Optional.
+    var intensityBefore: Int?
+    var intensityAfter: Int?
 
     init(timestamp: Date = .now, kind: ActivityKind, minutes: Double? = nil, amount: Double? = nil,
          distanceMeters: Double? = nil, source: ActivitySource = .manual, externalID: String? = nil,
@@ -90,6 +95,47 @@ final class ActivityLog {
     }
 
     var activityKind: ActivityKind? { ActivityKind(rawValue: kind) }
+
+    /// "Run", the intervention's title, or for coach steps that fit no kind, the step (kept in the note).
+    var displayTitle: String {
+        if let intervention = Intervention.find(interventionID) { return intervention.title }
+        if activityKind == .other, let note { return note }
+        return activityKind?.title ?? kind.capitalized
+    }
+}
+
+/// One coach conversation: your questions, what Claude saw, and its answers.
+/// Synced and backed up like everything else you create; never sent to logs.
+@Model
+final class CoachLog {
+    var id: UUID = UUID()
+    var startedAt: Date = Date()
+    var updatedAt: Date = Date()
+    /// The first question, for lists.
+    var title: String = ""
+    /// What Claude saw with the first question: time, bars, Oura, recent logs.
+    var context: String = ""
+    /// JSON array of `CoachConversation.Turn`.
+    var turnsData: Data = Data()
+    var deletedAt: Date?
+
+    init(id: UUID, startedAt: Date) {
+        self.id = id
+        self.startedAt = startedAt
+    }
+
+    var turns: [CoachConversation.Turn] { CoachRecord.decodeTurns(turnsData) }
+
+    var record: CoachRecord {
+        CoachRecord(id: id, startedAt: startedAt, context: context, turns: turns, deletedAt: deletedAt)
+    }
+
+    func update(_ conversation: CoachConversation) {
+        title = conversation.turns.first?.question ?? ""
+        context = conversation.context
+        turnsData = CoachRecord.encodeTurns(conversation.turns)
+        updatedAt = .now
+    }
 }
 
 /// One day of sensor data (cache store). The payload is a JSON-encoded `SensorDay`,
@@ -132,7 +178,7 @@ extension JSONDecoder {
 }
 
 enum Stores {
-    static let userModels: [any PersistentModel.Type] = [MoodEntry.self, GratitudeEntry.self, ActivityLog.self]
+    static let userModels: [any PersistentModel.Type] = [MoodEntry.self, GratitudeEntry.self, ActivityLog.self, CoachLog.self]
     static let cacheModels: [any PersistentModel.Type] = [DailySnapshot.self]
 
     /// Builds the container. If this throws we show an error screen and never

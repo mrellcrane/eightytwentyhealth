@@ -12,13 +12,16 @@ public struct BackupDocument: Codable, Equatable, Sendable {
     public var moods: [MoodRecord]
     public var gratitude: [GratitudeRecord]
     public var activities: [ActivityRecord]
+    /// Coach conversations. Missing in backups from before the coach.
+    public var coach: [CoachRecord]
 
     public init(
         exportedAt: Date,
         appVersion: String?,
         moods: [MoodRecord],
         gratitude: [GratitudeRecord],
-        activities: [ActivityRecord]
+        activities: [ActivityRecord],
+        coach: [CoachRecord] = []
     ) {
         self.version = Self.currentVersion
         self.exportedAt = exportedAt
@@ -26,9 +29,25 @@ public struct BackupDocument: Codable, Equatable, Sendable {
         self.moods = moods
         self.gratitude = gratitude
         self.activities = activities
+        self.coach = coach
     }
 
-    public var isEmpty: Bool { moods.isEmpty && gratitude.isEmpty && activities.isEmpty }
+    enum CodingKeys: String, CodingKey {
+        case version, exportedAt, appVersion, moods, gratitude, activities, coach
+    }
+
+    public init(from decoder: Decoder) throws {
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+        version = try container.decode(Int.self, forKey: .version)
+        exportedAt = try container.decode(Date.self, forKey: .exportedAt)
+        appVersion = try container.decodeIfPresent(String.self, forKey: .appVersion)
+        moods = try container.decode([MoodRecord].self, forKey: .moods)
+        gratitude = try container.decode([GratitudeRecord].self, forKey: .gratitude)
+        activities = try container.decode([ActivityRecord].self, forKey: .activities)
+        coach = try container.decodeIfPresent([CoachRecord].self, forKey: .coach) ?? []
+    }
+
+    public var isEmpty: Bool { moods.isEmpty && gratitude.isEmpty && activities.isEmpty && coach.isEmpty }
 
     public static func encoder() -> JSONEncoder {
         let encoder = JSONEncoder()
@@ -161,12 +180,15 @@ public enum BackupMerge {
             return true
         }
 
+        let coach = backup.coach.filter { seen.insert($0.id).inserted }
+
         return BackupDocument(
             exportedAt: backup.exportedAt,
             appVersion: backup.appVersion,
             moods: moods,
             gratitude: gratitude,
-            activities: activities
+            activities: activities,
+            coach: coach
         )
     }
 }

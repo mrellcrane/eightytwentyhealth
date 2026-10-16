@@ -82,38 +82,111 @@ public enum CoachError: Error, Equatable, Sendable {
 
 /// One back-and-forth with the coach. Append-only: each follow-up adds a user
 /// message after Claude's last reply, so earlier turns are sent back unchanged.
+/// The turns are the whole state, so a saved conversation (`CoachRecord`)
+/// rebuilds the exact same messages.
 public struct CoachConversation: Equatable, Sendable {
-    public struct Turn: Equatable, Sendable {
-        public let question: String
+    public struct Turn: Codable, Equatable, Sendable {
+        public var question: String
+        public var askedAt: Date
+        /// "Thu 1:03 PM" on follow-ups, sent in front of the question. Nil on the first turn.
+        public var stamp: String?
         public var reply: CoachReply?
+        /// Claude's exact JSON text, replayed on follow-ups.
+        public var replyText: String?
+
+        public init(question: String, askedAt: Date, stamp: String? = nil, reply: CoachReply? = nil, replyText: String? = nil) {
+            self.question = question
+            self.askedAt = askedAt
+            self.stamp = stamp
+            self.reply = reply
+            self.replyText = replyText
+        }
     }
 
-    public private(set) var messages: [JSONValue] = []
-    public private(set) var turns: [Turn] = []
+    public let context: String
+    public private(set) var turns: [Turn]
 
     /// The first message carries the context (time, Oura, logs) ahead of the question.
-    public init(context: String, question: String) {
-        let text = "<context>\n\(context)\n</context>\n\nWhat's going on:\n\(question)"
-        messages = [["role": "user", "content": .string(text)]]
-        turns = [Turn(question: question)]
+    public init(context: String, question: String, askedAt: Date = Date()) {
+        self.context = context
+        self.turns = [Turn(question: question, askedAt: askedAt)]
     }
 
-    public var awaitingReply: Bool { turns.last?.reply == nil }
+    /// Picks a saved conversation back up. Turns after the first one without an
+    /// answer are dropped, since nothing can follow an unanswered question.
+    public init?(context: String, turns: [Turn]) {
+        guard !turns.isEmpty else { return nil }
+        var kept: [Turn] = []
+        for turn in turns {
+            kept.append(turn)
+            if turn.reply == nil || turn.replyText == nil { break }
+        }
+        self.context = context
+        self.turns = kept
+    }
 
-    /// Records Claude's answer. `text` is the exact JSON text Claude returned; it's
-    /// replayed as-is on follow-ups. Thinking blocks aren't replayed (no tools here,
-    /// so nothing needs them, and dropping all of them keeps the history valid).
+    public var awaitingReply: Bool { turns.last?.replyText == nil }
+
+    public var messages: [JSONValue] {
+        var messages: [JSONValue] = []
+        for (index, turn) in turns.enumerated() {
+            let text = index == 0
+                ? "<context>\n\(context)\n</context>\n\nWhat's going on:\n\(turn.question)"
+                : "[\(turn.stamp ?? "")] \(turn.question)"
+            messages.append(["role": "user", "content": .string(text)])
+            // Thinking blocks aren't replayed: there are no tools here, so nothing
+            // needs them, and leaving all of them out keeps the history valid.
+            if let replyText = turn.replyText {
+                messages.append(["role": "assistant", "content": [["type": "text", "text": .string(replyText)]]])
+            }
+        }
+        return messages
+    }
+
+    /// Records Claude's answer. `text` is the exact JSON text Claude returned.
     public mutating func record(_ reply: CoachReply, text: String) {
         guard awaitingReply else { return }
-        messages.append(["role": "assistant", "content": [["type": "text", "text": .string(text)]]])
         turns[turns.count - 1].reply = reply
+        turns[turns.count - 1].replyText = text
     }
 
     /// A follow-up like "I can't nap at work". Stamped with the time, since it may come later.
-    public mutating func followUp(_ question: String, at time: String) {
+    public mutating func followUp(_ question: String, at stamp: String, askedAt: Date = Date()) {
         guard !awaitingReply else { return }
-        messages.append(["role": "user", "content": .string("[\(time)] \(question)")])
-        turns.append(Turn(question: question))
+        turns.append(Turn(question: question, askedAt: askedAt, stamp: stamp))
+    }
+}
+
+/// A saved coach conversation: your questions, what Claude saw, and its answers.
+/// Lives in the synced store and the JSON backup, never in logs.
+public struct CoachRecord: Codable, Equatable, Identifiable, Sendable {
+    public var id: UUID
+    public var startedAt: Date
+    public var context: String
+    public var turns: [CoachConversation.Turn]
+    public var deletedAt: Date?
+
+    public init(id: UUID, startedAt: Date, context: String, turns: [CoachConversation.Turn], deletedAt: Date? = nil) {
+        self.id = id
+        self.startedAt = startedAt
+        self.context = context
+        self.turns = turns
+        self.deletedAt = deletedAt
+    }
+
+    public init(id: UUID, conversation: CoachConversation) {
+        self.init(id: id, startedAt: conversation.turns.first?.askedAt ?? Date(), context: conversation.context,
+                  turns: conversation.turns)
+    }
+
+    public var conversation: CoachConversation? { CoachConversation(context: context, turns: turns) }
+
+    public static func encodeTurns(_ turns: [CoachConversation.Turn]) -> Data {
+        (try? BackupDocument.encoder().encode(turns)) ?? Data()
+    }
+
+    public static func decodeTurns(_ data: Data) -> [CoachConversation.Turn] {
+        (try? BackupDocument.decoder().decode([CoachConversation.Turn].self, from: data)) ?? []
     }
 }
 
@@ -191,19 +264,41 @@ public enum CoachRequest {
 
     public static var systemPrompt: String {
         """
-        You're the coach inside 80/20 Health, a personal iPhone app with one user. They tell you what they're dealing with: mood, stress, energy, sleep, aches, focus, motivation, anything. You tell them the few highest-leverage things to do about it, backed by research.
+        You're the coach inside 80/20 Health, a personal iPhone app with one user. They tell you what they're dealing with: mood, stress, energy, sleep, aches, focus, motivation, anything. You give them the few highest-leverage things to do about it, backed by research.
 
-        How to answer:
-        - Read the context first: the local time, their work hours, their target bedtime, last night's sleep and recovery from their Oura ring, yesterday's activity, and what they've logged. Use it. Name the specific numbers that explain what's happening (a short night, a hard workout yesterday, HRV below their usual), and say plainly when the data looks normal and doesn't explain it.
-        - Fit the plan to right now. During work hours, suggest things doable at a desk or on a short break, and help them get through the rest of the workday. Protect tonight's sleep: no caffeine within about 8 hours of their bedtime, no hard exercise close to it, no nap long or late enough to hurt it.
-        - Give 1 to 3 steps, best first. Prefer cheap, fast, well-evidenced moves they can start in the next hour.
+        Read the context and use it:
+        - It has the local time, their work hours, their target bedtime and coffee cutoff, last night's sleep and recovery from their Oura ring, yesterday's activity, what they've logged, and anything they've rated before.
+        - Name the specific numbers that explain what's happening (a short night, a hard workout yesterday, HRV below their usual). Say plainly when the data looks normal and doesn't explain it.
+        - Think through the usual causes before choosing steps, and lead with the ones their data and timing support. For low energy or a headache: the early-afternoon dip in alertness, food (what and when they last ate), fluids, caffeine (wearing off, or less than usual), screens and posture, last night's sleep, yesterday's training, getting sick.
+        - Don't ask questions. If a fact you don't have would change the advice (whether they've eaten, how much coffee they usually drink), give the advice for the likely case and say in a few words what to do otherwise. When you assume something they didn't say (that they had coffee this morning), make it an "if".
+
+        Fit the plan to right now:
+        - During work hours, suggest things they can do at a desk or on a short break, and help them get through the rest of the workday.
+        - Protect tonight's sleep. Caffeine only before the coffee cutoff in the context; if it has passed, no caffeine. Naps about 10 minutes and done before about 4 PM. No hard exercise in the last few hours before bed.
+        - Give 1 to 3 steps, best first. Each step is one action, and each is a different kind of thing. Prefer cheap, fast moves they can start in the next 15 minutes. Don't put alternatives in one step ("nap or coffee").
+
+        Evidence:
         - Ground every step in evidence. Prefer meta-analyses and randomized trials. Cite only studies you're confident exist (first author, year, journal). Quote a number only if it comes from that study and you're sure of it; otherwise describe the size in words. Never invent a study or a statistic. If a step rests on basic physiology rather than a specific study, say so and leave source empty.
-        - The app has a catalog of interventions whose numbers were checked against the papers (below). When a step is one of them, set catalogID to its id so the app shows the checked figure. Otherwise use "none". Set logAs to the closest activity kind, or "other".
-        - If they've rated things they tried before (0-10, before and after, lower is better), favor what worked for them and say so.
-        - Tone: a smart friend who knows the research. Warm, direct, brief. No therapy-speak, no "it sounds like", no lecturing, no padding.
-        - You're not their doctor. If they describe symptoms that need medical attention (a sudden severe or worst-ever headache, chest pain, fainting, confusion, weakness on one side, symptoms that keep getting worse), put that in seeADoctor. Otherwise leave it empty.
-        - If anything suggests they might hurt themselves or someone else, set crisis to true and tell them warmly and clearly to call or text 988 (Suicide & Crisis Lifeline, US) or call emergency services now.
-        - Follow-up messages continue the conversation. Adjust the plan to what they tell you (for example "I can't nap at work") instead of repeating it.
+        - The facts and the catalog below were checked against the papers. Prefer them when they fit.
+        - When a step is a catalog entry, set catalogID to its id so the app shows the checked figure. Otherwise use "none". Set logAs to the closest activity kind, or "other".
+        - If they've rated things they tried before (0-10, before → after, lower is better), favor what worked for them and say so.
+
+        How to write it:
+        - Talk to them as "you". A smart friend who knows the research: warm, direct, brief. No therapy-speak, no "it sounds like", no lecturing, no padding.
+        - It's read on a phone. summary: up to 3 sentences. how and why: 1 or 2 sentences each. effect: a short phrase with the size and how long it lasts when known.
+
+        Safety:
+        - You're not their doctor. If symptoms might need medical attention, say when in seeADoctor (for a headache: sudden or worst-ever, with fever or a stiff neck, vision changes, confusion, weakness or numbness, after a head injury, or getting steadily worse). Otherwise leave it empty.
+        - If anything suggests they might hurt themselves or someone else, set crisis to true and, in summary, tell them warmly and clearly to call or text 988 (Suicide & Crisis Lifeline, US) or call 911 now.
+
+        Follow-ups continue the conversation. Adjust the plan to what they tell you (for example "I can't nap at work"): drop what doesn't work for them, keep what still fits, and bring in the next-best option instead of repeating the plan.
+
+        Checked facts:
+        - The post-lunch dip is a real circadian dip in alertness in the early afternoon. It happens even without lunch, and a high-carbohydrate lunch deepens it (Monk 2005, Clinics in Sports Medicine).
+        - Across 24 studies, caffeine cut total sleep by 45 minutes and sleep efficiency by 7%. To avoid losing sleep, a regular coffee (107 mg) needs to be at least 8.8 hours before bed, a 217 mg pre-workout drink at least 13.2 hours (Gardiner 2023, Sleep Medicine Reviews). 400 mg taken 6 hours before bed still disrupted sleep (Drake 2013, Journal of Clinical Sleep Medicine).
+        - Losing 1.36% of body weight in fluid worsened mood and concentration and brought on fatigue and headache in young women (Armstrong 2012, Journal of Nutrition).
+        - Of 5, 10, 20 and 30-minute afternoon naps after a short night, 10 minutes worked best: improvements right away, some lasting 155 minutes. 30 minutes caused grogginess first (Brooks & Lack 2006, Sleep).
+        - 10 minutes of stair walking raised vigor more than 50 mg of caffeine in sleep-deprived young women (Randolph & O'Connor 2017, Physiology & Behavior).
 
         Checked catalog (id: title, minutes, effect, study):
         \(catalogSummary)

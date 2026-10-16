@@ -130,6 +130,7 @@ struct Repository {
         let moods = try context.fetch(FetchDescriptor<MoodEntry>(sortBy: [SortDescriptor(\.timestamp)]))
         let gratitude = try context.fetch(FetchDescriptor<GratitudeEntry>(sortBy: [SortDescriptor(\.date)]))
         let activities = try context.fetch(FetchDescriptor<ActivityLog>(sortBy: [SortDescriptor(\.timestamp)]))
+        let coach = try context.fetch(FetchDescriptor<CoachLog>(sortBy: [SortDescriptor(\.startedAt)]))
         return BackupDocument(
             exportedAt: .now,
             appVersion: appVersion,
@@ -145,17 +146,20 @@ struct Repository {
                 ActivityRecord(id: $0.id, timestamp: $0.timestamp, kind: $0.kind, minutes: $0.minutes,
                                amount: $0.amount, distanceMeters: $0.distanceMeters, source: $0.source,
                                externalID: $0.externalID, note: $0.note, routePolyline: $0.routePolyline,
-                               deletedAt: $0.deletedAt)
-            }
+                               deletedAt: $0.deletedAt, interventionID: $0.interventionID,
+                               intensityBefore: $0.intensityBefore, intensityAfter: $0.intensityAfter)
+            },
+            coach: coach.map(\.record)
         )
     }
 
     /// Adds whatever in the backup isn't already here. Never overwrites or deletes.
-    func restore(_ backup: BackupDocument) throws -> (moods: Int, gratitude: Int, activities: Int) {
+    func restore(_ backup: BackupDocument) throws -> RestoreCounts {
         let moods = try context.fetch(FetchDescriptor<MoodEntry>())
         let gratitude = try context.fetch(FetchDescriptor<GratitudeEntry>())
         let activities = try context.fetch(FetchDescriptor<ActivityLog>())
-        let existingIDs = Set(moods.map(\.id) + gratitude.map(\.id) + activities.map(\.id))
+        let coach = try context.fetch(FetchDescriptor<CoachLog>())
+        let existingIDs: Set<UUID> = Set(moods.map(\.id)).union(gratitude.map(\.id)).union(activities.map(\.id)).union(coach.map(\.id))
 
         let toInsert = BackupMerge.recordsToInsert(
             from: backup,
@@ -195,9 +199,30 @@ struct Repository {
             entry.source = record.source
             entry.id = record.id
             entry.deletedAt = record.deletedAt
+            entry.interventionID = record.interventionID
+            entry.intensityBefore = record.intensityBefore
+            entry.intensityAfter = record.intensityAfter
+            context.insert(entry)
+        }
+        for record in toInsert.coach {
+            let entry = CoachLog(id: record.id, startedAt: record.startedAt)
+            entry.title = record.turns.first?.question ?? ""
+            entry.context = record.context
+            entry.turnsData = CoachRecord.encodeTurns(record.turns)
+            entry.deletedAt = record.deletedAt
             context.insert(entry)
         }
         try context.save()
-        return (toInsert.moods.count, toInsert.gratitude.count, toInsert.activities.count)
+        return RestoreCounts(moods: toInsert.moods.count, gratitude: toInsert.gratitude.count,
+                             activities: toInsert.activities.count, coach: toInsert.coach.count)
     }
+}
+
+struct RestoreCounts {
+    var moods: Int
+    var gratitude: Int
+    var activities: Int
+    var coach: Int
+
+    var total: Int { moods + gratitude + activities + coach }
 }

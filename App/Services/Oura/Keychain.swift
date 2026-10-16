@@ -1,15 +1,15 @@
 import Foundation
 import Security
 
-/// Tiny Keychain wrapper for the Oura tokens.
+/// Tiny Keychain wrapper for the Oura tokens and the Claude API key.
 ///
 /// Stored "this device only" on purpose: Oura refresh tokens are single-use, so
 /// two phones sharing one token would knock each other out. On a new phone you
-/// just tap Connect Oura again.
+/// just tap Connect Oura again (and paste the Claude key again).
 enum Keychain {
-    private static let service = "eightytwenty.oura"
+    static let ouraService = "eightytwenty.oura"
 
-    static func data(for account: String) -> Data? {
+    static func data(for account: String, service: String = ouraService) -> Data? {
         let query: [String: Any] = [
             kSecClass as String: kSecClassGenericPassword,
             kSecAttrService as String: service,
@@ -23,7 +23,7 @@ enum Keychain {
     }
 
     @discardableResult
-    static func set(_ data: Data, for account: String) -> Bool {
+    static func set(_ data: Data, for account: String, service: String = ouraService) -> Bool {
         let query: [String: Any] = [
             kSecClass as String: kSecClassGenericPassword,
             kSecAttrService as String: service,
@@ -41,7 +41,7 @@ enum Keychain {
         return status == errSecSuccess
     }
 
-    static func delete(_ account: String) {
+    static func delete(_ account: String, service: String = ouraService) {
         let query: [String: Any] = [
             kSecClass as String: kSecClassGenericPassword,
             kSecAttrService as String: service,
