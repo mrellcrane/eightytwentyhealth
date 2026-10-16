@@ -13,6 +13,10 @@ struct TodayView: View {
 
     @AppStorage(PrefKey.windDownOn) private var windDownOn = true
     @AppStorage(PrefKey.bedtimeMinutes) private var bedtimeMinutes = 22 * 60 + 15
+    @AppStorage(PrefKey.trainingGoal) private var trainingGoal = TrainingGoal.both.rawValue
+    @AppStorage(PrefKey.runPlanStart) private var planStart = ""
+    @AppStorage(PrefKey.runPlanStartMiles) private var planStartMiles = 0.0
+    @AppStorage(PrefKey.runCheckIns) private var checkInsRaw = ""
 
     @State private var showingMood = false
     @State private var showingGratitude = false
@@ -31,6 +35,8 @@ struct TodayView: View {
                     .buttonStyle(.plain)
 
                 quickActions
+
+                trainingCard(input: input)
 
                 let steps = nextSteps(physical: physical, mental: mental)
                 if !steps.isEmpty {
@@ -80,13 +86,49 @@ struct TodayView: View {
             }
             .buttonStyle(.plain)
             NavigationLink {
-                RunView()
+                RunningView()
             } label: {
                 QuickActionLabel(title: "Run", systemImage: "figure.run")
             }
             .buttonStyle(.plain)
         }
         .fixedSize(horizontal: false, vertical: true)
+    }
+
+    /// Today's session for the goal you pick, from your running plan, recent lifting and readiness.
+    private func trainingCard(input: BarsInput) -> some View {
+        let training = TrainingInput(healthRuns: model.healthRuns, activities: activities)
+        let today = DayKey(date: .now)
+        let context = TrainingContext(
+            today: today,
+            runs: training.runs,
+            checkIns: RunCheckIns.decode(checkInsRaw),
+            plan: RunPlanSettings.plan(start: planStart, miles: planStartMiles),
+            strengthDays: training.strengthDays,
+            readiness: input.sensors[today]?.readinessScore
+        )
+        let advice = TrainingAdvisor.advise(TrainingGoal(rawValue: trainingGoal) ?? .both, context)
+        return VStack(alignment: .leading, spacing: 10) {
+            Text("Today's training").font(.title3.bold())
+            Picker("Goal", selection: $trainingGoal) {
+                ForEach(TrainingGoal.allCases) { goal in
+                    Text(goal.title).tag(goal.rawValue)
+                }
+            }
+            .pickerStyle(.segmented)
+            NavigationLink {
+                RunningView()
+            } label: {
+                VStack(alignment: .leading, spacing: 4) {
+                    Text(advice.title).font(.headline)
+                    Text(advice.detail).font(.subheadline).foregroundStyle(.secondary)
+                }
+                .frame(maxWidth: .infinity, alignment: .leading)
+                .padding()
+                .background(.background.secondary, in: RoundedRectangle(cornerRadius: 12))
+            }
+            .buttonStyle(.plain)
+        }
     }
 
     /// Plain nudges about missing data, until real recommendations land in Phase 2.

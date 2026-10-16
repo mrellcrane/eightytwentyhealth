@@ -15,6 +15,12 @@ enum PrefKey {
     static let morningBriefOn = "morningBriefOn"
     /// Day (yyyy-MM-dd) the morning brief was last sent or made unnecessary.
     static let morningBriefDay = "morningBriefDay"
+    /// Running plan: first Monday (yyyy-MM-dd) and that week's miles. Empty until set up.
+    static let runPlanStart = "runPlanStart"
+    static let runPlanStartMiles = "runPlanStartMiles"
+    /// JSON [yyyy-MM-dd: green/yellow/red], one per run day.
+    static let runCheckIns = "runCheckIns"
+    static let trainingGoal = "trainingGoal"
 
     /// Registered at launch so `@AppStorage` defaults and direct UserDefaults reads agree.
     static let defaults: [String: Any] = [

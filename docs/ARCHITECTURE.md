@@ -129,6 +129,7 @@ Starter catalog candidates: mindfulness meditation (Goyal 2014, JAMA Intern Med)
 | Sync | | `Services/Sync/SyncService`, `BackgroundRefresh` |
 | Backup | `Backup/BackupDocument` (format, merge, pruning) | `Services/Backup/BackupService`, `Persistence/Repository` |
 | Run | `Run/RunTracker`, `Run/Polyline` | `Services/Location/RunRecorder`, `Features/Run` |
+| Training | `Training/RunningPlan` (weekly miles, green/yellow/red), `Training/TrainingAdvisor` (cardio/strength/both today), `Training/RunScreenshotParser` | `Features/Run/RunningView`, `Shared/TrainingInput`, `Services/ScreenshotReader`, Today's training card |
 | Meditation | `Meditation/MeditationTimer` | `Features/Meditation`, `Services/Notifications` |
 | Patterns | `Patterns/Stats`, `Patterns/PatternFinder` | `Features/Insights` |
 | Mood | `Mood/MoodScale` | `Features/Log` |

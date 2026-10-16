@@ -26,6 +26,8 @@ final class AppModel {
     }
     /// Whether iOS has already shown the Health permission sheet. Nil until checked.
     private(set) var healthAsked: Bool?
+    /// Running workouts from Apple Health over the last 120 days. Refreshed on foreground.
+    private(set) var healthRuns: [HealthKitRun] = []
 
     init(container: ModelContainer) {
         let oura = OuraAccount()
@@ -48,6 +50,7 @@ final class AppModel {
         await applyReminderSettings()
         await refreshHealthStatus()
         await sync.syncIfStale(context: context)
+        await refreshRuns()
         markMorningBriefSeenIfLooking()
         await backup.backupIfDue(context: context)
         BackgroundRefresh.schedule()
@@ -76,6 +79,22 @@ final class AppModel {
         } catch {
             notice = "Apple Health: \(error.localizedDescription)"
         }
+    }
+
+    // MARK: Running
+
+    func refreshRuns() async {
+        let end = Date.now
+        let start = Calendar.current.date(byAdding: .day, value: -120, to: end) ?? end
+        healthRuns = await healthKit.runs(from: start, to: end)
+        Log.health.info("Runs from Health: \(healthRuns.count)")
+    }
+
+    /// A run Apple Health doesn't have: a Strava screenshot, treadmill miles.
+    func logManualRun(miles: Double, on date: Date) {
+        context.insert(ActivityLog(timestamp: date, kind: .run, distanceMeters: miles * RunningPlan.metersPerMile, source: .manual))
+        save()
+        Log.app.info("Run added by hand")
     }
 
     // MARK: Bars
