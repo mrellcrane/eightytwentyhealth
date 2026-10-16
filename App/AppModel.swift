@@ -197,8 +197,10 @@ final class AppModel {
         }
     }
 
-    func logMeditation(start: Date, end: Date, minutes: Double) async {
-        let entry = ActivityLog(timestamp: start, kind: .meditation, minutes: minutes, source: .meditationTimer)
+    func logMeditation(start: Date, end: Date, minutes: Double, kind: ActivityKind = .meditation,
+                       interventionID: String? = nil) async {
+        let entry = ActivityLog(timestamp: start, kind: kind, minutes: minutes, source: .meditationTimer)
+        entry.interventionID = interventionID
         context.insert(entry)
         save()
         do {

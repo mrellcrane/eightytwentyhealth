@@ -142,6 +142,19 @@ Ask anything (mood, stress, energy, sleep, aches, focus). Optional mood face (sa
 - **History**: every question and answer is saved as a `CoachLog` (UserData store, so CloudKit-synced) and as `coach` records in the JSON backup (`CoachRecord`; older backups without the field still import). "Past questions" on the Mental screen lists them; a past conversation can be picked up with a follow-up.
 - **Privacy**: the key is pasted in Settings and kept in the Keychain, never in the binary (public repo). Sentry gets status codes, durations, turn numbers and step counts only (`Log.coach`), never the question, the answer or the context.
 
+## Meditate screen
+
+`Meditation/MeditationGuide` (core, tested) picks a **style and length for right now** from the same `RankingSignals` as the Mental screen, and the screen shows it with steps, the why, the study, and a one-tap start:
+
+| When | Style | Minutes | Evidence |
+|---|---|---|---|
+| 8 PM to 5 AM | Body scan | 15 | Rusch 2019: sleep quality +0.33 vs attention-matched controls, no better than proven sleep treatments |
+| Stressed (check-in or Oura) | Cyclic sighing | 5 | Fincham 2023 (breathwork, stress g 0.35); Balban 2023 (beat mindfulness on mood) |
+| Low mood | Self-compassion | 10 | Ferrari 2019 (stress 0.67, depression 0.66) |
+| Otherwise | Breath-focused mindfulness | 13 | Basso 2019: 13 min a day helped at 8 weeks, not 4 |
+
+Below it, "How long and how often" (Basso 2019; Parsons 2017: people in 8-week courses actually did about 30 min a day, 6 days a week, practice-outcome r = 0.26; Strohmaier 2020: bigger doses didn't predict bigger effects across 203 trials) and "What the research says" (Goyal 2014, Galante 2021, Hoge 2023, Khoury 2015, Rusch 2019, Goldberg 2018, Schumer 2018, Brown 2021 on HRV, Farias 2020 on side effects, plus the breathwork and self-compassion evidence). Every number was checked against the abstract or results text. A sit logs as its style's kind (meditation, breathwork or self-compassion) with the catalog id, so it counts toward personal results and "done today".
+
 ## Phase 3: correlation engine
 
 - **Daily feature table**: one row per day. Inputs: logged activities, bedtime, mood, gratitude, Oura tags. Outcomes: that night's sleep and HRV, next-day readiness, next-day mood.
@@ -162,7 +175,7 @@ Ask anything (mood, stress, energy, sleep, aches, focus). Optional mood face (sa
 | Sync | | `Services/Sync/SyncService`, `BackgroundRefresh` |
 | Backup | `Backup/BackupDocument` (format, merge, pruning) | `Services/Backup/BackupService`, `Persistence/Repository` |
 | Run | `Run/RunTracker`, `Run/Polyline` | `Services/Location/RunRecorder`, `Features/Run` |
-| Meditation | `Meditation/MeditationTimer` | `Features/Meditation`, `Services/Notifications` |
+| Meditation | `Meditation/MeditationTimer`, `Meditation/MeditationGuide` (styles, plan, findings) | `Features/Meditation`, `Services/Notifications` |
 | Mood | `Mood/MoodScale` | `Features/Log` |
 | Morning brief | `Briefing/MorningBrief` | `AppModel` (send/retry), `Services/Notifications` |
 | Interventions | `Coach/Intervention` (estimate, personal blend, ranker), `Coach/InterventionCatalog` | `Features/Mental/MentalView`, `InterventionViews` |
