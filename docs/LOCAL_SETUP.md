@@ -77,7 +77,7 @@ curl -s https://api.ouraring.com/oauth/token -d grant_type=authorization_code -d
   --data-urlencode redirect_uri=eightytwenty://oauth-callback \
   --data-urlencode client_id=682e6545-f8eb-44eb-aea1-2693c4342c5f \
   --data-urlencode client_secret="$(sed -n 's/^OURA_CLIENT_SECRET = //p' Config/Secrets.xcconfig)" \
-  | grep -o '"error":"[a-z_]*"'
+  | grep -o '"error": *"[a-z_]*"'
 ```
 
 ### A4. Build and install
