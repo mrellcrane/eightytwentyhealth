@@ -14,6 +14,7 @@ struct HealthKitMood: Sendable {
 struct HealthKitRun: Sendable {
     let uuid: UUID
     let start: Date
+    let end: Date
     let meters: Double
 }
 
@@ -85,7 +86,8 @@ final class HealthKitService {
     }
 
     /// Running workouts with their distance, from every app including this one: the
-    /// running plan dedupes against our own log by Health UUID.
+    /// running plan dedupes against our own log by Health UUID, and counts runs that
+    /// overlap in time (a watch and this app on the same run) once (`TrainingInput`).
     func runs(from start: Date, to end: Date) async -> [HealthKitRun] {
         guard isAvailable else { return [] }
         let workouts = (try? await samples(of: HKObjectType.workoutType(), from: start, to: end)) ?? []
@@ -95,7 +97,7 @@ final class HealthKitService {
             let meters = workout.statistics(for: distance)?.sumQuantity()?.doubleValue(for: .meter())
                 ?? workout.totalDistance?.doubleValue(for: .meter())
             guard let meters, meters > 0 else { return nil }
-            return HealthKitRun(uuid: workout.uuid, start: workout.startDate, meters: meters)
+            return HealthKitRun(uuid: workout.uuid, start: workout.startDate, end: workout.endDate, meters: meters)
         }
     }
 

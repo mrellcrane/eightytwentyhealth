@@ -11,14 +11,17 @@ struct TrainingInput {
 
     init(healthRuns: [HealthKitRun], activities: [ActivityLog]) {
         let inHealth = Set(healthRuns.map(\.uuid))
-        var runs = healthRuns.map { RunEntry(day: DayKey(date: $0.start), miles: $0.meters / RunningPlan.metersPerMile) }
+        var runs = healthRuns.map { (span: Overlap.Span(start: $0.start, end: $0.end), meters: $0.meters) }
         for log in activities where log.deletedAt == nil && log.activityKind == .run {
             // The recorder also saves to Health; count those once.
             if let uuid = log.healthKitUUID, inHealth.contains(uuid) { continue }
             guard let meters = log.distanceMeters, meters > 0 else { continue }
-            runs.append(RunEntry(day: DayKey(date: log.timestamp), miles: meters / RunningPlan.metersPerMile))
+            runs.append((span: Overlap.Span(start: log.timestamp, minutes: log.minutes), meters: meters))
         }
-        self.runs = runs
+        // The same run saved by two apps (this one and a watch, or Oura through Apple
+        // Health) overlaps in time: it counts once, at the longer distance.
+        self.runs = Overlap.distinct(runs, span: { $0.span }, size: { $0.meters })
+            .map { RunEntry(day: DayKey(date: $0.span.start), miles: $0.meters / RunningPlan.metersPerMile) }
         self.walks = activities
             .filter { $0.deletedAt == nil && $0.activityKind == .walk }
             .map { RunEntry(day: DayKey(date: $0.timestamp), miles: ($0.distanceMeters ?? 0) / RunningPlan.metersPerMile) }

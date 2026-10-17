@@ -63,6 +63,8 @@ Oura tokens and the Claude API key live in the Keychain, this device only (servi
 - **Apple Health** for steps (iPhone/Watch), VO2 max (Watch beats the ring's estimate), workouts, mindful minutes, and State of Mind logged in other apps. Queries **exclude the Oura app's source** (we already have that data from the API) and **this app's source** (already in our store).
 - Steps: max of ring and phone/watch, since both undercount.
 - Oura tags map to activity kinds by keyword (`OuraActivityMapper`). Morning coffee is ignored; caffeine at or after 2pm becomes "late caffeine". Unknown tags are skipped, never guessed.
+- **Nothing counts twice** (`Activities/Overlap`, tested). An Oura Moment or tag of the same kind within 15 minutes of something already logged (a sit you timed here, or a Moment and a tag for the same sit) is skipped; skipped ones are checked again each sync, so deleting your own log lets Oura's in. Running workouts that overlap in time (this app's recorder and a watch, or Oura writing to Apple Health) count once toward the running plan, at the longer distance; back-to-back runs stay two. Oura workouts only feed daily workout minutes, taken as the max with Health's, never added.
+- Oura's naps (short sleep periods, nap Moments) are never imported and never stand in for the night, so a nap counts only when you log it here.
 
 ## The two bars
 

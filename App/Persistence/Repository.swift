@@ -90,8 +90,15 @@ struct Repository {
     @discardableResult
     func insertImported(_ activities: [ImportedActivity]) throws -> Int {
         var seen = existingExternalIDs()
+        // Something you logged here too (a sit you timed, then an Oura Moment or tag
+        // for it) would count twice. Skipped ones are checked again next sync, so
+        // deleting your own log lets Oura's in.
+        let logged = ((try? context.fetch(FetchDescriptor<ActivityLog>())) ?? [])
+            .filter { $0.deletedAt == nil }
+            .compactMap { log in log.activityKind.map { Overlap.Entry(kind: $0, span: Overlap.Span(start: log.timestamp, minutes: log.minutes)) } }
+        let fresh = Overlap.newImports(activities.filter { seen.insert($0.externalID).inserted }, existing: logged)
         var inserted = 0
-        for item in activities where seen.insert(item.externalID).inserted {
+        for item in fresh {
             context.insert(ActivityLog(
                 timestamp: item.timestamp,
                 kind: item.kind,
