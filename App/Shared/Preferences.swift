@@ -5,6 +5,9 @@ enum PrefKey {
     static let usesMiles = "usesMiles"
     static let meditationMinutes = "meditationMinutes"
     static let meditationBellMinutes = "meditationBellMinutes"
+    /// Nap alarm length, and the nap in progress (a JSON `Nap`) while you sleep.
+    static let napMinutes = "napMinutes"
+    static let napInProgress = "napInProgress"
     static let moodReminderOn = "moodReminderOn"
     static let moodReminderMinutes = "moodReminderMinutes"
     static let gratitudeReminderOn = "gratitudeReminderOn"
@@ -51,6 +54,7 @@ enum PrefKey {
         morningBriefOn: true,
         meditationMinutes: 10,
         meditationBellMinutes: 0,
+        napMinutes: 15,
         workStartMinutes: 6 * 60,
         workEndMinutes: 16 * 60,
         workWeekdaysOnly: true,

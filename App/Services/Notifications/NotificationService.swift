@@ -2,7 +2,7 @@ import Foundation
 import UserNotifications
 
 /// Local notifications: check-in reminders, the wind-down nudge, the morning
-/// brief, and meditation bells.
+/// brief, meditation bells, and the nap alarm when AlarmKit can't ring.
 ///
 /// Bells are notifications (not in-app audio) so they still ring with the
 /// screen locked and the app suspended.
@@ -21,6 +21,7 @@ final class NotificationService: NSObject, UNUserNotificationCenterDelegate {
     static let cueID = "record.cue"
     private static let bellPrefix = "meditation.bell."
     private static let endID = "meditation.end"
+    private static let napID = "nap.alarm"
 
     private var center: UNUserNotificationCenter { .current() }
 
@@ -97,5 +98,23 @@ final class NotificationService: NSObject, UNUserNotificationCenterDelegate {
         let ids = (0..<240).map { Self.bellPrefix + "\($0)" } + [Self.endID]
         center.removePendingNotificationRequests(withIdentifiers: ids)
         center.removeDeliveredNotifications(withIdentifiers: ids)
+    }
+
+    // MARK: Nap alarm
+
+    /// The nap's wake-up call when a real alarm isn't possible (`NapAlarm`).
+    func scheduleNapAlarm(in seconds: TimeInterval) async {
+        cancelNapAlarm()
+        guard await requestAuthorization() else { return }
+        let content = UNMutableNotificationContent()
+        content.title = "Time to get up"
+        content.body = "Your nap logs itself when you open 80/20."
+        content.sound = .default
+        let trigger = UNTimeIntervalNotificationTrigger(timeInterval: max(seconds, 1), repeats: false)
+        try? await center.add(UNNotificationRequest(identifier: Self.napID, content: content, trigger: trigger))
+    }
+
+    func cancelNapAlarm() {
+        center.removePendingNotificationRequests(withIdentifiers: [Self.napID])
     }
 }

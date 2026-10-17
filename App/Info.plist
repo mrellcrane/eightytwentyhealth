@@ -57,6 +57,8 @@
 	<string>80/20 reads your steps, workouts, VO2 max, mindful minutes and State of Mind to build your Physical and Mental bars.</string>
 	<key>NSHealthUpdateUsageDescription</key>
 	<string>80/20 saves your mood check-ins, meditations and runs to Apple Health so you have a second copy of everything.</string>
+	<key>NSAlarmKitUsageDescription</key>
+	<string>80/20 sets an alarm to wake you from a nap, even with your ringer on silent.</string>
 	<key>NSLocationWhenInUseUsageDescription</key>
 	<string>80/20 uses GPS while you record a run to measure distance, pace and your route.</string>
 	<!-- Never requested (runs use While Using + a background activity session), but

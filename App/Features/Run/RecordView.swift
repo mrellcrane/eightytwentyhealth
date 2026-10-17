@@ -1,6 +1,6 @@
 import SwiftUI
 
-/// The "do the thing" tab: the two trackers that log themselves.
+/// The "do the thing" tab: the trackers that log themselves.
 struct RecordView: View {
     var body: some View {
         List {
@@ -22,6 +22,16 @@ struct RecordView: View {
                     subtitle: "GPS time, distance, pace and route. Keeps going with the screen locked. Saves a workout to Apple Health; only runs count toward your running plan.",
                     systemImage: "figure.run",
                     tint: .orange
+                )
+            }
+            NavigationLink {
+                NapView()
+            } label: {
+                RecordRow(
+                    title: "Nap",
+                    subtitle: "Pick a length and lie down. An alarm wakes you, even on silent, and the nap logs itself. Took one already? Log it here too.",
+                    systemImage: "powersleep",
+                    tint: .purple
                 )
             }
         }

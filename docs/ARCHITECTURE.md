@@ -10,7 +10,7 @@ The app has three jobs, in this order:
 2. **Name the highest-leverage move.** Rank evidence-backed actions by *expected bar gain per minute of effort*. That ratio is the 80/20.
 3. **Learn what works for you.** Start from research averages, replace them with your own numbers as data piles up.
 
-Logging is the bottleneck for job 3, so anything that makes logging automatic (meditation timer, run recorder, Oura tag import, Health import) beats a new feature.
+Logging is the bottleneck for job 3, so anything that makes logging automatic (meditation timer, run recorder, nap alarm, Oura tag import, Health import) beats a new feature.
 
 ### Honest numbers
 
@@ -28,7 +28,7 @@ Apple Health ┘      │           (cache store)    ├─> Insights (trends, s
                          Moments,  ActivityLog ──┘
                          moods)    (synced store)
                                        │
-You (Log, Meditate, Run) ──────────────┘──> mirrored to Apple Health
+You (Log, Meditate, Run, Nap) ─────────┘──> mirrored to Apple Health (not naps)
 ```
 
 `HealthBarsCalculator` (core package) reads both stores' contents and produces the bars. It's pure Swift and unit tested.
@@ -166,6 +166,15 @@ Below it, "How long and how often" (Basso 2019; Parsons 2017: people in 8-week c
 - **Lock Screen and Dynamic Island**: a Live Activity (`RecordingWidgets` extension, `RecordingAttributes` shared with the app) shows time, distance and average pace. The clock ticks on its own; distance updates at most every 5 seconds, right away on pause, resume and each distance update. Ended on finish, and at launch if one was left behind.
 - **Distance updates** (`Run/DistanceCues`, tested): every 0.25, 0.5, 1 or 2 mi or km (default 1), a notification like "2 miles in 18:40 / Average 9:20 /mi. Last mile 9:45.", also read out loud by default (`CueAnnouncer`, ducking music; the `audio` background mode lets it speak with the screen locked). The bell on the recorder changes it, mid-recording too.
 
+## Naps
+
+Record > Nap: pick an alarm length (10 to 90 minutes, falling asleep included; default 15, the catalog's `power-nap`, about 10 minutes of sleep once you drift off), lie down, and an alarm wakes you. `Nap/Nap` (core, tested) holds the nap and its math; `NapGuide` the lengths and heads-ups: under 15 minutes, 30 or more (grogginess first, Brooks & Lack 2006), and later than the catalog's nap hours (12-16).
+
+- **The alarm** (`NapAlarm`): on iOS 26 and later an AlarmKit alarm (`NSAlarmKitUsageDescription`), which rings with the ringer on silent and through Focus. Alert only, no countdown, because AlarmKit expects a widget for countdowns; the Nap screen shows the countdown. If alarms aren't allowed, or before iOS 26, it falls back to a notification and the screen says to turn the ringer on.
+- **Logging**: the nap in progress is saved to UserDefaults (`napInProgress`), so it survives iOS closing the app. It logs as a Nap (`source: napTimer`) once it's over: on the Nap screen's tick, or the next time the app comes to the front. Its length runs to the alarm or to I'm up, never to whenever you reopened the app. Under a minute isn't logged, Cancel logs nothing, and logging leaves a ringing alarm alone. "Log a nap you already took" opens the quick-log sheet.
+- **Not in Apple Health**: a nap there is sleep, which would need another permission, and the ring records sleep already.
+- A nap counts as "done today" for the 10-minute-nap step and shows in the coach's last 48 hours of logs. It isn't a mental practice.
+
 ## Phase 3: correlation engine
 
 - **Daily feature table**: one row per day. Inputs: logged activities, bedtime, mood, gratitude, Oura tags. Outcomes: that night's sleep and HRV, next-day readiness, next-day mood.
@@ -190,6 +199,7 @@ Below it, "How long and how often" (Basso 2019; Parsons 2017: people in 8-week c
 | Run and walk recorder | `Run/RunTracker`, `Run/Polyline`, `Run/DistanceCues` | `Services/Location/RunRecorder`, `RecordingLiveActivity`, `CueAnnouncer`, `Features/Run`, `Widgets/` (Live Activity) |
 | Training | `Training/RunningPlan` (weekly miles, green/yellow/red), `Training/TrainingAdvisor` (cardio/strength/both today), `Training/RunScreenshotParser` | `Features/Run/RunningView`, `Shared/TrainingInput`, `Services/ScreenshotReader`, Today's training card |
 | Meditation | `Meditation/MeditationTimer`, `Meditation/MeditationGuide` (styles, plan, findings) | `Features/Meditation`, `Services/Notifications` |
+| Nap | `Nap/Nap` (`Nap`, `NapGuide`) | `Features/Nap/NapView` (`NapSession`), `Services/Notifications/NapAlarm` (AlarmKit, notification fallback) |
 | Patterns | `Patterns/Stats`, `Patterns/PatternFinder` | `Features/Insights` |
 | Chat | `Coach/CoachBriefing` (system prompt + data snapshot, app links) | `Services/Coach/CoachSession` (Messages API, streamed, `claude-haiku-5-5`), `Features/Coach/CoachView`; notes in Settings |
 | Mood | `Mood/MoodScale` | `Features/Log` |

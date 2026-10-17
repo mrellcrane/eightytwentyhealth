@@ -161,6 +161,7 @@ public enum ActivitySource: String, Codable, Sendable {
     case manual
     case meditationTimer
     case runRecorder
+    case napTimer
     case ouraTag
     case ouraSession
     case healthKit

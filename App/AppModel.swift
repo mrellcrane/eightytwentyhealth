@@ -15,10 +15,11 @@ final class AppModel {
     let backup: BackupService
     let notifications: NotificationService
     let sync: SyncService
-    /// Owned here (not by the screens) so a run or a sit keeps going if you
+    /// Owned here (not by the screens) so a run, a sit or a nap keeps going if you
     /// navigate away, and there's only ever one GPS session.
     let runRecorder: RunRecorder
     let meditation: MeditationSession
+    let nap: NapSession
     /// The Mental screen's coach: structured steps, checked research, study lookup.
     let coach: CoachService
     /// Open-ended chat with Claude Haiku about your data (the sparkles button on Today).
@@ -44,6 +45,7 @@ final class AppModel {
         self.sync = SyncService(oura: oura, healthKit: healthKit)
         self.runRecorder = RunRecorder(usesMiles: Units.defaultUsesMiles)
         self.meditation = MeditationSession()
+        self.nap = NapSession()
         self.coach = CoachService()
         self.chat = CoachSession()
     }
@@ -53,6 +55,8 @@ final class AppModel {
     // MARK: Lifecycle
 
     func onForeground() async {
+        // A nap whose alarm rang while the app was in the background or closed.
+        nap.logIfOver(using: self)
         await applyReminderSettings()
         await refreshHealthStatus()
         await sync.syncIfStale(context: context)
@@ -274,6 +278,14 @@ final class AppModel {
         } catch {
             notice = "Logged here, but not to Apple Health (\(error.localizedDescription))."
         }
+    }
+
+    /// A nap from the Nap screen. Kept here only: in Apple Health a nap is sleep,
+    /// which needs another permission, and the ring already records your sleep.
+    func logNap(start: Date, minutes: Double) {
+        context.insert(ActivityLog(timestamp: start, kind: .nap, minutes: minutes, source: .napTimer))
+        save()
+        Log.app.info("Nap logged")
     }
 
     /// Saves a finished run or walk. Returns false only if nothing could be saved.
