@@ -85,19 +85,25 @@ struct CoachView: View {
 
     private func bubble(_ message: CoachSession.Message) -> some View {
         let isUser = message.role == .user
+        let streaming = session.isReplying && message.id == session.messages.last?.id
         return HStack {
             if isUser { Spacer(minLength: 40) }
-            Group {
-                if message.text.isEmpty && session.isReplying {
-                    ProgressView()
-                } else {
-                    Text(Self.markdown(message.text))
-                        .textSelection(.enabled)
+            VStack(alignment: .leading, spacing: 6) {
+                Group {
+                    if message.text.isEmpty && session.isReplying {
+                        ProgressView()
+                    } else {
+                        Text(Self.markdown(message.text))
+                            .textSelection(.enabled)
+                    }
+                }
+                .padding(12)
+                .background(isUser ? Color.accentColor.opacity(0.15) : Color.secondary.opacity(0.1),
+                            in: RoundedRectangle(cornerRadius: 14))
+                if !isUser && !streaming && !message.text.isEmpty {
+                    ReadAloudControls(pieces: ReadAloud.pieces(markdown: message.text), compact: true)
                 }
             }
-            .padding(12)
-            .background(isUser ? Color.accentColor.opacity(0.15) : Color.secondary.opacity(0.1),
-                        in: RoundedRectangle(cornerRadius: 14))
             if !isUser { Spacer(minLength: 40) }
         }
     }

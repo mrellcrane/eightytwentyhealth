@@ -19,11 +19,12 @@ Personal iOS app (SwiftUI, SwiftData + CloudKit, HealthKit, Oura API v2). One us
 - **Core logic is plain Swift** in `Packages/EightyTwentyCore` (no UIKit/HealthKit), with tests. Run them before pushing. Put new logic there, with tests, whenever it doesn't need Apple frameworks. If `swift` is installed, `cd Packages/EightyTwentyCore && swift test`. If not (the default cloud image doesn't have it; swift.org downloads are blocked, Docker Hub works), use the `swift:6.1` image; the CA mount lets the container through the session's TLS proxy:
   ```sh
   (sudo dockerd > /tmp/dockerd.log 2>&1 &); sleep 5; docker pull swift:6.1
-  cd Packages/EightyTwentyCore && docker run --rm --network host -e CLAUDE_COACH_API_KEY \
+  cd Packages/EightyTwentyCore && docker run --rm --network host -e CLAUDE_COACH_API_KEY -e ELEVENLABS_API_KEY \
     -v /root/.ccr/ca-bundle.crt:/etc/ssl/certs/ca-certificates.crt:ro \
     -v swiftbuild:/tmp/build -v "$PWD":/pkg -w /pkg swift:6.1 swift test --scratch-path /tmp/build
   ```
 - **Coach live tests**: `CoachLiveTests` calls the real Claude API: the owner's 1 PM scenario (both answers printed), talking that answer through in the chat (two questions), and a study lookup on meditation followed by a library match (`--filter CoachLiveTests`). They run only when `CLAUDE_COACH_API_KEY` is set (cloud sessions; never `ANTHROPIC_API_KEY`, which Claude Code itself may read), and are skipped in CI. Never print or write the key. Run them after any change to the coach's system prompt, schema, context or lookup, and read the advice.
+- **Read-aloud live test**: `ElevenLabsLiveTests` calls the real ElevenLabs API (voice list, then the first piece of a coach answer as MP3). It runs only when `ELEVENLABS_API_KEY` is set and the environment's network policy allows `api.elevenlabs.io`; skipped in CI. Run it after changing the request, model or default voice.
 - **App code** (`App/`) only compiles in CI. Keep changes there small and match the surrounding style.
 - A finished build reaches the owner's phone through TestFlight about 15 minutes after the run goes green. Tell them the build number.
 

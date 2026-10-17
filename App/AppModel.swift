@@ -24,6 +24,8 @@ final class AppModel {
     let coach: CoachService
     /// Open-ended chat with Claude Haiku about your data (the sparkles button on Today).
     let chat: CoachSession
+    /// Coach and chat answers read out loud (ElevenLabs), at 1×, 1.5× or 2×.
+    let readAloud: ReadAloudPlayer
 
     /// Shown as an alert after something non-fatal goes wrong (e.g. Health write denied).
     var notice: String? {
@@ -48,6 +50,7 @@ final class AppModel {
         self.nap = NapSession()
         self.coach = CoachService()
         self.chat = CoachSession()
+        self.readAloud = ReadAloudPlayer()
     }
 
     var context: ModelContext { container.mainContext }

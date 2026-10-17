@@ -9,7 +9,7 @@ struct URLSessionTransport: HTTPTransport {
     func send(_ request: URLRequest) async throws -> (Data, HTTPURLResponse) {
         let (data, response) = try await session.data(for: request)
         guard let http = response as? HTTPURLResponse else { throw URLError(.badServerResponse) }
-        if !(200..<300).contains(http.statusCode), request.url?.path.hasPrefix("/v2/") == true {
+        if !(200..<300).contains(http.statusCode), request.url?.host == OuraClient.baseURL.host, request.url?.path.hasPrefix("/v2/") == true {
             Log.oura.warning("\(request.url?.path ?? ""): HTTP \(http.statusCode) \(String(decoding: data.prefix(300), as: UTF8.self))")
         }
         return (data, http)

@@ -33,6 +33,7 @@ struct SettingsView: View {
             ouraSection
             healthSection
             ClaudeKeySection()
+            ElevenLabsSection()
             coachSection
             backupSection
             sleepAndMorningSection

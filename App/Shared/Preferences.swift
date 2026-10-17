@@ -40,6 +40,10 @@ enum PrefKey {
     static let cueSpeak = "cueSpeak"
     /// What you want the coach to know (history, goals). Sent with each chat, never logged.
     static let coachNotes = "coachNotes"
+    /// Coach answers read out loud: speed (1, 1.5 or 2) and the ElevenLabs voice.
+    static let readAloudSpeed = "readAloudSpeed"
+    static let readAloudVoice = "readAloudVoice"
+    static let readAloudVoiceName = "readAloudVoiceName"
 
     /// Registered at launch so `@AppStorage` defaults and direct UserDefaults reads agree.
     static let defaults: [String: Any] = [

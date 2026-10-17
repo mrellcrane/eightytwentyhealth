@@ -292,7 +292,7 @@ struct AskView: View {
             }
 
             if let chat = coach.chat {
-                ForEach(Array(chat.turns.enumerated()), id: \.offset) { _, turn in
+                ForEach(Array(chat.turns.enumerated()), id: \.offset) { index, turn in
                     ChatQuestionBubble(text: turn.question)
                     if turn.answer.isEmpty {
                         HStack(spacing: 10) {
@@ -303,6 +303,9 @@ struct AskView: View {
                         Text(Self.markdown(turn.answer))
                             .textSelection(.enabled)
                             .frame(maxWidth: .infinity, alignment: .leading)
+                        if !(coach.isChatting && index == chat.turns.count - 1) {
+                            ReadAloudControls(pieces: ReadAloud.pieces(markdown: turn.answer), compact: true)
+                        }
                     }
                 }
             }
@@ -438,6 +441,7 @@ struct ReplyView: View {
                     .padding()
                     .background(.red.opacity(0.12), in: RoundedRectangle(cornerRadius: 12))
             }
+            ReadAloudControls(pieces: ReadAloud.pieces(reply))
             Text(reply.summary)
             ForEach(Array(reply.steps.enumerated()), id: \.offset) { index, step in
                 StepCard(number: index + 1, step: step, library: library,
