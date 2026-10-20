@@ -13,3 +13,4 @@ build/
 Config/Secrets.xcconfig
 
 .DS_Store
+__pycache__/
