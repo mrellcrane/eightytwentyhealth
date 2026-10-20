@@ -23,7 +23,8 @@
    "https://www.seattle.gov/documents/Departments/ParksAndRecreation/BriefingPapers/BPRC%20Memo%20-%20Lincoln%20HS%207-23-26_ADA.pdf",
    "https://www.letsrun.com/forum/flat_read.php?thread=3532850",
    "https://www.openstreetmap.org/relation/6205462"
-  ]
+  ],
+  "availability": "open"
  },
  {
   "id": "queen-anne-bowl-track",
@@ -48,7 +49,8 @@
    "https://www.yearofseattleparks.com/2011/11/01/queen-anne-bowl-playfield/",
    "https://www.letsrun.com/forum/flat_read.php?thread=12142451",
    "https://www.openstreetmap.org/relation/276066"
-  ]
+  ],
+  "availability": "open"
  },
  {
   "id": "montlake-playfield-track",
@@ -72,7 +74,8 @@
    "https://seattle.gov/parks/allparks/montlake-playfield",
    "https://www.letsrun.com/forum/flat_read.php?thread=3140706",
    "https://www.openstreetmap.org/relation/5465517"
-  ]
+  ],
+  "availability": "open"
  },
  {
   "id": "hiawatha-playfield-track",
@@ -96,7 +99,8 @@
    "https://www.seattle.gov/parks/parks/hiawatha-playfield",
    "https://parkways.seattle.gov/2023/09/08/hiawatha-playfield-reopening/",
    "https://www.openstreetmap.org/relation/537369"
-  ]
+  ],
+  "availability": "open"
  },
  {
   "id": "west-seattle-stadium-track",
@@ -121,7 +125,8 @@
    "https://parkways.seattle.gov/2017/09/29/west-seattle-stadium-track-renovation-project-complete/",
    "https://www.letsrun.com/forum/flat_read.php?thread=5173195",
    "https://www.openstreetmap.org/relation/10531234"
-  ]
+  ],
+  "availability": "open"
  },
  {
   "id": "nathan-hale-track",
@@ -146,7 +151,8 @@
    "https://www.yearofseattleparks.com/?p=32",
    "https://www.letsrun.com/forum/flat_read.php?thread=10016821",
    "https://www.openstreetmap.org/relation/544257"
-  ]
+  ],
+  "availability": "after-hours"
  },
  {
   "id": "garfield-track",
@@ -172,7 +178,8 @@
    "https://www.letsrun.com/forum/flat_read.php?thread=10889356",
    "https://www.letsrun.com/forum/flat_read.php?thread=12142451",
    "https://www.openstreetmap.org/relation/2472848"
-  ]
+  ],
+  "availability": "after-hours"
  },
  {
   "id": "roosevelt-hs-track",
@@ -197,7 +204,8 @@
    "https://www.letsrun.com/forum/flat_read.php?thread=10016821",
    "https://www.meetup.com/seattle-frontrunners/events/315703887/",
    "https://www.openstreetmap.org/relation/537398"
-  ]
+  ],
+  "availability": "after-hours"
  },
  {
   "id": "ballard-hs-track",
@@ -221,7 +229,8 @@
    "https://www.letsrun.com/forum/flat_read.php?thread=10016821",
    "https://www.letsrun.com/forum/flat_read.php?thread=12142451",
    "https://www.openstreetmap.org/relation/4289538"
-  ]
+  ],
+  "availability": "after-hours"
  },
  {
   "id": "sw-athletic-complex-track",
@@ -246,7 +255,8 @@
    "https://www.westsideseattle.com/node/54868",
    "https://westseattleblog.com/2018/05/followup-southwest-athletic-complex-work-begins",
    "https://www.openstreetmap.org/relation/5511880"
-  ]
+  ],
+  "availability": "after-hours"
  },
  {
   "id": "mercer-island-hs-track",
@@ -271,7 +281,8 @@
    "https://wm.mercerislandschools.org/news/~board/misd-news/post/islander-stadium-to-close-next-week-for-track-painting",
    "https://www.mi-reporter.com/news/permit-renewals-for-community-access-to-the-mihs-track-are-due/",
    "https://www.openstreetmap.org/relation/2071714"
-  ]
+  ],
+  "availability": "limited"
  },
  {
   "id": "lake-washington-hs-track",
@@ -295,7 +306,8 @@
    "https://www.lwsd.org/services/facilities/facility-use",
    "https://www.lwsd.org/services/facilities/building-use",
    "https://www.openstreetmap.org/relation/7586542"
-  ]
+  ],
+  "availability": "after-hours"
  },
  {
   "id": "juanita-hs-track",
@@ -319,7 +331,8 @@
    "https://www.lwsd.org/services/facilities/facility-use",
    "https://www.lwsd.org/services/facilities/building-use",
    "https://www.openstreetmap.org/relation/7584554"
-  ]
+  ],
+  "availability": "after-hours"
  },
  {
   "id": "redmond-hs-track",
@@ -343,7 +356,8 @@
    "https://www.lwsd.org/services/facilities/facility-use",
    "https://www.lwsd.org/services/facilities/building-use",
    "https://www.openstreetmap.org/relation/7136351"
-  ]
+  ],
+  "availability": "after-hours"
  },
  {
   "id": "renton-memorial-stadium-track",
@@ -368,7 +382,8 @@
    "https://rentonhs.rentonschools.us/athletics/renton-memorial-stadium",
    "https://www.rentonschools.us/locations/renton-memorial-stadium",
    "https://www.openstreetmap.org/relation/149096"
-  ]
+  ],
+  "availability": "after-hours"
  },
  {
   "id": "shoreline-stadium-track",
@@ -392,7 +407,8 @@
    "https://clubnorthwest.org/all-comers",
    "https://www.ssd412.org/departments/facility-use",
    "https://www.openstreetmap.org/relation/5504219"
-  ]
+  ],
+  "availability": "limited"
  },
  {
   "id": "einstein-ms-track",
@@ -416,7 +432,8 @@
    "https://nextdoor.com/pages/shoreline-stadium-shoreline-wa/",
    "https://einstein.ssd412.org/about-us",
    "https://www.openstreetmap.org/relation/18141973"
-  ]
+  ],
+  "availability": "unknown"
  },
  {
   "id": "i90-trail-mercer-island",

@@ -22,13 +22,20 @@ final class RouteCatalogTests: XCTestCase {
         let asphalt = encoded([point(north: 0, east: 0), point(north: 0, east: 500)])
         let dirt = encoded([point(north: 1000, east: 0), point(north: 1000, east: 200)])
         let loop = encoded([point(north: 950, east: -50), point(north: 1050, east: -50), point(north: 1050, east: 250), point(north: 950, east: -50)])
+        // A track 2 km south.
+        let oval = encoded([point(north: -2000, east: 0), point(north: -2000, east: 100), point(north: -1930, east: 100), point(north: -1930, east: 0), point(north: -2000, east: 0)])
+        let ovalCenter = point(north: -1965, east: 50)
         let json = """
         {"attribution": "OSM",
          "trails": [["asphalt", 1, "Lake Path", "\(asphalt)"], ["dirt", 0, null, "\(dirt)"], ["gravel", 1, null, "?"]],
          "routes": [{"id": "woods-loop", "name": "Woods Loop", "area": "Park", "kind": "loop", "meters": 800,
                      "surfaces": {"dirt": 0.6, "asphalt": 0.4, "mystery": 0.0}, "elevation": "rolling",
                      "start": [\(point(north: 950, east: -50).latitude), \(point(north: 950, east: -50).longitude)],
-                     "startLabel": "Lot", "notes": "Shady.", "lines": ["\(loop)"]}]}
+                     "startLabel": "Lot", "notes": "Shady.", "lines": ["\(loop)"]},
+                    {"id": "school-track", "name": "School Track", "area": "Park", "kind": "track", "meters": 400,
+                     "surfaces": {"track": 1}, "elevation": "flat", "start": [\(ovalCenter.latitude), \(ovalCenter.longitude)],
+                     "startLabel": "Center", "notes": "Rubber.", "access": "After school.", "availability": "after-hours",
+                     "lines": ["\(oval)"]}]}
         """
         return Data(json.utf8)
     }
@@ -54,11 +61,17 @@ final class RouteCatalogTests: XCTestCase {
         XCTAssertEqual(route.mainSurface, .dirt)
         XCTAssertEqual(route.surfaceBreakdown.map(\.surface), [.dirt, .asphalt])
         XCTAssertEqual(route.lines.count, 1)
+        XCTAssertNil(route.availability)
         XCTAssertEqual(catalog.attribution, "OSM")
+
+        let track = try XCTUnwrap(catalog.route(id: "school-track"))
+        XCTAssertEqual(track.kind, .track)
+        XCTAssertEqual(track.availability, .afterHours)
+        XCTAssertEqual(track.access, "After school.")
     }
 
     func testRouteShowsWhenPickedSurfacesAreAtLeastHalf() throws {
-        let route = try XCTUnwrap(RouteCatalog(json: sampleJSON()).routes.first)
+        let route = try XCTUnwrap(RouteCatalog(json: sampleJSON()).route(id: "woods-loop"))
         XCTAssertTrue(route.matches([.dirt]))
         XCTAssertTrue(route.matches([.dirt, .gravel, .track]))
         XCTAssertFalse(route.matches([.asphalt]))
@@ -83,10 +96,11 @@ final class RouteCatalogTests: XCTestCase {
     func testNearbyRoutesSortedByDistanceAndFiltered() throws {
         let catalog = try RouteCatalog(json: sampleJSON())
         let near = catalog.routes(near: point(north: 0, east: 0), surfaces: Set(RunSurface.allCases))
-        XCTAssertEqual(near.count, 1)
+        XCTAssertEqual(near.map(\.route.id), ["woods-loop", "school-track"])
         // The loop's nearest edge is 950 m north.
         XCTAssertEqual(near[0].distance, 950, accuracy: 15)
         XCTAssertTrue(catalog.routes(near: origin, surfaces: [.concrete]).isEmpty)
+        XCTAssertEqual(catalog.routes(near: origin, surfaces: [.track]).map(\.route.id), ["school-track"])
     }
 
     func testTapPrefersARouteThenAPathAmongWhatsDrawn() throws {
@@ -156,7 +170,8 @@ final class RouteCatalogTests: XCTestCase {
 
         XCTAssertGreaterThan(catalog.trails.count, 5000)
         XCTAssertTrue(catalog.trails.allSatisfy { region.contains($0.box.center) })
-        for surface in RunSurface.allCases {
+        // Tracks are routes (below), with when they're open, rather than plain paths.
+        for surface in RunSurface.allCases where surface != .track {
             XCTAssertTrue(catalog.trails.contains { $0.surface == surface }, "no \(surface) trails")
         }
         XCTAssertTrue(catalog.attribution.contains("OpenStreetMap"))
@@ -178,7 +193,17 @@ final class RouteCatalogTests: XCTestCase {
         for surface in RunSurface.allCases where surface != .boardwalk {
             XCTAssertTrue(catalog.routes.contains { $0.matches([surface]) }, "no route mostly on \(surface)")
         }
-        XCTAssertGreaterThan(catalog.routes.filter { $0.kind == .track }.count, 10)
+        // Every public school, college and park track, each saying when it's open.
+        let tracks = catalog.routes.filter { $0.kind == .track }
+        XCTAssertGreaterThan(tracks.count, 60)
+        for track in tracks {
+            XCTAssertNotNil(track.availability, track.id)
+            XCTAssertFalse((track.access ?? "").isEmpty, track.id)
+            XCTAssertTrue((200...500).contains(track.length), track.id)
+        }
+        let garfield = try XCTUnwrap(catalog.routes(near: GeoPoint(latitude: 47.6045, longitude: -122.3005), surfaces: [.track]).first)
+        XCTAssertLessThan(garfield.distance, 150)
+        XCTAssertTrue(garfield.route.name.contains("Garfield"), garfield.route.name)
     }
 
     func testEverySeattleNeighborhoodHasARouteWithinTwoMiles() throws {

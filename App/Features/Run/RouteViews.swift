@@ -46,6 +46,40 @@ extension RunSurface {
     }
 }
 
+extension RunRoute.Availability {
+    var color: Color {
+        switch self {
+        case .open: return .green
+        case .afterHours: return .blue
+        case .limited: return .orange
+        case .unknown: return .gray
+        }
+    }
+
+    var systemImage: String {
+        switch self {
+        case .open: return "checkmark.circle.fill"
+        case .afterHours: return "clock.fill"
+        case .limited: return "key.fill"
+        case .unknown: return "questionmark.circle.fill"
+        }
+    }
+}
+
+/// "Outside school hours" as a small colored tag.
+struct AvailabilityTag: View {
+    let availability: RunRoute.Availability
+
+    var body: some View {
+        Label(availability.title, systemImage: availability.systemImage)
+            .font(.caption.weight(.semibold))
+            .foregroundStyle(availability.color)
+            .padding(.horizontal, 8)
+            .padding(.vertical, 3)
+            .background(availability.color.opacity(0.15), in: Capsule())
+    }
+}
+
 extension GeoPoint {
     init(_ coordinate: CLLocationCoordinate2D) {
         self.init(latitude: coordinate.latitude, longitude: coordinate.longitude)
@@ -188,6 +222,9 @@ struct RouteCard: View {
     private func routeBody(_ route: RunRoute) -> some View {
         Text(route.name).font(.headline).padding(.trailing, 32)
         Text(facts(route)).font(.subheadline).foregroundStyle(.secondary)
+        if let availability = route.availability {
+            AvailabilityTag(availability: availability)
+        }
         SurfaceBar(route: route)
         Text(surfaceSummary(route)).font(.caption).foregroundStyle(.secondary)
         ScrollView {
@@ -340,6 +377,9 @@ struct NearbyRoutesView: View {
             Text("\(route.area) · \(RouteFormat.length(route.length, usesMiles: usesMiles))\(route.kind == .track ? " lap" : "") · \(route.kind.title)")
                 .font(.subheadline)
                 .foregroundStyle(.secondary)
+            if let availability = route.availability {
+                AvailabilityTag(availability: availability)
+            }
             SurfaceBar(route: route)
             Text(surfaceSummary(route)).font(.caption).foregroundStyle(.secondary)
         }

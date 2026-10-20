@@ -28,6 +28,8 @@ struct RunView: View {
     /// `body`, so the map isn't rebuilt on every GPS fix while you stand there.
     @State private var pickedFrom: GeoPoint?
     @State private var showingRoutes = false
+    /// What the map first drew this visit has been logged (see `refreshLayers`).
+    @State private var loggedLayers = false
     @State private var confirmDiscard = false
     @State private var saving = false
     @State private var saved = false
@@ -81,6 +83,11 @@ struct RunView: View {
         .task {
             await library.load()
             refreshLayers()
+            // The layers wait for the map to report what it's showing; say so if it never does.
+            try? await Task.sleep(for: .seconds(3))
+            if mapBox == nil {
+                Log.app.warning("Route map: no camera region 3 s after opening, so no paths or routes are drawn")
+            }
         }
         .sheet(isPresented: $showingRoutes) {
             NearbyRoutesView(
@@ -248,7 +255,8 @@ struct RunView: View {
                 }
                 .accessibilityLabel(route.name)
             }
-            .annotationTitles((mapBox?.latitudeSpan ?? 1) < 0.03 ? .automatic : .hidden)
+            // Track names show a little sooner than other routes: they're small and easy to miss.
+            .annotationTitles((mapBox?.latitudeSpan ?? 1) < (route.kind == .track ? 0.05 : 0.03) ? .automatic : .hidden)
         }
     }
 
@@ -281,6 +289,12 @@ struct RunView: View {
         visibleTrails = showTrails && box.latitudeSpan < Self.trailSpan
             ? catalog.trails(in: box, surfaces: surfaces, limit: Self.maxTrails)
             : []
+        // Counts and zoom only (never where you are), so a "nothing shows" report can be checked in Sentry.
+        if !loggedLayers, !catalog.routes.isEmpty {
+            loggedLayers = true
+            let tracks = visibleRoutes.filter { $0.kind == .track }.count
+            Log.app.info("Route map drawing \(visibleTrails.count) paths, \(visibleRoutes.count) routes (\(tracks) tracks), span \(String(format: "%.3f", box.latitudeSpan)), \(surfaces.count) surfaces, paths \(showTrails ? "on" : "off")")
+        }
     }
 
     /// Picks the route or path under your finger, with about 24 points of slack.

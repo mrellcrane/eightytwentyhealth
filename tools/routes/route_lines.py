@@ -249,6 +249,7 @@ def build(segments, data_dir, routes_path):
             "surfaces": fix_sum(surfaces), "elevation": r.get("elevation", "flat"),
             "start": [round(r["start"]["lat"], 5), round(r["start"]["lon"], 5)],
             "startLabel": r["start"].get("label", ""), "notes": r["notes"], "access": r.get("access"),
+            "availability": r.get("availability"),
             "lines": [encode(line.simplify(0.00002, preserve_topology=False).coords)],
         })
     print(f"{len(out)} routes; {len(problems)} to check:")

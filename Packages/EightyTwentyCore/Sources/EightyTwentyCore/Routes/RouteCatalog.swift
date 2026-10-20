@@ -50,6 +50,23 @@ public struct RunRoute: Identifiable, Sendable {
         }
     }
 
+    /// Whether the public can use it: for tracks, which mostly belong to schools.
+    public enum Availability: String, Codable, Sendable {
+        case open
+        case afterHours = "after-hours"
+        case limited
+        case unknown
+
+        public var title: String {
+            switch self {
+            case .open: return "Open to the public"
+            case .afterHours: return "Outside school hours"
+            case .limited: return "Limited access"
+            case .unknown: return "Access not confirmed"
+            }
+        }
+    }
+
     public enum Elevation: String, Codable, Sendable {
         case flat, rolling, hilly
 
@@ -71,6 +88,7 @@ public struct RunRoute: Identifiable, Sendable {
     public let notes: String
     /// Who can use it and when (tracks at schools).
     public let access: String?
+    public let availability: Availability?
     /// The route as drawn; several pieces for networks and trails with branches.
     public let lines: [[GeoPoint]]
     public let box: GeoBox
@@ -78,7 +96,7 @@ public struct RunRoute: Identifiable, Sendable {
     public init(
         id: String, name: String, area: String, kind: Kind, length: Double,
         surfaces: [RunSurface: Double], elevation: Elevation, start: GeoPoint, startLabel: String,
-        notes: String, access: String? = nil, lines: [[GeoPoint]]
+        notes: String, access: String? = nil, availability: Availability? = nil, lines: [[GeoPoint]]
     ) {
         self.id = id
         self.name = name
@@ -91,6 +109,7 @@ public struct RunRoute: Identifiable, Sendable {
         self.startLabel = startLabel
         self.notes = notes
         self.access = access
+        self.availability = availability
         self.lines = lines
         box = lines.compactMap { GeoBox(around: $0) }.reduce(nil as GeoBox?) { $0?.union($1) ?? $1 }
             ?? GeoBox(around: [start])!
@@ -167,7 +186,7 @@ public struct RouteCatalog: Sendable {
                 }),
                 elevation: r.elevation,
                 start: GeoPoint(latitude: r.start[0], longitude: r.start[1]),
-                startLabel: r.startLabel, notes: r.notes, access: r.access,
+                startLabel: r.startLabel, notes: r.notes, access: r.access, availability: r.availability,
                 lines: r.lines.compactMap(Polyline.points)
             )
         }
@@ -272,6 +291,7 @@ private struct CatalogFile: Decodable {
         let startLabel: String
         let notes: String
         let access: String?
+        let availability: RunRoute.Availability?
         let lines: [String]
     }
 

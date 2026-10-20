@@ -207,28 +207,59 @@ def build_trails(segments):
     return trails
 
 
-def track_ovals(data_dir):
-    """Running tracks mapped in OSM (`leisure=track`), named after their school or park."""
+def track_routes(data_dir, routes):
+    """Every running track mapped in OSM (`leisure=track`) that the public can use, as a
+    route with when it's open (`tracks_access.json`). Researched tracks already in
+    `routes` keep their entry; closed ones (locked, private, athletes only) are left out."""
     rows = pq.read_table(os.path.join(data_dir, "land_use.parquet")).to_pylist()
-    owners = [(shapely.from_wkb(r["geometry"]), (r["names"] or {}).get("primary"))
-              for r in rows if r["class"] in ("school", "park", "stadium", "college", "university", "recreation_ground")]
-    owners = [(g, n) for g, n in owners if n]
-    tree = shapely.STRtree([g for g, _ in owners])
-    out = []
+    with open(os.path.join(HERE, "tracks_access.json")) as f:
+        access = {tuple(a["center"]): a for a in json.load(f)}
+    taken = [Point(r["start"][1], r["start"][0]) for r in routes if r["kind"] == "track"]
+    ovals = []
     for r in rows:
         tags = dict(r["source_tags"] or [])
         if r["class"] != "track" or tags.get("sport") not in (None, "running", "athletics", "multi"):
             continue
-        if tags.get("access") in ("private", "no"):
-            continue
         geom = shapely.from_wkb(r["geometry"])
         ring = LineString(geom.exterior.coords) if geom.geom_type == "Polygon" else geom
-        if not isinstance(ring, LineString) or not 250 <= meters(ring) <= 700:
-            continue  # bike pump tracks and horse rings
-        surface = SURFACES.get(first_value(tags.get("surface")))
-        holders = [owners[i][1] for i in tree.query(geom.centroid, predicate="intersects")]
-        name = (r["names"] or {}).get("primary") or (f"{holders[0]} track" if holders else "Running track")
-        out.append([surface or "track", 1 if surface else 0, name, encode(simplified(ring).coords), meters(ring)])
+        if isinstance(ring, LineString) and 250 <= meters(ring) <= 700:  # not pump tracks or horse rings
+            ovals.append((geom.centroid, ring, tags))
+    out, ids = [], {r["id"] for r in routes}
+    seen = []
+    # Biggest first, so where OSM has two outlines of one track (lane 1 and the outer edge) the outer one wins.
+    for center, ring, tags in sorted(ovals, key=lambda o: -meters(o[1])):
+        if any(center.distance(p) * 100_000 < 120 for p in taken + seen):
+            continue
+        seen.append(center)
+        info = access.get((round(center.y, 5), round(center.x, 5)))
+        if info is None:
+            print(f"  no access research for track at {center.y:.5f},{center.x:.5f}")
+            continue
+        if info["access"] == "closed":
+            continue
+        surface = SURFACES.get(first_value(tags.get("surface"))) or {"paved": "asphalt", "unpaved": "gravel"}.get(first_value(tags.get("surface")))
+        perimeter = meters(ring)
+        lap = 400 if perimeter >= 420 else round(perimeter * 0.9 / 10) * 10
+        notes = {
+            "track": "Rubberized all-weather track.",
+            "dirt": "Dirt or cinder track, not rubberized.",
+            "gravel": "Cinder or crushed gravel track, not rubberized.",
+            "asphalt": "Paved asphalt track.",
+            "concrete": "Paved track.",
+        }.get(surface, "Surface isn't mapped; most school tracks around here are rubberized.")
+        notes += " One lap is 400 m in lane 1." if lap == 400 else f" A short track, about {lap} m a lap."
+        slug = re.sub(r"[^a-z0-9]+", "-", info["name"].lower()).strip("-")
+        rid, n = slug, 2
+        while rid in ids:
+            rid, n = f"{slug}-{n}", n + 1
+        ids.add(rid)
+        out.append({
+            "id": rid, "name": info["name"], "area": info["area"], "kind": "track", "meters": lap,
+            "surfaces": {surface or "track": 1.0}, "elevation": "flat",
+            "start": [round(center.y, 5), round(center.x, 5)], "startLabel": f"{info['owner']}",
+            "notes": notes, "access": info["note"], "availability": info["access"],
+            "lines": [encode(simplified(ring).coords)],
+        })
     return out
 
 
@@ -239,7 +270,10 @@ def main(data_dir):
     if os.path.exists(routes_path):
         import route_lines
         routes = route_lines.build(segments, data_dir, routes_path)
-    trails = build_trails(segments) + track_ovals(data_dir)
+        tracks = track_routes(data_dir, routes)
+        print(f"{len(tracks)} more public tracks from OSM")
+        routes += tracks
+    trails = build_trails(segments)
     by_surface = Counter()
     for t in trails:
         by_surface[t[0]] += t[4]
