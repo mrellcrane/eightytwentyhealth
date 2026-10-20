@@ -1,445 +1,5047 @@
 [
-  {
-    "id": "lower-woodland-track",
-    "name": "Lower Woodland Park Track",
-    "area": "Woodland Park",
-    "kind": "track",
-    "miles": 0.25,
-    "surfaces": {
-      "dirt": 1.0
-    },
-    "elevation": "flat",
-    "start": {
-      "lat": 47.66969,
-      "lon": -122.34163,
-      "label": "Center of the Lower Woodland track (Field 7), off West Green Lake Way N"
-    },
-    "lanes": null,
-    "access": "Seattle Parks track, open with the park 4 am to 11:30 pm when not reserved. Lincoln High School track and cross country use it heavily after school.",
-    "notes": "Unpaved dirt oval that runners call the Green Lake dirt oval. SPS and Seattle Parks plan to rebuild it as a 4-lane track, which will close Field 7 during construction (design and permitting as of 2026).",
-    "sources": [
-      "https://www.seattle.gov/parks/parks/woodland-park",
-      "https://www.wallyhood.org/2025/11/november-6th-update-meeting-for-lhs-athletic-field/",
-      "https://www.seattle.gov/documents/Departments/ParksAndRecreation/BriefingPapers/BPRC%20Memo%20-%20Lincoln%20HS%207-23-26_ADA.pdf",
-      "https://www.letsrun.com/forum/flat_read.php?thread=3532850",
-      "https://www.openstreetmap.org/relation/6205462"
-    ]
+ {
+  "id": "lower-woodland-track",
+  "name": "Lower Woodland Park Track",
+  "area": "Woodland Park",
+  "kind": "track",
+  "miles": 0.25,
+  "surfaces": {
+   "dirt": 1.0
   },
-  {
-    "id": "queen-anne-bowl-track",
-    "name": "Queen Anne Bowl Track",
-    "area": "Queen Anne",
-    "kind": "track",
-    "miles": 0.23,
-    "surfaces": {
-      "gravel": 1.0
-    },
-    "elevation": "flat",
-    "start": {
-      "lat": 47.64559,
-      "lon": -122.35961,
-      "label": "Center of the Queen Anne Bowl Playfield track, 2806 3rd Ave W"
-    },
-    "lanes": null,
-    "access": "Seattle Parks playfield and track, open 4 am to 11:30 pm. Popular with youth sports groups and runners.",
-    "notes": "A 400-yard (about 366 m) unpaved loop of crushed rock and dirt around a turf field, so it is not a true 400 m. Street parking only; David Rodgers Park is next door.",
-    "sources": [
-      "https://seattle.gov/parks/allparks/queen-anne-bowl-playfield",
-      "https://www.yearofseattleparks.com/2011/11/01/queen-anne-bowl-playfield/",
-      "https://www.letsrun.com/forum/flat_read.php?thread=12142451",
-      "https://www.openstreetmap.org/relation/276066"
-    ]
+  "elevation": "flat",
+  "start": {
+   "lat": 47.66969,
+   "lon": -122.34163,
+   "label": "Center of the Lower Woodland track (Field 7), off West Green Lake Way N"
   },
-  {
-    "id": "montlake-playfield-track",
-    "name": "Montlake Playfield Track",
-    "area": "Montlake",
-    "kind": "track",
-    "miles": 0.25,
-    "surfaces": {
-      "dirt": 1.0
-    },
-    "elevation": "flat",
-    "start": {
-      "lat": 47.64257,
-      "lon": -122.30828,
-      "label": "Center of the Montlake Playfield track, around the turf football field"
-    },
-    "lanes": null,
-    "access": "Seattle Parks playfield that lists a track among its amenities; public park, but the infield can be booked for games and practices.",
-    "notes": "Dirt track around a synthetic turf field next to Montlake Community Center, which has restrooms. Maps measure it near 400 m, but one runner called it about 370 yards, so treat the lap as approximate.",
-    "sources": [
-      "https://seattle.gov/parks/allparks/montlake-playfield",
-      "https://www.letsrun.com/forum/flat_read.php?thread=3140706",
-      "https://www.openstreetmap.org/relation/5465517"
-    ]
+  "lanes": null,
+  "access": "Seattle Parks track, open with the park 4 am to 11:30 pm when not reserved. Lincoln High School track and cross country use it heavily after school.",
+  "notes": "Unpaved dirt oval that runners call the Green Lake dirt oval. SPS and Seattle Parks plan to rebuild it as a 4-lane track, which will close Field 7 during construction (design and permitting as of 2026).",
+  "sources": [
+   "https://www.seattle.gov/parks/parks/woodland-park",
+   "https://www.wallyhood.org/2025/11/november-6th-update-meeting-for-lhs-athletic-field/",
+   "https://www.seattle.gov/documents/Departments/ParksAndRecreation/BriefingPapers/BPRC%20Memo%20-%20Lincoln%20HS%207-23-26_ADA.pdf",
+   "https://www.letsrun.com/forum/flat_read.php?thread=3532850",
+   "https://www.openstreetmap.org/relation/6205462"
+  ]
+ },
+ {
+  "id": "queen-anne-bowl-track",
+  "name": "Queen Anne Bowl Track",
+  "area": "Queen Anne",
+  "kind": "track",
+  "miles": 0.23,
+  "surfaces": {
+   "gravel": 1.0
   },
-  {
-    "id": "hiawatha-playfield-track",
-    "name": "Hiawatha Playfield Track",
-    "area": "West Seattle (Admiral)",
-    "kind": "track",
-    "miles": 0.25,
-    "surfaces": {
-      "track": 1.0
-    },
-    "elevation": "flat",
-    "start": {
-      "lat": 47.57805,
-      "lon": -122.38545,
-      "label": "Center of the Hiawatha Playfield track, beside West Seattle High School"
-    },
-    "lanes": 3,
-    "access": "Seattle Parks playfield, open to the public 4 am to 11:30 pm.",
-    "notes": "Rubberized 3-lane, 400 m track around a turf field, resurfaced in 2023. Hiawatha Community Center is on the east side of the playfield.",
-    "sources": [
-      "https://www.seattle.gov/parks/parks/hiawatha-playfield",
-      "https://parkways.seattle.gov/2023/09/08/hiawatha-playfield-reopening/",
-      "https://www.openstreetmap.org/relation/537369"
-    ]
+  "elevation": "flat",
+  "start": {
+   "lat": 47.64559,
+   "lon": -122.35961,
+   "label": "Center of the Queen Anne Bowl Playfield track, 2806 3rd Ave W"
   },
-  {
-    "id": "west-seattle-stadium-track",
-    "name": "West Seattle Stadium Track",
-    "area": "West Seattle (Fairmount Park)",
-    "kind": "track",
-    "miles": 0.25,
-    "surfaces": {
-      "track": 1.0
-    },
-    "elevation": "flat",
-    "start": {
-      "lat": 47.56305,
-      "lon": -122.37407,
-      "label": "Center of the West Seattle Stadium track, 4432 35th Ave SW"
-    },
-    "lanes": 8,
-    "access": "Seattle Parks stadium, open to the public when not rented. Grounds open 4 am to 11:30 pm; parking lot gates 7 am to 9 pm. Closed during games and meets.",
-    "notes": "Rubberized track replaced in 2017. Parking lot off 35th Ave SW next to the West Seattle Golf Course.",
-    "sources": [
-      "https://seattle.gov/parks/parks/west-seattle-stadium",
-      "https://parkways.seattle.gov/2017/09/29/west-seattle-stadium-track-renovation-project-complete/",
-      "https://www.letsrun.com/forum/flat_read.php?thread=5173195",
-      "https://www.openstreetmap.org/relation/10531234"
-    ]
+  "lanes": null,
+  "access": "Seattle Parks playfield and track, open 4 am to 11:30 pm. Popular with youth sports groups and runners.",
+  "notes": "A 400-yard (about 366 m) unpaved loop of crushed rock and dirt around a turf field, so it is not a true 400 m. Street parking only; David Rodgers Park is next door.",
+  "sources": [
+   "https://seattle.gov/parks/allparks/queen-anne-bowl-playfield",
+   "https://www.yearofseattleparks.com/2011/11/01/queen-anne-bowl-playfield/",
+   "https://www.letsrun.com/forum/flat_read.php?thread=12142451",
+   "https://www.openstreetmap.org/relation/276066"
+  ]
+ },
+ {
+  "id": "montlake-playfield-track",
+  "name": "Montlake Playfield Track",
+  "area": "Montlake",
+  "kind": "track",
+  "miles": 0.25,
+  "surfaces": {
+   "dirt": 1.0
   },
-  {
-    "id": "nathan-hale-track",
-    "name": "Nathan Hale Playfield Track",
-    "area": "Meadowbrook",
-    "kind": "track",
-    "miles": 0.25,
-    "surfaces": {
-      "track": 1.0
-    },
-    "elevation": "flat",
-    "start": {
-      "lat": 47.70782,
-      "lon": -122.29215,
-      "label": "Center of the Nathan Hale High School stadium track, 30th Ave NE"
-    },
-    "lanes": 8,
-    "access": "Seattle Parks lists Nathan Hale Playfield with a track, open 4 am to 11:30 pm. Runners use it when Nathan Hale High School is not; closed for school events and games.",
-    "notes": "All-weather track in the high school stadium with a parking lot beside it. Meadowbrook Playfield and Community Center are just south.",
-    "sources": [
-      "https://seattle.gov/parks/find/parks/nathan-hale-playfield",
-      "https://www.yearofseattleparks.com/?p=32",
-      "https://www.letsrun.com/forum/flat_read.php?thread=10016821",
-      "https://www.openstreetmap.org/relation/544257"
-    ]
+  "elevation": "flat",
+  "start": {
+   "lat": 47.64257,
+   "lon": -122.30828,
+   "label": "Center of the Montlake Playfield track, around the turf football field"
   },
-  {
-    "id": "garfield-track",
-    "name": "Garfield Playfield Track",
-    "area": "Central District",
-    "kind": "track",
-    "miles": 0.25,
-    "surfaces": {
-      "track": 1.0
-    },
-    "elevation": "flat",
-    "start": {
-      "lat": 47.6052,
-      "lon": -122.30063,
-      "label": "Center of the Garfield High School track, east of the school near 25th Ave"
-    },
-    "lanes": 6,
-    "access": "Seattle Parks lists the track at Garfield Playfield (park hours 6 am to 10 pm). Runners report it open outside Garfield High School practices and events.",
-    "notes": "Six-lane all-weather track, often called the closest good track to downtown. The Garfield Super Block renovation (play area, restroom, loop path) began in 2025, so parts of the site may be fenced.",
-    "sources": [
-      "https://seattle.gov/parks/allparks/garfield-playfield",
-      "https://seattle.gov/parks/about-us/projects/garfield-super-block-renovation",
-      "https://www.letsrun.com/forum/flat_read.php?thread=10889356",
-      "https://www.letsrun.com/forum/flat_read.php?thread=12142451",
-      "https://www.openstreetmap.org/relation/2472848"
-    ]
+  "lanes": null,
+  "access": "Seattle Parks playfield that lists a track among its amenities; public park, but the infield can be booked for games and practices.",
+  "notes": "Dirt track around a synthetic turf field next to Montlake Community Center, which has restrooms. Maps measure it near 400 m, but one runner called it about 370 yards, so treat the lap as approximate.",
+  "sources": [
+   "https://seattle.gov/parks/allparks/montlake-playfield",
+   "https://www.letsrun.com/forum/flat_read.php?thread=3140706",
+   "https://www.openstreetmap.org/relation/5465517"
+  ]
+ },
+ {
+  "id": "hiawatha-playfield-track",
+  "name": "Hiawatha Playfield Track",
+  "area": "West Seattle (Admiral)",
+  "kind": "track",
+  "miles": 0.25,
+  "surfaces": {
+   "track": 1.0
   },
-  {
-    "id": "roosevelt-hs-track",
-    "name": "Roosevelt High School Track",
-    "area": "Roosevelt",
-    "kind": "track",
-    "miles": 0.25,
-    "surfaces": {
-      "track": 1.0
-    },
-    "elevation": "flat",
-    "start": {
-      "lat": 47.67706,
-      "lon": -122.31446,
-      "label": "Center of the Roosevelt High School track, on 12th Ave NE across from Roosevelt station"
-    },
-    "lanes": 4,
-    "access": "Seattle Public Schools track with no gate, open to walk-in runners outside school use. May be off-limits during practices, such as summer football.",
-    "notes": "Rubberized track across the street from Roosevelt light rail station. Seattle Frontrunners hold Tuesday track sessions here, and it is often crowded.",
-    "sources": [
-      "https://www.letsrun.com/forum/flat_read.php?thread=12142451",
-      "https://www.letsrun.com/forum/flat_read.php?thread=10016821",
-      "https://www.meetup.com/seattle-frontrunners/events/315703887/",
-      "https://www.openstreetmap.org/relation/537398"
-    ]
+  "elevation": "flat",
+  "start": {
+   "lat": 47.57805,
+   "lon": -122.38545,
+   "label": "Center of the Hiawatha Playfield track, beside West Seattle High School"
   },
-  {
-    "id": "ballard-hs-track",
-    "name": "Ballard High School Track",
-    "area": "Ballard",
-    "kind": "track",
-    "miles": 0.25,
-    "surfaces": {
-      "track": 1.0
-    },
-    "elevation": "flat",
-    "start": {
-      "lat": 47.67695,
-      "lon": -122.37314,
-      "label": "Center of the Ballard High School track, between NW 65th and NW 67th St"
-    },
-    "lanes": null,
-    "access": "Seattle Public Schools track. Runners report it unlocked in summer and outside school hours, but the gates are sometimes locked.",
-    "notes": "All-weather track on the east side of the Ballard High School campus. Access is inconsistent, so check the gate before planning a workout.",
-    "sources": [
-      "https://www.letsrun.com/forum/flat_read.php?thread=10016821",
-      "https://www.letsrun.com/forum/flat_read.php?thread=12142451",
-      "https://www.openstreetmap.org/relation/4289538"
-    ]
+  "lanes": 3,
+  "access": "Seattle Parks playfield, open to the public 4 am to 11:30 pm.",
+  "notes": "Rubberized 3-lane, 400 m track around a turf field, resurfaced in 2023. Hiawatha Community Center is on the east side of the playfield.",
+  "sources": [
+   "https://www.seattle.gov/parks/parks/hiawatha-playfield",
+   "https://parkways.seattle.gov/2023/09/08/hiawatha-playfield-reopening/",
+   "https://www.openstreetmap.org/relation/537369"
+  ]
+ },
+ {
+  "id": "west-seattle-stadium-track",
+  "name": "West Seattle Stadium Track",
+  "area": "West Seattle (Fairmount Park)",
+  "kind": "track",
+  "miles": 0.25,
+  "surfaces": {
+   "track": 1.0
   },
-  {
-    "id": "franklin-hs-track",
-    "name": "Franklin High School Track",
-    "area": "Mount Baker",
-    "kind": "track",
-    "miles": 0.25,
-    "surfaces": {
-      "track": 1.0
-    },
-    "elevation": "flat",
-    "start": {
-      "lat": 47.57673,
-      "lon": -122.29552,
-      "label": "Center of the Franklin High School track, west of the school building"
-    },
-    "lanes": null,
-    "access": "Seattle Public Schools track that runners report open to the public outside school hours, typically weekday evenings and weekends, barring school events.",
-    "notes": "Rubberized track a short walk from Mount Baker light rail station. One runner was unsure whether the gates are always unlocked.",
-    "sources": [
-      "https://www.letsrun.com/forum/flat_read.php?thread=10889356",
-      "https://www.letsrun.com/forum/flat_read.php?thread=12142451",
-      "https://www.openstreetmap.org/relation/537424"
-    ]
+  "elevation": "flat",
+  "start": {
+   "lat": 47.56305,
+   "lon": -122.37407,
+   "label": "Center of the West Seattle Stadium track, 4432 35th Ave SW"
   },
-  {
-    "id": "sw-athletic-complex-track",
-    "name": "Nino Cantu Southwest Athletic Complex Track",
-    "area": "Westwood",
-    "kind": "track",
-    "miles": 0.25,
-    "surfaces": {
-      "track": 1.0
-    },
-    "elevation": "flat",
-    "start": {
-      "lat": 47.52723,
-      "lon": -122.36691,
-      "label": "Center of the Southwest Athletic Complex track, SW Thistle St and 26th Ave SW"
-    },
-    "lanes": null,
-    "access": "Seattle Public Schools stadium used daily by community walkers and runners outside school and game times. Busy with high school football and meets in season.",
-    "notes": "Track rebuilt in 2018, across from Chief Sealth International High School. The Longfellow Creek trail runs beside the complex.",
-    "sources": [
-      "https://westseattleblog.com/forums-2/topic/public-running-track/",
-      "https://www.westsideseattle.com/node/54868",
-      "https://westseattleblog.com/2018/05/followup-southwest-athletic-complex-work-begins",
-      "https://www.openstreetmap.org/relation/5511880"
-    ]
+  "lanes": 8,
+  "access": "Seattle Parks stadium, open to the public when not rented. Grounds open 4 am to 11:30 pm; parking lot gates 7 am to 9 pm. Closed during games and meets.",
+  "notes": "Rubberized track replaced in 2017. Parking lot off 35th Ave SW next to the West Seattle Golf Course.",
+  "sources": [
+   "https://seattle.gov/parks/parks/west-seattle-stadium",
+   "https://parkways.seattle.gov/2017/09/29/west-seattle-stadium-track-renovation-project-complete/",
+   "https://www.letsrun.com/forum/flat_read.php?thread=5173195",
+   "https://www.openstreetmap.org/relation/10531234"
+  ]
+ },
+ {
+  "id": "nathan-hale-track",
+  "name": "Nathan Hale Playfield Track",
+  "area": "Meadowbrook",
+  "kind": "track",
+  "miles": 0.25,
+  "surfaces": {
+   "track": 1.0
   },
-  {
-    "id": "mercer-island-hs-track",
-    "name": "Mercer Island High School Track (Islander Stadium)",
-    "area": "Mercer Island",
-    "kind": "track",
-    "miles": 0.25,
-    "surfaces": {
-      "track": 1.0
-    },
-    "elevation": "flat",
-    "start": {
-      "lat": 47.57187,
-      "lon": -122.22172,
-      "label": "Center of the Islander Stadium track, Mercer Island High School"
-    },
-    "lanes": 8,
-    "access": "Open to the public with a district key card ($5 a year, free for 65 and over): weekdays 5 to 7 am and 4:30 to 10 pm, weekends and holidays 5 am to 10 pm, unless the district is using it.",
-    "notes": "Get the key card from the district Maintenance and Operations office. The stadium closed for a few days in August 2025 for track painting.",
-    "sources": [
-      "https://www.mercerislandschools.org/programs-and-services/maintenance-operations",
-      "https://wm.mercerislandschools.org/news/~board/misd-news/post/islander-stadium-to-close-next-week-for-track-painting",
-      "https://www.mi-reporter.com/news/permit-renewals-for-community-access-to-the-mihs-track-are-due/",
-      "https://www.openstreetmap.org/relation/2071714"
-    ]
+  "elevation": "flat",
+  "start": {
+   "lat": 47.70782,
+   "lon": -122.29215,
+   "label": "Center of the Nathan Hale High School stadium track, 30th Ave NE"
   },
-  {
-    "id": "lake-washington-hs-track",
-    "name": "Lake Washington High School Track",
-    "area": "Kirkland (Rose Hill)",
-    "kind": "track",
-    "miles": 0.25,
-    "surfaces": {
-      "track": 1.0
-    },
-    "elevation": "flat",
-    "start": {
-      "lat": 47.67423,
-      "lon": -122.179,
-      "label": "Center of the Lake Washington High School stadium track, NE 80th St"
-    },
-    "lanes": 8,
-    "access": "LWSD tracks are closed to the public during the school day (7:30 am to 4 or 5 pm) and open evenings and weekends when no school activity is scheduled.",
-    "notes": "Stadium track at Lake Washington High School, 12033 NE 80th St. Expect closures for games and meets.",
-    "sources": [
-      "https://www.lwsd.org/services/facilities/facility-use",
-      "https://www.lwsd.org/services/facilities/building-use",
-      "https://www.openstreetmap.org/relation/7586542"
-    ]
+  "lanes": 8,
+  "access": "Seattle Parks lists Nathan Hale Playfield with a track, open 4 am to 11:30 pm. Runners use it when Nathan Hale High School is not; closed for school events and games.",
+  "notes": "All-weather track in the high school stadium with a parking lot beside it. Meadowbrook Playfield and Community Center are just south.",
+  "sources": [
+   "https://seattle.gov/parks/find/parks/nathan-hale-playfield",
+   "https://www.yearofseattleparks.com/?p=32",
+   "https://www.letsrun.com/forum/flat_read.php?thread=10016821",
+   "https://www.openstreetmap.org/relation/544257"
+  ]
+ },
+ {
+  "id": "garfield-track",
+  "name": "Garfield Playfield Track",
+  "area": "Central District",
+  "kind": "track",
+  "miles": 0.25,
+  "surfaces": {
+   "track": 1.0
   },
-  {
-    "id": "juanita-hs-track",
-    "name": "Juanita High School Track",
-    "area": "Kirkland (Juanita)",
-    "kind": "track",
-    "miles": 0.25,
-    "surfaces": {
-      "track": 1.0
-    },
-    "elevation": "flat",
-    "start": {
-      "lat": 47.71438,
-      "lon": -122.19855,
-      "label": "Center of the Juanita High School stadium track, NE 132nd St"
-    },
-    "lanes": 8,
-    "access": "LWSD tracks are closed to the public during the school day (7:30 am to 4 or 5 pm) and open evenings and weekends when no school activity is scheduled.",
-    "notes": "Lit 8-lane all-weather track at Juanita High School, 10601 NE 132nd St. Expect closures for games and meets.",
-    "sources": [
-      "https://www.lwsd.org/services/facilities/facility-use",
-      "https://www.lwsd.org/services/facilities/building-use",
-      "https://www.openstreetmap.org/relation/7584554"
-    ]
+  "elevation": "flat",
+  "start": {
+   "lat": 47.6052,
+   "lon": -122.30063,
+   "label": "Center of the Garfield High School track, east of the school near 25th Ave"
   },
-  {
-    "id": "redmond-hs-track",
-    "name": "Redmond High School Track",
-    "area": "Redmond (Education Hill)",
-    "kind": "track",
-    "miles": 0.25,
-    "surfaces": {
-      "track": 1.0
-    },
-    "elevation": "flat",
-    "start": {
-      "lat": 47.69437,
-      "lon": -122.10992,
-      "label": "Center of the track around Walter L. Seabloom Field, Redmond High School"
-    },
-    "lanes": null,
-    "access": "LWSD tracks are closed to the public during the school day (7:30 am to 4 or 5 pm) and open evenings and weekends when no school activity is scheduled.",
-    "notes": "Stadium track at Redmond High School, 17272 NE 104th St. Expect closures for games and meets.",
-    "sources": [
-      "https://www.lwsd.org/services/facilities/facility-use",
-      "https://www.lwsd.org/services/facilities/building-use",
-      "https://www.openstreetmap.org/relation/7136351"
-    ]
+  "lanes": 6,
+  "access": "Seattle Parks lists the track at Garfield Playfield (park hours 6 am to 10 pm). Runners report it open outside Garfield High School practices and events.",
+  "notes": "Six-lane all-weather track, often called the closest good track to downtown. The Garfield Super Block renovation (play area, restroom, loop path) began in 2025, so parts of the site may be fenced.",
+  "sources": [
+   "https://seattle.gov/parks/allparks/garfield-playfield",
+   "https://seattle.gov/parks/about-us/projects/garfield-super-block-renovation",
+   "https://www.letsrun.com/forum/flat_read.php?thread=10889356",
+   "https://www.letsrun.com/forum/flat_read.php?thread=12142451",
+   "https://www.openstreetmap.org/relation/2472848"
+  ]
+ },
+ {
+  "id": "roosevelt-hs-track",
+  "name": "Roosevelt High School Track",
+  "area": "Roosevelt",
+  "kind": "track",
+  "miles": 0.25,
+  "surfaces": {
+   "track": 1.0
   },
-  {
-    "id": "renton-memorial-stadium-track",
-    "name": "Renton Memorial Stadium Track",
-    "area": "Renton",
-    "kind": "track",
-    "miles": 0.25,
-    "surfaces": {
-      "track": 1.0
-    },
-    "elevation": "flat",
-    "start": {
-      "lat": 47.48871,
-      "lon": -122.20963,
-      "label": "Center of the Renton Memorial Stadium track, Logan Ave N"
-    },
-    "lanes": null,
-    "access": "Renton School District stadium. District policy makes athletic fields available to the community after hours when no district activity is scheduled; no posted drop-in hours were found.",
-    "notes": "All-weather rubberized track replaced in 2020, used by three high schools for football, soccer and track meets. The Cedar River Trail passes about 100 m away.",
-    "sources": [
-      "https://www.rentonschools.us/departments/business-services/facilities-rental",
-      "https://rentonhs.rentonschools.us/athletics/renton-memorial-stadium",
-      "https://www.rentonschools.us/locations/renton-memorial-stadium",
-      "https://www.openstreetmap.org/relation/149096"
-    ]
+  "elevation": "flat",
+  "start": {
+   "lat": 47.67706,
+   "lon": -122.31446,
+   "label": "Center of the Roosevelt High School track, on 12th Ave NE across from Roosevelt station"
   },
-  {
-    "id": "shoreline-stadium-track",
-    "name": "Shoreline Stadium Track",
-    "area": "Shoreline",
-    "kind": "track",
-    "miles": 0.25,
-    "surfaces": {
-      "track": 1.0
-    },
-    "elevation": "flat",
-    "start": {
-      "lat": 47.76505,
-      "lon": -122.32514,
-      "label": "Center of the Shoreline Stadium track at the Shoreline Center, 18560 1st Ave NE"
-    },
-    "lanes": null,
-    "access": "Shoreline School District stadium. Open to anyone by registering for Club Northwest's all-comers meets on summer Wednesday evenings; drop-in access at other times is not confirmed.",
-    "notes": "Home track for Shoreline high schools, next to Shoreline North/185th light rail station. Rentals go through the district athletic office.",
-    "sources": [
-      "https://clubnorthwest.org/all-comers",
-      "https://www.ssd412.org/departments/facility-use",
-      "https://www.openstreetmap.org/relation/5504219"
-    ]
+  "lanes": 4,
+  "access": "Seattle Public Schools track with no gate, open to walk-in runners outside school use. May be off-limits during practices, such as summer football.",
+  "notes": "Rubberized track across the street from Roosevelt light rail station. Seattle Frontrunners hold Tuesday track sessions here, and it is often crowded.",
+  "sources": [
+   "https://www.letsrun.com/forum/flat_read.php?thread=12142451",
+   "https://www.letsrun.com/forum/flat_read.php?thread=10016821",
+   "https://www.meetup.com/seattle-frontrunners/events/315703887/",
+   "https://www.openstreetmap.org/relation/537398"
+  ]
+ },
+ {
+  "id": "ballard-hs-track",
+  "name": "Ballard High School Track",
+  "area": "Ballard",
+  "kind": "track",
+  "miles": 0.25,
+  "surfaces": {
+   "track": 1.0
   },
-  {
-    "id": "einstein-ms-track",
-    "name": "Einstein Middle School Track",
-    "area": "Shoreline (Richmond Highlands)",
-    "kind": "track",
-    "miles": 0.25,
-    "surfaces": {
-      "track": 1.0
-    },
-    "elevation": "flat",
-    "start": {
-      "lat": 47.76904,
-      "lon": -122.36447,
-      "label": "Center of the Einstein Middle School track, west of the school building"
-    },
-    "lanes": 6,
-    "access": "Shoreline School District track that local runners use outside school hours; no official public hours were found.",
-    "notes": "Flat 6-lane track at a school rebuilt in 2020, next to Hillwood Park. Local runners describe it as a convenient option with a good surface.",
-    "sources": [
-      "https://nextdoor.com/pages/shoreline-stadium-shoreline-wa/",
-      "https://einstein.ssd412.org/about-us",
-      "https://www.openstreetmap.org/relation/18141973"
-    ]
-  }
+  "elevation": "flat",
+  "start": {
+   "lat": 47.67695,
+   "lon": -122.37314,
+   "label": "Center of the Ballard High School track, between NW 65th and NW 67th St"
+  },
+  "lanes": null,
+  "access": "Seattle Public Schools track. Runners report it unlocked in summer and outside school hours, but the gates are sometimes locked.",
+  "notes": "All-weather track on the east side of the Ballard High School campus. Access is inconsistent, so check the gate before planning a workout.",
+  "sources": [
+   "https://www.letsrun.com/forum/flat_read.php?thread=10016821",
+   "https://www.letsrun.com/forum/flat_read.php?thread=12142451",
+   "https://www.openstreetmap.org/relation/4289538"
+  ]
+ },
+ {
+  "id": "sw-athletic-complex-track",
+  "name": "Nino Cantu Southwest Athletic Complex Track",
+  "area": "Westwood",
+  "kind": "track",
+  "miles": 0.25,
+  "surfaces": {
+   "track": 1.0
+  },
+  "elevation": "flat",
+  "start": {
+   "lat": 47.52723,
+   "lon": -122.36691,
+   "label": "Center of the Southwest Athletic Complex track, SW Thistle St and 26th Ave SW"
+  },
+  "lanes": null,
+  "access": "Seattle Public Schools stadium used daily by community walkers and runners outside school and game times. Busy with high school football and meets in season.",
+  "notes": "Track rebuilt in 2018, across from Chief Sealth International High School. The Longfellow Creek trail runs beside the complex.",
+  "sources": [
+   "https://westseattleblog.com/forums-2/topic/public-running-track/",
+   "https://www.westsideseattle.com/node/54868",
+   "https://westseattleblog.com/2018/05/followup-southwest-athletic-complex-work-begins",
+   "https://www.openstreetmap.org/relation/5511880"
+  ]
+ },
+ {
+  "id": "mercer-island-hs-track",
+  "name": "Mercer Island High School Track (Islander Stadium)",
+  "area": "Mercer Island",
+  "kind": "track",
+  "miles": 0.25,
+  "surfaces": {
+   "track": 1.0
+  },
+  "elevation": "flat",
+  "start": {
+   "lat": 47.57187,
+   "lon": -122.22172,
+   "label": "Center of the Islander Stadium track, Mercer Island High School"
+  },
+  "lanes": 8,
+  "access": "Open to the public with a district key card ($5 a year, free for 65 and over): weekdays 5 to 7 am and 4:30 to 10 pm, weekends and holidays 5 am to 10 pm, unless the district is using it.",
+  "notes": "Get the key card from the district Maintenance and Operations office. The stadium closed for a few days in August 2025 for track painting.",
+  "sources": [
+   "https://www.mercerislandschools.org/programs-and-services/maintenance-operations",
+   "https://wm.mercerislandschools.org/news/~board/misd-news/post/islander-stadium-to-close-next-week-for-track-painting",
+   "https://www.mi-reporter.com/news/permit-renewals-for-community-access-to-the-mihs-track-are-due/",
+   "https://www.openstreetmap.org/relation/2071714"
+  ]
+ },
+ {
+  "id": "lake-washington-hs-track",
+  "name": "Lake Washington High School Track",
+  "area": "Kirkland (Rose Hill)",
+  "kind": "track",
+  "miles": 0.25,
+  "surfaces": {
+   "track": 1.0
+  },
+  "elevation": "flat",
+  "start": {
+   "lat": 47.67423,
+   "lon": -122.179,
+   "label": "Center of the Lake Washington High School stadium track, NE 80th St"
+  },
+  "lanes": 8,
+  "access": "LWSD tracks are closed to the public during the school day (7:30 am to 4 or 5 pm) and open evenings and weekends when no school activity is scheduled.",
+  "notes": "Stadium track at Lake Washington High School, 12033 NE 80th St. Expect closures for games and meets.",
+  "sources": [
+   "https://www.lwsd.org/services/facilities/facility-use",
+   "https://www.lwsd.org/services/facilities/building-use",
+   "https://www.openstreetmap.org/relation/7586542"
+  ]
+ },
+ {
+  "id": "juanita-hs-track",
+  "name": "Juanita High School Track",
+  "area": "Kirkland (Juanita)",
+  "kind": "track",
+  "miles": 0.25,
+  "surfaces": {
+   "track": 1.0
+  },
+  "elevation": "flat",
+  "start": {
+   "lat": 47.71438,
+   "lon": -122.19855,
+   "label": "Center of the Juanita High School stadium track, NE 132nd St"
+  },
+  "lanes": 8,
+  "access": "LWSD tracks are closed to the public during the school day (7:30 am to 4 or 5 pm) and open evenings and weekends when no school activity is scheduled.",
+  "notes": "Lit 8-lane all-weather track at Juanita High School, 10601 NE 132nd St. Expect closures for games and meets.",
+  "sources": [
+   "https://www.lwsd.org/services/facilities/facility-use",
+   "https://www.lwsd.org/services/facilities/building-use",
+   "https://www.openstreetmap.org/relation/7584554"
+  ]
+ },
+ {
+  "id": "redmond-hs-track",
+  "name": "Redmond High School Track",
+  "area": "Redmond (Education Hill)",
+  "kind": "track",
+  "miles": 0.25,
+  "surfaces": {
+   "track": 1.0
+  },
+  "elevation": "flat",
+  "start": {
+   "lat": 47.69437,
+   "lon": -122.10992,
+   "label": "Center of the track around Walter L. Seabloom Field, Redmond High School"
+  },
+  "lanes": null,
+  "access": "LWSD tracks are closed to the public during the school day (7:30 am to 4 or 5 pm) and open evenings and weekends when no school activity is scheduled.",
+  "notes": "Stadium track at Redmond High School, 17272 NE 104th St. Expect closures for games and meets.",
+  "sources": [
+   "https://www.lwsd.org/services/facilities/facility-use",
+   "https://www.lwsd.org/services/facilities/building-use",
+   "https://www.openstreetmap.org/relation/7136351"
+  ]
+ },
+ {
+  "id": "renton-memorial-stadium-track",
+  "name": "Renton Memorial Stadium Track",
+  "area": "Renton",
+  "kind": "track",
+  "miles": 0.25,
+  "surfaces": {
+   "track": 1.0
+  },
+  "elevation": "flat",
+  "start": {
+   "lat": 47.48871,
+   "lon": -122.20963,
+   "label": "Center of the Renton Memorial Stadium track, Logan Ave N"
+  },
+  "lanes": null,
+  "access": "Renton School District stadium. District policy makes athletic fields available to the community after hours when no district activity is scheduled; no posted drop-in hours were found.",
+  "notes": "All-weather rubberized track replaced in 2020, used by three high schools for football, soccer and track meets. The Cedar River Trail passes about 100 m away.",
+  "sources": [
+   "https://www.rentonschools.us/departments/business-services/facilities-rental",
+   "https://rentonhs.rentonschools.us/athletics/renton-memorial-stadium",
+   "https://www.rentonschools.us/locations/renton-memorial-stadium",
+   "https://www.openstreetmap.org/relation/149096"
+  ]
+ },
+ {
+  "id": "shoreline-stadium-track",
+  "name": "Shoreline Stadium Track",
+  "area": "Shoreline",
+  "kind": "track",
+  "miles": 0.25,
+  "surfaces": {
+   "track": 1.0
+  },
+  "elevation": "flat",
+  "start": {
+   "lat": 47.76505,
+   "lon": -122.32514,
+   "label": "Center of the Shoreline Stadium track at the Shoreline Center, 18560 1st Ave NE"
+  },
+  "lanes": null,
+  "access": "Shoreline School District stadium. Open to anyone by registering for Club Northwest's all-comers meets on summer Wednesday evenings; drop-in access at other times is not confirmed.",
+  "notes": "Home track for Shoreline high schools, next to Shoreline North/185th light rail station. Rentals go through the district athletic office.",
+  "sources": [
+   "https://clubnorthwest.org/all-comers",
+   "https://www.ssd412.org/departments/facility-use",
+   "https://www.openstreetmap.org/relation/5504219"
+  ]
+ },
+ {
+  "id": "einstein-ms-track",
+  "name": "Einstein Middle School Track",
+  "area": "Shoreline (Richmond Highlands)",
+  "kind": "track",
+  "miles": 0.25,
+  "surfaces": {
+   "track": 1.0
+  },
+  "elevation": "flat",
+  "start": {
+   "lat": 47.76904,
+   "lon": -122.36447,
+   "label": "Center of the Einstein Middle School track, west of the school building"
+  },
+  "lanes": 6,
+  "access": "Shoreline School District track that local runners use outside school hours; no official public hours were found.",
+  "notes": "Flat 6-lane track at a school rebuilt in 2020, next to Hillwood Park. Local runners describe it as a convenient option with a good surface.",
+  "sources": [
+   "https://nextdoor.com/pages/shoreline-stadium-shoreline-wa/",
+   "https://einstein.ssd412.org/about-us",
+   "https://www.openstreetmap.org/relation/18141973"
+  ]
+ },
+ {
+  "id": "i90-trail-mercer-island",
+  "name": "I-90 Trail across Mercer Island (Aubrey Davis Park)",
+  "area": "Mercer Island",
+  "kind": "point-to-point",
+  "miles": 2.74,
+  "surfaces": {
+   "asphalt": 0.94,
+   "concrete": 0.06
+  },
+  "elevation": "rolling",
+  "start": {
+   "lat": 47.59053,
+   "lon": -122.24929,
+   "label": "Aubrey Davis Park, west end by the I-90 floating bridge"
+  },
+  "bbox": [
+   47.5784,
+   -122.2493,
+   47.5924,
+   -122.1995
+  ],
+  "pathNames": [
+   "I 90 Trail",
+   "I-90 Trail",
+   "Mountains to Sound Greenway Trail"
+  ],
+  "waypoints": [
+   [
+    47.59053,
+    -122.24929
+   ],
+   [
+    47.59245,
+    -122.2423
+   ],
+   [
+    47.58974,
+    -122.23577
+   ],
+   [
+    47.58699,
+    -122.22868
+   ],
+   [
+    47.58376,
+    -122.22205
+   ],
+   [
+    47.58017,
+    -122.21553
+   ],
+   [
+    47.57864,
+    -122.20749
+   ],
+   [
+    47.57938,
+    -122.19952
+   ]
+  ],
+  "notes": "Paved multi-use path across the island from the floating bridge landing, over the Aubrey Davis Park freeway lid and through Town Center, to the East Channel Bridge into Bellevue's Enatai neighborhood. Popular with bike commuters; it continues west to Seattle and east to Mercer Slough.",
+  "sources": [
+   "https://www.wta.org/go-hiking/hikes/i-90-trail",
+   "https://www.traillink.com/trail/i-90-trail/",
+   "https://www.openstreetmap.org/"
+  ]
+ },
+ {
+  "id": "mercer-island-loop",
+  "name": "Mercer Island Loop (East and West Mercer Way)",
+  "area": "Mercer Island",
+  "kind": "loop",
+  "miles": 12.91,
+  "surfaces": {
+   "asphalt": 0.98,
+   "concrete": 0.02
+  },
+  "elevation": "hilly",
+  "start": {
+   "lat": 47.5885,
+   "lon": -122.23179,
+   "label": "I-90 Trail at 80th Ave SE, Mercer Island Town Center"
+  },
+  "bbox": [
+   47.526,
+   -122.2491,
+   47.5924,
+   -122.2055
+  ],
+  "pathNames": [
+   "East Mercer Way",
+   "West Mercer Way",
+   "North Mercer Way",
+   "I 90 Trail"
+  ],
+  "waypoints": [
+   [
+    47.5885,
+    -122.23179
+   ],
+   [
+    47.5788,
+    -122.20924
+   ],
+   [
+    47.56542,
+    -122.21303
+   ],
+   [
+    47.55235,
+    -122.21272
+   ],
+   [
+    47.53826,
+    -122.21249
+   ],
+   [
+    47.52701,
+    -122.22934
+   ],
+   [
+    47.54062,
+    -122.23576
+   ],
+   [
+    47.55615,
+    -122.22536
+   ],
+   [
+    47.57196,
+    -122.2331
+   ],
+   [
+    47.58524,
+    -122.24868
+   ]
+  ],
+  "notes": "Road run around the island, clockwise here: I-90 Trail along the north end, south on East Mercer Way, back north on West Mercer Way. Winding and hilly with narrow or no shoulders in places and steady bike traffic, so stay visible and watch blind curves.",
+  "sources": [
+   "https://halfmarathons.net/races/mercer-island-half-marathon-10k-5k",
+   "https://www.renehersecycles.com/routes/mercer-island-loop/",
+   "https://www.openstreetmap.org/"
+  ]
+ },
+ {
+  "id": "luther-burbank-park",
+  "name": "Luther Burbank Park Loop",
+  "area": "Mercer Island",
+  "kind": "loop",
+  "miles": 2.13,
+  "surfaces": {
+   "asphalt": 0.33,
+   "gravel": 0.33,
+   "dirt": 0.27,
+   "concrete": 0.04,
+   "boardwalk": 0.03
+  },
+  "elevation": "flat",
+  "start": {
+   "lat": 47.58883,
+   "lon": -122.22677,
+   "label": "Park entrance at 84th Ave SE and SE 24th St"
+  },
+  "bbox": [
+   47.5865,
+   -122.2297,
+   47.595,
+   -122.2244
+  ],
+  "pathNames": [],
+  "waypoints": [
+   [
+    47.58883,
+    -122.22677
+   ],
+   [
+    47.58688,
+    -122.22592
+   ],
+   [
+    47.59012,
+    -122.22476
+   ],
+   [
+    47.59366,
+    -122.2257
+   ],
+   [
+    47.59441,
+    -122.22688
+   ],
+   [
+    47.59209,
+    -122.2262
+   ],
+   [
+    47.59144,
+    -122.22807
+   ],
+   [
+    47.58956,
+    -122.22764
+   ]
+  ],
+  "notes": "Lakefront park on the island's north tip with a web of paved, gravel and dirt paths past the beach, meadows and wetland; this loop is about 2 miles. Paths are mostly unnamed and intersect often, so a GPS track helps.",
+  "sources": [
+   "https://mercerisland.gov/parksrec/page/luther-burbank-park",
+   "https://www.wta.org/go-hiking/hikes/luther-burbank-park",
+   "https://www.10adventures.com/hikes/seattle/luther-burbank-park-loop",
+   "https://www.openstreetmap.org/"
+  ]
+ },
+ {
+  "id": "pioneer-park-mercer-island",
+  "name": "Pioneer Park Trails (Mercer Island)",
+  "area": "Mercer Island",
+  "kind": "loop",
+  "miles": 2.53,
+  "surfaces": {
+   "dirt": 0.62,
+   "gravel": 0.33,
+   "asphalt": 0.05
+  },
+  "elevation": "rolling",
+  "start": {
+   "lat": 47.54267,
+   "lon": -122.22214,
+   "label": "Island Crest Way at SE 68th St"
+  },
+  "bbox": [
+   47.5385,
+   -122.2267,
+   47.5456,
+   -122.2163
+  ],
+  "pathNames": [
+   "Northwest Perimiter Trail",
+   "Northwest Perimeter Trail",
+   "SE Perimeter Trail",
+   "Overlook Trail",
+   "Fox Trail",
+   "Fern Trail",
+   "Hazelnut Trail",
+   "Chickadee Trail",
+   "Maple Trail",
+   "Bike Trail"
+  ],
+  "waypoints": [
+   [
+    47.54267,
+    -122.22214
+   ],
+   [
+    47.54543,
+    -122.22265
+   ],
+   [
+    47.54484,
+    -122.22645
+   ],
+   [
+    47.54232,
+    -122.22459
+   ],
+   [
+    47.54279,
+    -122.22138
+   ],
+   [
+    47.54481,
+    -122.21938
+   ],
+   [
+    47.54234,
+    -122.21705
+   ],
+   [
+    47.54046,
+    -122.21641
+   ],
+   [
+    47.5401,
+    -122.21637
+   ],
+   [
+    47.54134,
+    -122.21843
+   ]
+  ],
+  "notes": "113-acre forest split into three quadrants by Island Crest Way and SE 68th St, with about 6.6 miles of trail. This loop links the gravel Northwest Perimeter trail, the Overlook trail and the dirt SE Perimeter and Fox trails; the southeast quadrant is shared with horses, and you cross busy Island Crest Way.",
+  "sources": [
+   "https://www.mercerisland.gov/node/2821",
+   "https://www.wta.org/go-hiking/hikes/pioneer-park-mercer-island",
+   "https://www.hikingproject.com/trail/7089027/pioneer-park",
+   "https://www.openstreetmap.org/"
+  ]
+ },
+ {
+  "id": "bellevue-downtown-park",
+  "name": "Bellevue Downtown Park Promenade",
+  "area": "Bellevue",
+  "kind": "loop",
+  "miles": 0.51,
+  "surfaces": {
+   "gravel": 0.82,
+   "concrete": 0.18
+  },
+  "elevation": "flat",
+  "start": {
+   "lat": 47.61218,
+   "lon": -122.20555,
+   "label": "Downtown Park promenade, west side (100th Ave NE)"
+  },
+  "bbox": [
+   47.6115,
+   -122.2056,
+   47.6134,
+   -122.2028
+  ],
+  "pathNames": [],
+  "waypoints": [
+   [
+    47.61218,
+    -122.20555
+   ],
+   [
+    47.61327,
+    -122.20499
+   ],
+   [
+    47.6133,
+    -122.20349
+   ],
+   [
+    47.61226,
+    -122.20283
+   ],
+   [
+    47.61153,
+    -122.20418
+   ]
+  ],
+  "notes": "Half-mile promenade around the central lawn and canal in downtown Bellevue, good for repeat laps. OpenStreetMap tags the promenade as fine gravel with concrete plazas; the city does not state the surface, and one third-party site calls it paved.",
+  "sources": [
+   "https://bellevuewa.gov/city-government/departments/parks/parks-and-trails/nature-trails/downtown-park-trails",
+   "https://bellevuewa.gov/city-government/departments/parks/parks-and-trails/parks/bellevue-downtown-park",
+   "https://www.openstreetmap.org/"
+  ]
+ },
+ {
+  "id": "mercer-slough",
+  "name": "Mercer Slough Nature Park Loop",
+  "area": "Bellevue",
+  "kind": "loop",
+  "miles": 3.56,
+  "surfaces": {
+   "dirt": 0.38,
+   "asphalt": 0.34,
+   "boardwalk": 0.16,
+   "concrete": 0.1,
+   "gravel": 0.02
+  },
+  "elevation": "flat",
+  "start": {
+   "lat": 47.59288,
+   "lon": -122.19108,
+   "label": "Heritage Loop by Winters House (Bellevue Way SE)"
+  },
+  "bbox": [
+   47.58,
+   -122.1911,
+   47.5934,
+   -122.1792
+  ],
+  "pathNames": [
+   "Heritage Loop",
+   "Heritage Trail",
+   "Bellefields Loop Trail",
+   "Lake-to-Lake Trail",
+   "I 90 Trail"
+  ],
+  "waypoints": [
+   [
+    47.59288,
+    -122.19108
+   ],
+   [
+    47.58975,
+    -122.18752
+   ],
+   [
+    47.59277,
+    -122.18813
+   ],
+   [
+    47.59269,
+    -122.18327
+   ],
+   [
+    47.58823,
+    -122.18202
+   ],
+   [
+    47.58318,
+    -122.18074
+   ],
+   [
+    47.58043,
+    -122.18226
+   ],
+   [
+    47.58147,
+    -122.18712
+   ],
+   [
+    47.58528,
+    -122.18841
+   ],
+   [
+    47.58975,
+    -122.18752
+   ]
+  ],
+  "notes": "Mixed loop through the wetland park: soft dirt and wood-chip Heritage and Bellefields trails with wooden boardwalks, then the paved path along 118th Ave SE and the I-90 Trail. Boardwalks are slick when wet and low spots can flood in winter.",
+  "sources": [
+   "https://www.wta.org/go-hiking/hikes/mercer-slough-nature-park-trails",
+   "https://bellevuewa.gov/sites/default/files/media/pdf_document/trail_guide_mercer_slough_nature_park.pdf",
+   "https://parks.bellevuewa.gov/parks-and-trails/nature-trails/mercer-slough-nature-park-trails",
+   "https://www.openstreetmap.org/"
+  ]
+ },
+ {
+  "id": "lake-to-lake-trail",
+  "name": "Lake to Lake Trail (Weowna Park to Meydenbauer Bay)",
+  "area": "Bellevue",
+  "kind": "point-to-point",
+  "miles": 9.06,
+  "surfaces": {
+   "gravel": 0.26,
+   "asphalt": 0.26,
+   "concrete": 0.23,
+   "dirt": 0.22,
+   "boardwalk": 0.03
+  },
+  "elevation": "hilly",
+  "start": {
+   "lat": 47.59218,
+   "lon": -122.11211,
+   "label": "Weowna Park lower trailhead, W Lake Sammamish Pkwy SE"
+  },
+  "bbox": [
+   47.5922,
+   -122.2101,
+   47.6126,
+   -122.1121
+  ],
+  "pathNames": [
+   "Lake to Lake Trail",
+   "Lake-to-Lake Trail",
+   "Weowna Trail",
+   "McTavish Trail",
+   "McTavish Extension",
+   "McTavish",
+   "Koh Trail",
+   "WIlburton Hill Park Trails",
+   "Pipeline Trail"
+  ],
+  "waypoints": [
+   [
+    47.59218,
+    -122.11211
+   ],
+   [
+    47.59819,
+    -122.11916
+   ],
+   [
+    47.59755,
+    -122.1331
+   ],
+   [
+    47.60592,
+    -122.13877
+   ],
+   [
+    47.60716,
+    -122.15293
+   ],
+   [
+    47.60585,
+    -122.1613
+   ],
+   [
+    47.60009,
+    -122.17293
+   ],
+   [
+    47.60388,
+    -122.17659
+   ],
+   [
+    47.60918,
+    -122.17427
+   ],
+   [
+    47.60897,
+    -122.18505
+   ],
+   [
+    47.61003,
+    -122.19897
+   ],
+   [
+    47.6115,
+    -122.2101
+   ]
+  ],
+  "notes": "Bellevue's signed greenway from Lake Sammamish to Lake Washington: steep climb through Weowna Park, past Phantom Lake, through the Lake Hills Greenbelt and Larsen Lake, Kelsey Creek Park and Wilburton Hill Park, then sidewalks to Downtown Park and Meydenbauer Bay. Several street crossings; the Bellevue Botanical Garden asks visitors not to run on its own paths.",
+  "sources": [
+   "https://bellevuewa.gov/city-government/departments/parks/parks-and-trails/nature-trails/lake-to-lake-trail-and-greenway",
+   "https://mountaineers.org/activities/routes-places/lake-to-lake-trail-and-greenway",
+   "https://www.wta.org/go-hiking/hikes/lake-hills-greenbelt",
+   "https://bellevuebotanical.org/group-visits/",
+   "https://www.openstreetmap.org/"
+  ]
+ },
+ {
+  "id": "coal-creek-trail",
+  "name": "Coal Creek Trail",
+  "area": "Bellevue",
+  "kind": "point-to-point",
+  "miles": 4.01,
+  "surfaces": {
+   "dirt": 0.96,
+   "gravel": 0.02,
+   "concrete": 0.01,
+   "boardwalk": 0.01
+  },
+  "elevation": "rolling",
+  "start": {
+   "lat": 47.53559,
+   "lon": -122.12902,
+   "label": "Red Town Trailhead, Lakemont Blvd SE"
+  },
+  "bbox": [
+   47.5355,
+   -122.1805,
+   47.5666,
+   -122.129
+  ],
+  "pathNames": [
+   "Coal Creek Trail",
+   "Lower Coal Creek Trail"
+  ],
+  "waypoints": [
+   [
+    47.53559,
+    -122.12902
+   ],
+   [
+    47.54001,
+    -122.1368
+   ],
+   [
+    47.5415,
+    -122.1468
+   ],
+   [
+    47.54296,
+    -122.15593
+   ],
+   [
+    47.54686,
+    -122.16092
+   ],
+   [
+    47.5527,
+    -122.16514
+   ],
+   [
+    47.55812,
+    -122.16937
+   ],
+   [
+    47.56289,
+    -122.17427
+   ],
+   [
+    47.56662,
+    -122.18021
+   ]
+  ],
+  "notes": "Soft dirt and mulch trail down a forested creek canyon from Cougar Mountain's Red Town Trailhead to 119th Ave SE near I-405. The eastern 2.5 miles are gentle; the lower section near Coal Creek Parkway is a string of steep hills, and the Red Cedar trailhead there is closed for King County sewer work.",
+  "sources": [
+   "https://www.traillink.com/trail/coal-creek-trail-(wa)/",
+   "https://www.wta.org/go-hiking/hikes/coal-creek",
+   "https://www.openstreetmap.org/"
+  ]
+ },
+ {
+  "id": "eastrail-bellevue",
+  "name": "Eastrail through Bellevue (Wilburton to Kirkland line)",
+  "area": "Bellevue",
+  "kind": "point-to-point",
+  "miles": 2.3,
+  "surfaces": {
+   "gravel": 0.82,
+   "concrete": 0.11,
+   "asphalt": 0.07
+  },
+  "elevation": "flat",
+  "start": {
+   "lat": 47.61322,
+   "lon": -122.18321,
+   "label": "Eastrail at NE 4th St, Wilburton"
+  },
+  "bbox": [
+   47.6132,
+   -122.1944,
+   47.6442,
+   -122.1826
+  ],
+  "pathNames": [
+   "Eastrail"
+  ],
+  "waypoints": [
+   [
+    47.61322,
+    -122.18321
+   ],
+   [
+    47.6187,
+    -122.18391
+   ],
+   [
+    47.62426,
+    -122.18289
+   ],
+   [
+    47.62932,
+    -122.1838
+   ],
+   [
+    47.63461,
+    -122.18674
+   ],
+   [
+    47.63946,
+    -122.18983
+   ],
+   [
+    47.64416,
+    -122.19435
+   ]
+  ],
+  "notes": "Interim gravel rail trail from NE 4th St past the NE 8th St overcrossing at Wilburton light rail station, north to the Kirkland line where it becomes the Cross Kirkland Corridor. South of NE 4th the Wilburton Trestle section is still closed; Bellevue expects it to open in mid-2027.",
+  "sources": [
+   "https://bellevuewa.gov/city-government/departments/transportation/projects/capital-projects/eastside-rail-corridor-trail",
+   "https://kingcounty.gov/en/dept/dnrp/nature-recreation/parks-recreation/king-county-parks/capital-projects/eastrail",
+   "https://www.openstreetmap.org/"
+  ]
+ },
+ {
+  "id": "cross-kirkland-corridor",
+  "name": "Cross Kirkland Corridor (Eastrail)",
+  "area": "Kirkland",
+  "kind": "point-to-point",
+  "miles": 5.83,
+  "surfaces": {
+   "gravel": 0.85,
+   "asphalt": 0.08,
+   "concrete": 0.07
+  },
+  "elevation": "flat",
+  "start": {
+   "lat": 47.6442,
+   "lon": -122.19441,
+   "label": "South end at 108th Ave NE by South Kirkland Park and Ride"
+  },
+  "bbox": [
+   47.6442,
+   -122.2029,
+   47.7125,
+   -122.166
+  ],
+  "pathNames": [
+   "Cross Kirkland Corridor",
+   "Eastrail",
+   "CKC"
+  ],
+  "waypoints": [
+   [
+    47.6442,
+    -122.19441
+   ],
+   [
+    47.65297,
+    -122.20195
+   ],
+   [
+    47.66368,
+    -122.20102
+   ],
+   [
+    47.67302,
+    -122.19619
+   ],
+   [
+    47.68084,
+    -122.19075
+   ],
+   [
+    47.69205,
+    -122.19433
+   ],
+   [
+    47.69827,
+    -122.18312
+   ],
+   [
+    47.70776,
+    -122.17811
+   ],
+   [
+    47.71246,
+    -122.16602
+   ]
+  ],
+  "notes": "Ten-foot-wide crushed gravel rail trail the length of Kirkland, with mile markers and many access points, from the Bellevue line to Totem Lake. Flat and shared with cyclists; paved only at street crossings and a few plazas. Kirkland lists full paving as a future improvement once funded. OpenStreetMap marks some stretches as paved, so the colored paths on the map may disagree; this split follows Kirkland's own description.",
+  "sources": [
+   "https://www.kirklandwa.gov/Government/Departments/Public-Works-Department/Cross-Kirkland-Corridor/Cross-Kirkland-Corridor-Interim-Trail",
+   "https://www.wta.org/go-hiking/hikes/kirkland-cross-corridor-trail",
+   "https://www.traillink.com/trail/cross-kirkland-corridor/",
+   "https://www.openstreetmap.org/"
+  ]
+ },
+ {
+  "id": "kirkland-waterfront-juanita-bay",
+  "name": "Kirkland Waterfront to Juanita Bay Park",
+  "area": "Kirkland",
+  "kind": "point-to-point",
+  "miles": 3.61,
+  "surfaces": {
+   "concrete": 0.82,
+   "asphalt": 0.1,
+   "boardwalk": 0.08
+  },
+  "elevation": "flat",
+  "start": {
+   "lat": 47.65632,
+   "lon": -122.20596,
+   "label": "Carillon Point, Lake Washington Blvd NE"
+  },
+  "bbox": [
+   47.6563,
+   -122.2103,
+   47.7025,
+   -122.2054
+  ],
+  "pathNames": [
+   "Lake Washington Boulevard Northeast",
+   "Lake Street South",
+   "Market Street",
+   "Old Market Street Trail"
+  ],
+  "waypoints": [
+   [
+    47.65632,
+    -122.20596
+   ],
+   [
+    47.66204,
+    -122.20668
+   ],
+   [
+    47.66766,
+    -122.2059
+   ],
+   [
+    47.67317,
+    -122.20584
+   ],
+   [
+    47.67732,
+    -122.20965
+   ],
+   [
+    47.68374,
+    -122.20988
+   ],
+   [
+    47.69002,
+    -122.21007
+   ],
+   [
+    47.69601,
+    -122.21006
+   ],
+   [
+    47.70252,
+    -122.21035
+   ]
+  ],
+  "notes": "Lakeside sidewalk run from Carillon Point along Lake Washington Blvd and Lake St past Houghton Beach and Marina Park, then up Market St to the old Market Street causeway and boardwalks of Juanita Bay Park. Busy on summer weekends; the best lake views are the 1.5 miles from Yarrow Bay to Houghton Beach.",
+  "sources": [
+   "https://greatruns.com/seattle-kirkland-running-highlights/",
+   "https://www.parentmap.com/article/juanita-bay-park",
+   "https://www.openstreetmap.org/"
+  ]
+ },
+ {
+  "id": "saint-edward-state-park",
+  "name": "Saint Edward State Park Loop",
+  "area": "Kenmore",
+  "kind": "loop",
+  "miles": 3.99,
+  "surfaces": {
+   "dirt": 0.97,
+   "concrete": 0.02,
+   "asphalt": 0.01
+  },
+  "elevation": "hilly",
+  "start": {
+   "lat": 47.73294,
+   "lon": -122.25838,
+   "label": "The Lodge at St. Edward State Park"
+  },
+  "bbox": [
+   47.7274,
+   -122.2648,
+   47.7369,
+   -122.2465
+  ],
+  "pathNames": [
+   "North",
+   "Beach",
+   "South Canyon",
+   "Watertower",
+   "Plateau Trail",
+   "Orchard Loop",
+   "Perimeter",
+   "Juanita",
+   "Arrowhead",
+   "Volunteer",
+   "Seminary"
+  ],
+  "waypoints": [
+   [
+    47.73294,
+    -122.25838
+   ],
+   [
+    47.73546,
+    -122.25767
+   ],
+   [
+    47.73507,
+    -122.26459
+   ],
+   [
+    47.72948,
+    -122.2628
+   ],
+   [
+    47.72872,
+    -122.25773
+   ],
+   [
+    47.73069,
+    -122.25598
+   ],
+   [
+    47.72908,
+    -122.25315
+   ],
+   [
+    47.73318,
+    -122.25115
+   ],
+   [
+    47.73494,
+    -122.24873
+   ],
+   [
+    47.73458,
+    -122.25201
+   ]
+  ],
+  "notes": "Forest loop from the lodge down the North trail to the Lake Washington shore, back up South Canyon, then over the plateau to the Juanita and Arrowhead trails. Several steep climbs; Discover Pass required to park, and there is a restroom by the beach.",
+  "sources": [
+   "https://www.wta.org/go-hiking/hikes/north-trail-saint-edward-state-park",
+   "https://www.mountaineers.org/activities/activities/frontcountry-trail-run-saint-edward-state-park-30",
+   "https://hikingproject.com/trail/7047820/saint-edward-state-park-outer-loop",
+   "https://www.openstreetmap.org/"
+  ]
+ },
+ {
+  "id": "bridle-trails-state-park",
+  "name": "Bridle Trails State Park Outer Loop",
+  "area": "Kirkland",
+  "kind": "loop",
+  "miles": 4.64,
+  "surfaces": {
+   "dirt": 0.95,
+   "gravel": 0.05
+  },
+  "elevation": "rolling",
+  "start": {
+   "lat": 47.65548,
+   "lon": -122.18498,
+   "label": "Main lot off 116th Ave NE (Raven Trail)"
+  },
+  "bbox": [
+   47.6463,
+   -122.1854,
+   47.6607,
+   -122.165
+  ],
+  "pathNames": [
+   "Raven Trail",
+   "Coyote Trail"
+  ],
+  "waypoints": [
+   [
+    47.65548,
+    -122.18498
+   ],
+   [
+    47.66061,
+    -122.18338
+   ],
+   [
+    47.65609,
+    -122.18103
+   ],
+   [
+    47.65708,
+    -122.17513
+   ],
+   [
+    47.65854,
+    -122.16924
+   ],
+   [
+    47.65748,
+    -122.16545
+   ],
+   [
+    47.65166,
+    -122.16765
+   ],
+   [
+    47.64659,
+    -122.16727
+   ],
+   [
+    47.64684,
+    -122.17645
+   ],
+   [
+    47.6524,
+    -122.17781
+   ]
+  ],
+  "notes": "Outer loop on the Raven and Coyote trails through tall second-growth forest, used as the Bridle Trails Winter Festival race course. Packed dirt and sand shared with horses, which have the right of way; Bellevue calls the surface packed gravel. Muddy in winter; Discover Pass required to park.",
+  "sources": [
+   "https://www.hikingproject.com/trail/7022574/bridle-trails-state-park-outer-loop",
+   "https://www.wta.org/go-hiking/hikes/bridle-trails-state-park",
+   "https://bridletrails.org/visit",
+   "https://bellevuewa.gov/city-government/departments/parks/sports-and-athletics/tracks/hikes",
+   "https://www.openstreetmap.org/"
+  ]
+ },
+ {
+  "id": "sammamish-river-trail",
+  "name": "Sammamish River Trail",
+  "area": "Bothell/Woodinville/Redmond",
+  "kind": "point-to-point",
+  "miles": 10.06,
+  "surfaces": {
+   "asphalt": 0.98,
+   "concrete": 0.02
+  },
+  "elevation": "flat",
+  "start": {
+   "lat": 47.75039,
+   "lon": -122.2109,
+   "label": "Burke-Gilman junction at Blyth Park, Bothell"
+  },
+  "bbox": [
+   47.6626,
+   -122.2109,
+   47.7589,
+   -122.1259
+  ],
+  "pathNames": [
+   "Sammamish River Trail",
+   "Marymoor Connector Trail"
+  ],
+  "waypoints": [
+   [
+    47.75039,
+    -122.2109
+   ],
+   [
+    47.75752,
+    -122.2
+   ],
+   [
+    47.75728,
+    -122.18183
+   ],
+   [
+    47.75165,
+    -122.166
+   ],
+   [
+    47.74078,
+    -122.15291
+   ],
+   [
+    47.72892,
+    -122.14285
+   ],
+   [
+    47.71467,
+    -122.14245
+   ],
+   [
+    47.70013,
+    -122.14364
+   ],
+   [
+    47.68812,
+    -122.13274
+   ],
+   [
+    47.67375,
+    -122.13203
+   ],
+   [
+    47.66259,
+    -122.12587
+   ]
+  ],
+  "notes": "Flat paved trail on the river levee from Bothell past Bothell Landing, through the Woodinville wine-country valley and downtown Redmond to Marymoor Park. Little shade and busy with cyclists on weekends; a soft side path for horses runs alongside parts of the Woodinville stretch.",
+  "sources": [
+   "https://www.traillink.com/trail/sammamish-river-trail/",
+   "https://www.wta.org/go-hiking/hikes/sammamish-river-trail",
+   "https://www.openstreetmap.org/"
+  ]
+ },
+ {
+  "id": "marymoor-park-loop",
+  "name": "Marymoor Park Loop",
+  "area": "Redmond",
+  "kind": "loop",
+  "miles": 4.53,
+  "surfaces": {
+   "asphalt": 0.5,
+   "dirt": 0.25,
+   "gravel": 0.13,
+   "concrete": 0.07,
+   "boardwalk": 0.05
+  },
+  "elevation": "flat",
+  "start": {
+   "lat": 47.66259,
+   "lon": -122.12587,
+   "label": "West side of Marymoor Park at the Sammamish River Trail"
+  },
+  "bbox": [
+   47.6536,
+   -122.1259,
+   47.6641,
+   -122.0976
+  ],
+  "pathNames": [
+   "Marymoor Connector Trail",
+   "East Lake Sammamish Trail",
+   "Heron Loop Trail",
+   "Sparrow Loop Trail",
+   "Marymoor Gateway Trail"
+  ],
+  "waypoints": [
+   [
+    47.66259,
+    -122.12587
+   ],
+   [
+    47.66299,
+    -122.11621
+   ],
+   [
+    47.66403,
+    -122.10997
+   ],
+   [
+    47.66253,
+    -122.0988
+   ],
+   [
+    47.66097,
+    -122.10682
+   ],
+   [
+    47.65469,
+    -122.10788
+   ],
+   [
+    47.65897,
+    -122.1091
+   ],
+   [
+    47.66084,
+    -122.11855
+   ]
+  ],
+  "notes": "Loop from where the Sammamish River Trail arrives, east on the paved Marymoor Connector Trail, south through the meadows to the Audubon BirdLoop boardwalks near Lake Sammamish, and back on grass, gravel and park roads. $1 daily parking; the large off-leash dog area borders the river.",
+  "sources": [
+   "https://kingcounty.gov/en/dept/dnrp/nature-recreation/parks-recreation/king-county-parks/parks/marymoor/parking-passes",
+   "https://kingcountyparks.org/2023/06/05/three-short-spring-walks/",
+   "https://www.openstreetmap.org/"
+  ]
+ },
+ {
+  "id": "redmond-central-connector",
+  "name": "Redmond Central Connector",
+  "area": "Redmond",
+  "kind": "point-to-point",
+  "miles": 3.91,
+  "surfaces": {
+   "asphalt": 0.72,
+   "concrete": 0.28
+  },
+  "elevation": "flat",
+  "start": {
+   "lat": 47.66989,
+   "lon": -122.11122,
+   "label": "East end at the Bear Creek Trail junction near Redmond Way"
+  },
+  "bbox": [
+   47.6699,
+   -122.1541,
+   47.7112,
+   -122.1112
+  ],
+  "pathNames": [
+   "Redmond Central Connector Trail",
+   "Redmond Central Connector"
+  ],
+  "waypoints": [
+   [
+    47.66989,
+    -122.11122
+   ],
+   [
+    47.67253,
+    -122.12211
+   ],
+   [
+    47.67523,
+    -122.13318
+   ],
+   [
+    47.68108,
+    -122.14084
+   ],
+   [
+    47.68731,
+    -122.14714
+   ],
+   [
+    47.6949,
+    -122.1512
+   ],
+   [
+    47.70334,
+    -122.15282
+   ],
+   [
+    47.71121,
+    -122.15405
+   ]
+  ],
+  "notes": "Paved rail trail through downtown Redmond, over the Sammamish River on a restored trestle, then northwest along Willows Rd to Eastrail at NE 124th St; the last section opened in 2025. Concrete plazas downtown, asphalt with gravel shoulders elsewhere.",
+  "sources": [
+   "https://www.redmond.gov/2200/Redmond-Central-Connector-Phase-3",
+   "https://en.wikipedia.org/wiki/Redmond_Central_Connector",
+   "https://www.theurbanist.org/2025/09/12/redmond-celebrates-opening-of-trail-to-eastrail",
+   "https://www.openstreetmap.org/"
+  ]
+ },
+ {
+  "id": "redmond-watershed-preserve",
+  "name": "Redmond Watershed Preserve Loop",
+  "area": "Redmond",
+  "kind": "loop",
+  "miles": 4.51,
+  "surfaces": {
+   "dirt": 0.52,
+   "gravel": 0.48
+  },
+  "elevation": "rolling",
+  "start": {
+   "lat": 47.6968,
+   "lon": -122.05143,
+   "label": "Main trailhead lot, NE Novelty Hill Rd"
+  },
+  "bbox": [
+   47.6968,
+   -122.053,
+   47.7167,
+   -122.0411
+  ],
+  "pathNames": [
+   "Trillium Trail",
+   "I3NW",
+   "Pipeline Regional Trail",
+   "Collin Creek Trail",
+   "Siler's Mill Trail",
+   "PSE Trail"
+  ],
+  "waypoints": [
+   [
+    47.6968,
+    -122.05143
+   ],
+   [
+    47.70299,
+    -122.0518
+   ],
+   [
+    47.70763,
+    -122.05166
+   ],
+   [
+    47.71289,
+    -122.05067
+   ],
+   [
+    47.71638,
+    -122.05156
+   ],
+   [
+    47.71535,
+    -122.04378
+   ],
+   [
+    47.71038,
+    -122.04291
+   ],
+   [
+    47.70862,
+    -122.04619
+   ],
+   [
+    47.70404,
+    -122.04813
+   ],
+   [
+    47.69862,
+    -122.04766
+   ]
+  ],
+  "notes": "Quiet forest and wetland loop: north on the hardpacked gravel Trillium Trail (tagged I3NW in OpenStreetMap), east on the Pipeline Regional Trail, through Siler's Mill and back. No dogs and no fee; some trails are shared with horses and bikes, and junction signs are easy to miss.",
+  "sources": [
+   "https://www.wta.org/go-hiking/hikes/redmond-watershed-preserve",
+   "https://www.hikingproject.com/trail/7024603/redmond-watershed-loop",
+   "https://www.openstreetmap.org/"
+  ]
+ },
+ {
+  "id": "burke-gilman-kenmore-bothell",
+  "name": "Burke-Gilman Trail (Log Boom Park to Blyth Park)",
+  "area": "Kenmore/Bothell",
+  "kind": "point-to-point",
+  "miles": 2.59,
+  "surfaces": {
+   "asphalt": 0.93,
+   "concrete": 0.07
+  },
+  "elevation": "flat",
+  "start": {
+   "lat": 47.758,
+   "lon": -122.26397,
+   "label": "Log Boom Park, Kenmore"
+  },
+  "bbox": [
+   47.75,
+   -122.264,
+   47.7584,
+   -122.2109
+  ],
+  "pathNames": [
+   "Burke-Gilman Trail"
+  ],
+  "waypoints": [
+   [
+    47.758,
+    -122.26397
+   ],
+   [
+    47.75837,
+    -122.25491
+   ],
+   [
+    47.75747,
+    -122.24526
+   ],
+   [
+    47.75596,
+    -122.23618
+   ],
+   [
+    47.75362,
+    -122.22829
+   ],
+   [
+    47.75224,
+    -122.21937
+   ],
+   [
+    47.75039,
+    -122.2109
+   ]
+  ],
+  "notes": "Eastern end of the Burke-Gilman, from Log Boom Park on Lake Washington along the Sammamish River to the bridge into Blyth Park, where it meets the Sammamish River Trail. Flat and paved; busy with cyclists.",
+  "sources": [
+   "https://kingcounty.gov/en/dept/dnrp/nature-recreation/parks-recreation/king-county-parks/trails/leafline-trails/burke-gilman",
+   "https://www.traillink.com/trail/burke-gilman-trail/",
+   "https://www.openstreetmap.org/"
+  ]
+ },
+ {
+  "id": "east-lake-sammamish-trail",
+  "name": "East Lake Sammamish Trail",
+  "area": "Redmond/Sammamish/Issaquah",
+  "kind": "point-to-point",
+  "miles": 10.11,
+  "surfaces": {
+   "asphalt": 0.99,
+   "concrete": 0.01
+  },
+  "elevation": "flat",
+  "start": {
+   "lat": 47.66259,
+   "lon": -122.09887,
+   "label": "North end at Marymoor Park, Redmond"
+  },
+  "bbox": [
+   47.5398,
+   -122.0989,
+   47.6626,
+   -122.039
+  ],
+  "pathNames": [
+   "East Lake Sammamish Trail"
+  ],
+  "waypoints": [
+   [
+    47.66259,
+    -122.09887
+   ],
+   [
+    47.64973,
+    -122.08925
+   ],
+   [
+    47.63792,
+    -122.076
+   ],
+   [
+    47.62465,
+    -122.07122
+   ],
+   [
+    47.61082,
+    -122.07005
+   ],
+   [
+    47.59794,
+    -122.08128
+   ],
+   [
+    47.58563,
+    -122.08414
+   ],
+   [
+    47.57485,
+    -122.07194
+   ],
+   [
+    47.567,
+    -122.05425
+   ],
+   [
+    47.55436,
+    -122.04508
+   ],
+   [
+    47.53984,
+    -122.03901
+   ]
+  ],
+  "notes": "Paved 12-foot rail trail with gravel shoulders along Lake Sammamish's east shore from Marymoor Park to Issaquah, where it meets the Issaquah-Preston Trail. A 600-foot section between Louis Thompson Rd NE and NE Inglewood Hill Rd is closed for culvert work through the end of 2026 with no signed detour.",
+  "sources": [
+   "https://kingcounty.gov/en/dept/dnrp/nature-recreation/parks-recreation/king-county-parks/trails/leafline-trails/east-lake-sammamish",
+   "https://www.seattlebikeblog.com/?p=524543",
+   "https://www.openstreetmap.org/"
+  ]
+ },
+ {
+  "id": "issaquah-preston-trail",
+  "name": "Issaquah-Preston Trail",
+  "area": "Issaquah",
+  "kind": "point-to-point",
+  "miles": 4.76,
+  "surfaces": {
+   "gravel": 0.7,
+   "asphalt": 0.3
+  },
+  "elevation": "rolling",
+  "start": {
+   "lat": 47.54292,
+   "lon": -122.04027,
+   "label": "Junction with the East Lake Sammamish Trail at 4th Ave NW, Issaquah"
+  },
+  "bbox": [
+   47.5318,
+   -122.0403,
+   47.5429,
+   -121.9566
+  ],
+  "pathNames": [
+   "Issaquah-Preston Trail",
+   "Issaquah-High Point Trail"
+  ],
+  "waypoints": [
+   [
+    47.54292,
+    -122.04027
+   ],
+   [
+    47.53848,
+    -122.03319
+   ],
+   [
+    47.5326,
+    -122.02632
+   ],
+   [
+    47.53504,
+    -122.01688
+   ],
+   [
+    47.53745,
+    -122.00761
+   ],
+   [
+    47.53377,
+    -121.99799
+   ],
+   [
+    47.53242,
+    -121.98684
+   ],
+   [
+    47.53395,
+    -121.97645
+   ],
+   [
+    47.53601,
+    -121.96748
+   ],
+   [
+    47.5333,
+    -121.95662
+   ]
+  ],
+  "notes": "Old rail grade east from Issaquah alongside I-90: paved at the west end, then compacted gravel and dirt past the High Point trailhead. Steady gentle climb eastbound, freeway noise and some muddy, uneven patches; the last stretch to Preston follows the SE High Point Way shoulder.",
+  "sources": [
+   "https://www.wta.org/go-hiking/hikes/issaquah-preston-trail",
+   "https://www.traillink.com/trail/issaquah-preston-trail/",
+   "https://www.mountaineers.org/activities/routes-places/issaquah-preston-trail",
+   "https://www.openstreetmap.org/"
+  ]
+ },
+ {
+  "id": "cougar-mountain-red-town-loop",
+  "name": "Cougar Mountain Wildside and De Leo Wall Loop",
+  "area": "Cougar Mountain",
+  "kind": "loop",
+  "miles": 3.89,
+  "surfaces": {
+   "dirt": 0.98,
+   "gravel": 0.02
+  },
+  "elevation": "hilly",
+  "start": {
+   "lat": 47.53472,
+   "lon": -122.12873,
+   "label": "Red Town Trailhead, Lakemont Blvd SE"
+  },
+  "bbox": [
+   47.521,
+   -122.1421,
+   47.5347,
+   -122.1246
+  ],
+  "pathNames": [
+   "Wildside Trail",
+   "De Leo Wall Trail",
+   "Marshall's Hill Trail",
+   "Marshalls Hill Trail",
+   "Red Town Trail"
+  ],
+  "waypoints": [
+   [
+    47.53472,
+    -122.12873
+   ],
+   [
+    47.52986,
+    -122.12783
+   ],
+   [
+    47.52539,
+    -122.12496
+   ],
+   [
+    47.52183,
+    -122.1277
+   ],
+   [
+    47.5213,
+    -122.1344
+   ],
+   [
+    47.52375,
+    -122.13841
+   ],
+   [
+    47.52629,
+    -122.14029
+   ],
+   [
+    47.52657,
+    -122.13339
+   ],
+   [
+    47.52641,
+    -122.127
+   ],
+   [
+    47.52986,
+    -122.12783
+   ]
+  ],
+  "notes": "Popular Cougar Mountain loop from Red Town on the Wildside, De Leo Wall and Marshall's Hill trails, about 500 feet of climbing on rooty forest singletrack that gets muddy in winter. Part of the De Leo Wall area is on private land.",
+  "sources": [
+   "https://www.wta.org/go-hiking/hikes/wildside-trail-de-leo-wall",
+   "https://www.issaquahalps.org/hikesandevents/2023/5/6/native-plant-identification-hike-to-de-leo-wall",
+   "https://www.openstreetmap.org/"
+  ]
+ },
+ {
+  "id": "newcastle-may-creek-lake-boren",
+  "name": "May Creek and Waterline Trails (Newcastle)",
+  "area": "Newcastle",
+  "kind": "out-and-back",
+  "miles": 3.5,
+  "surfaces": {
+   "dirt": 0.89,
+   "concrete": 0.08,
+   "asphalt": 0.03
+  },
+  "elevation": "rolling",
+  "start": {
+   "lat": 47.52939,
+   "lon": -122.16551,
+   "label": "Lake Boren Park, Newcastle"
+  },
+  "bbox": [
+   47.5181,
+   -122.1844,
+   47.5294,
+   -122.1654
+  ],
+  "pathNames": [
+   "May Creek Trail",
+   "Waterline Trail"
+  ],
+  "waypoints": [
+   [
+    47.52939,
+    -122.16551
+   ],
+   [
+    47.52663,
+    -122.16704
+   ],
+   [
+    47.52202,
+    -122.16549
+   ],
+   [
+    47.52252,
+    -122.1705
+   ],
+   [
+    47.52125,
+    -122.17454
+   ],
+   [
+    47.51915,
+    -122.1787
+   ],
+   [
+    47.51859,
+    -122.18435
+   ]
+  ],
+  "notes": "Out-and-back from Lake Boren Park south on the Waterline Trail, then west on the May Creek Trail through a wooded ravine to the Windtree neighborhood entrance near SE 93rd St, about 1.75 miles each way. Dirt singletrack with short sidewalk links.",
+  "sources": [
+   "https://www.wta.org/go-hiking/hikes/may-creek-trail",
+   "https://newcastlewa.gov/news/what_s_new/trail_of_month___may_creek_park___trail",
+   "https://www.wta.org/go-hiking/hikes/waterline-trail",
+   "https://www.openstreetmap.org/"
+  ]
+ },
+ {
+  "id": "alki-trail",
+  "name": "Alki Trail: Seacrest Park to Alki Beach",
+  "area": "Alki",
+  "kind": "out-and-back",
+  "miles": 5.0,
+  "surfaces": {
+   "concrete": 0.65,
+   "asphalt": 0.35
+  },
+  "elevation": "flat",
+  "start": {
+   "lat": 47.5886,
+   "lon": -122.3798,
+   "label": "Seacrest Park (water taxi dock), Harbor Ave SW"
+  },
+  "bbox": [
+   47.5773,
+   -122.4162,
+   47.5955,
+   -122.3794
+  ],
+  "pathNames": [
+   "Alki Trail",
+   "Alki Avenue Southwest",
+   "Harbor Avenue Southwest"
+  ],
+  "waypoints": [
+   [
+    47.5884,
+    -122.3797
+   ],
+   [
+    47.5914,
+    -122.3824
+   ],
+   [
+    47.5951,
+    -122.3853
+   ],
+   [
+    47.5936,
+    -122.3903
+   ],
+   [
+    47.5906,
+    -122.393
+   ],
+   [
+    47.5879,
+    -122.3961
+   ],
+   [
+    47.5836,
+    -122.4011
+   ],
+   [
+    47.5813,
+    -122.4055
+   ],
+   [
+    47.5792,
+    -122.4105
+   ],
+   [
+    47.5776,
+    -122.4159
+   ]
+  ],
+  "notes": "Flat waterfront run around Duwamish Head to the west end of Alki Beach, with a wide concrete pedestrian promenade beside a separate asphalt bike path (the Harbor Ave stretch is a widened sidewalk-style path). Very crowded on sunny weekends; restrooms at Seacrest Park and the Alki Bathhouse.",
+  "sources": [
+   "https://outdoorproject.com/node/2075",
+   "https://seattle.gov/Documents/Departments/SDOT/BikeProgram/All_SDOTTrailDescriptions_FINAL.pdf",
+   "https://www.traillink.com/trail/alki-trail/",
+   "https://www.openstreetmap.org/way/31445054",
+   "https://www.openstreetmap.org/way/161130398"
+  ]
+ },
+ {
+  "id": "lincoln-park-loop",
+  "name": "Lincoln Park Waterfront and Bluff Loop",
+  "area": "Lincoln Park / Fauntleroy",
+  "kind": "loop",
+  "miles": 2.3,
+  "surfaces": {
+   "gravel": 0.55,
+   "asphalt": 0.2,
+   "dirt": 0.25
+  },
+  "elevation": "rolling",
+  "start": {
+   "lat": 47.5364,
+   "lon": -122.3932,
+   "label": "Lincoln Park north parking lot, Fauntleroy Way SW"
+  },
+  "bbox": [
+   47.5258,
+   -122.4016,
+   47.5373,
+   -122.3929
+  ],
+  "pathNames": [
+   "Trail #1",
+   "Trail #2",
+   "Beach Trail",
+   "Trail #8",
+   "Trail #9",
+   "Trail #11"
+  ],
+  "waypoints": [
+   [
+    47.5364,
+    -122.3932
+   ],
+   [
+    47.5371,
+    -122.396
+   ],
+   [
+    47.5344,
+    -122.3964
+   ],
+   [
+    47.5316,
+    -122.3998
+   ],
+   [
+    47.5304,
+    -122.4014
+   ],
+   [
+    47.5285,
+    -122.3987
+   ],
+   [
+    47.5261,
+    -122.3947
+   ],
+   [
+    47.5267,
+    -122.3933
+   ],
+   [
+    47.5285,
+    -122.3973
+   ],
+   [
+    47.5313,
+    -122.3985
+   ],
+   [
+    47.535,
+    -122.395
+   ],
+   [
+    47.5364,
+    -122.3932
+   ]
+  ],
+  "notes": "Drops to the Puget Sound shoreline path past Colman Pool, then climbs and returns on the gravel bluff-top trail. The north waterfront is packed gravel and the stretch south of Colman Pool is paved; inland trails get muddy in winter, and restrooms are in the park.",
+  "sources": [
+   "https://www.trailrunproject.com/trail/7020453/beachfront-trail",
+   "https://www.wta.org/go-hiking/trip-reports/trip_report.2012-02-20.6108513245",
+   "https://www.10adventures.com/hikes/seattle/lincoln-park-trail",
+   "https://www.openstreetmap.org/way/31113454",
+   "https://www.openstreetmap.org/way/25397856",
+   "https://www.openstreetmap.org/way/854295982"
+  ]
+ },
+ {
+  "id": "schmitz-preserve-loop",
+  "name": "Schmitz Preserve Park Loop",
+  "area": "Alki / Admiral (Schmitz Preserve)",
+  "kind": "loop",
+  "miles": 1.5,
+  "surfaces": {
+   "dirt": 0.9,
+   "concrete": 0.1
+  },
+  "elevation": "rolling",
+  "start": {
+   "lat": 47.5776,
+   "lon": -122.4002,
+   "label": "Schmitz Preserve entrance, SW Admiral Way"
+  },
+  "bbox": [
+   47.5716,
+   -122.4024,
+   47.5779,
+   -122.3968
+  ],
+  "pathNames": [
+   "Schmitz Boulevard"
+  ],
+  "waypoints": [
+   [
+    47.5776,
+    -122.4002
+   ],
+   [
+    47.5765,
+    -122.4007
+   ],
+   [
+    47.5757,
+    -122.4011
+   ],
+   [
+    47.5748,
+    -122.4018
+   ],
+   [
+    47.5737,
+    -122.4001
+   ],
+   [
+    47.5728,
+    -122.3991
+   ],
+   [
+    47.5719,
+    -122.4002
+   ],
+   [
+    47.5741,
+    -122.3996
+   ],
+   [
+    47.5739,
+    -122.397
+   ],
+   [
+    47.575,
+    -122.399
+   ],
+   [
+    47.5758,
+    -122.3979
+   ],
+   [
+    47.5776,
+    -122.4002
+   ]
+  ],
+  "notes": "Short figure-eight on dirt trails up an old-growth ravine, with roots, a few steep pitches and mud in wet months. No bikes and almost no trail signs; this version closes the loop on the SW Admiral Way sidewalk.",
+  "sources": [
+   "https://www.wta.org/go-hiking/hikes/schmitz-preserve-park",
+   "https://archive.seattletimes.com/archive/20020221/walk21/schmitz-park-trails",
+   "https://www.parentmap.com/article/city-forest-walks-seattle-and-eastside-families/3",
+   "https://www.openstreetmap.org/way/204190758",
+   "https://www.openstreetmap.org/way/75209826"
+  ]
+ },
+ {
+  "id": "camp-long-loop",
+  "name": "Camp Long Forest Loop",
+  "area": "Camp Long / Delridge",
+  "kind": "loop",
+  "miles": 1.2,
+  "surfaces": {
+   "gravel": 0.55,
+   "dirt": 0.45
+  },
+  "elevation": "rolling",
+  "start": {
+   "lat": 47.5556,
+   "lon": -122.3752,
+   "label": "Camp Long lodge, near the 35th Ave SW entrance"
+  },
+  "bbox": [
+   47.554,
+   -122.3755,
+   47.5598,
+   -122.3705
+  ],
+  "pathNames": [
+   "Lower Loop Trail",
+   "Middle Loop Trail",
+   "Ridge Trail",
+   "Animal Tracks Nature Trail"
+  ],
+  "waypoints": [
+   [
+    47.5556,
+    -122.3752
+   ],
+   [
+    47.5571,
+    -122.3743
+   ],
+   [
+    47.5585,
+    -122.3747
+   ],
+   [
+    47.5596,
+    -122.3748
+   ],
+   [
+    47.5588,
+    -122.374
+   ],
+   [
+    47.5583,
+    -122.3737
+   ],
+   [
+    47.5582,
+    -122.3725
+   ],
+   [
+    47.5563,
+    -122.3709
+   ],
+   [
+    47.5543,
+    -122.3712
+   ],
+   [
+    47.5549,
+    -122.373
+   ],
+   [
+    47.5556,
+    -122.3752
+   ]
+  ],
+  "notes": "Short loop on gravel and dirt trails through a forested park, with interconnecting paths that are easy to mix up. Restrooms at the lodge; extend it on the Longfellow Creek trail just to the east.",
+  "sources": [
+   "https://www.wta.org/go-hiking/hikes/camp-long",
+   "https://www.10adventures.com/hikes/seattle/camp-long-loop-trail",
+   "https://www.fitmamarealfood.com/hike-camp-long/",
+   "https://www.openstreetmap.org/way/850581970",
+   "https://www.openstreetmap.org/way/849600057"
+  ]
+ },
+ {
+  "id": "longfellow-creek-trail",
+  "name": "Longfellow Creek Legacy Trail",
+  "area": "Delridge / Westwood",
+  "kind": "point-to-point",
+  "miles": 4.2,
+  "surfaces": {
+   "asphalt": 0.35,
+   "concrete": 0.2,
+   "gravel": 0.25,
+   "dirt": 0.2
+  },
+  "elevation": "rolling",
+  "start": {
+   "lat": 47.5193,
+   "lon": -122.3676,
+   "label": "Roxhill Park, SW Roxbury St (south end)"
+  },
+  "bbox": [
+   47.519,
+   -122.368,
+   47.5679,
+   -122.3603
+  ],
+  "pathNames": [
+   "Longfellow Creek Legacy Trail",
+   "24th Avenue Southwest"
+  ],
+  "waypoints": [
+   [
+    47.5193,
+    -122.3676
+   ],
+   [
+    47.5227,
+    -122.3672
+   ],
+   [
+    47.5284,
+    -122.365
+   ],
+   [
+    47.5318,
+    -122.361
+   ],
+   [
+    47.5355,
+    -122.3613
+   ],
+   [
+    47.5409,
+    -122.3633
+   ],
+   [
+    47.5464,
+    -122.3638
+   ],
+   [
+    47.5501,
+    -122.3644
+   ],
+   [
+    47.5538,
+    -122.3663
+   ],
+   [
+    47.5587,
+    -122.3664
+   ],
+   [
+    47.5631,
+    -122.3664
+   ],
+   [
+    47.5676,
+    -122.3672
+   ]
+  ],
+  "notes": "Creek-side trail from Roxhill Park north through Westwood and Delridge to near SW Yancy St, stitching paved paths, crushed gravel, dirt and short stretches of neighborhood sidewalk. Signage is patchy and there are several street crossings; Camp Long is a short detour west.",
+  "sources": [
+   "https://www.wta.org/go-hiking/hikes/longfellow-creek",
+   "https://archive.seattletimes.com/archive/20050818/nwwcreek18/the-poetry-of-longfellow-creek",
+   "https://www.openstreetmap.org/way/31659068",
+   "https://www.openstreetmap.org/way/1099769455",
+   "https://www.openstreetmap.org/way/760451305"
+  ]
+ },
+ {
+  "id": "westcrest-park-greenbelt",
+  "name": "Westcrest Park and West Duwamish Greenbelt",
+  "area": "Highland Park (Westcrest Park)",
+  "kind": "network",
+  "miles": 2.5,
+  "surfaces": {
+   "dirt": 0.95,
+   "gravel": 0.05
+  },
+  "elevation": "rolling",
+  "start": {
+   "lat": 47.521,
+   "lon": -122.3433,
+   "label": "Westcrest Park south parking lot, off 8th Ave SW"
+  },
+  "bbox": [
+   47.5196,
+   -122.3433,
+   47.5322,
+   -122.3376
+  ],
+  "pathNames": [
+   "Douglas Fir Trail",
+   "West Duwamish Greenbelt Trail"
+  ],
+  "waypoints": [
+   [
+    47.521,
+    -122.3433
+   ],
+   [
+    47.5199,
+    -122.3424
+   ],
+   [
+    47.5209,
+    -122.3416
+   ],
+   [
+    47.5222,
+    -122.3405
+   ],
+   [
+    47.5236,
+    -122.3395
+   ],
+   [
+    47.5257,
+    -122.3379
+   ],
+   [
+    47.5273,
+    -122.3383
+   ],
+   [
+    47.5319,
+    -122.3408
+   ],
+   [
+    47.5273,
+    -122.3383
+   ],
+   [
+    47.5262,
+    -122.3398
+   ],
+   [
+    47.5234,
+    -122.3416
+   ],
+   [
+    47.521,
+    -122.3433
+   ]
+  ],
+  "notes": "Dirt forest loop on the Douglas Fir and West Duwamish Greenbelt trails, with an out-and-back north along the greenbelt singletrack. Expect roots, mud after rain and many unsigned junctions; the greenbelt section is rougher, and the park has a large off-leash dog area.",
+  "sources": [
+   "https://www.wta.org/go-hiking/hikes/westcrest-park",
+   "https://www.wta.org/go-hiking/hikes/west-duwamish-greenbelt-trails",
+   "https://www.hikingproject.com/trail/7110531/west-duwamish-greenbelt-trail",
+   "https://www.seattle.gov/documents/Departments/ParksAndRecreation/Reserve/Picnic/Westcrest_Map_Directions_2023.pdf",
+   "https://www.openstreetmap.org/way/371655587",
+   "https://www.openstreetmap.org/way/1245725626"
+  ]
+ },
+ {
+  "id": "duwamish-trail",
+  "name": "Duwamish Trail",
+  "area": "Duwamish / West Marginal Way",
+  "kind": "point-to-point",
+  "miles": 3.6,
+  "surfaces": {
+   "asphalt": 0.9,
+   "concrete": 0.1
+  },
+  "elevation": "flat",
+  "start": {
+   "lat": 47.5712,
+   "lon": -122.3579,
+   "label": "Spokane St low bridge, where the Alki and West Seattle Bridge trails meet"
+  },
+  "bbox": [
+   47.5317,
+   -122.3582,
+   47.5715,
+   -122.3225
+  ],
+  "pathNames": [
+   "Duwamish Trail",
+   "West Seattle Bridge Trail",
+   "West Marginal Way Southwest"
+  ],
+  "waypoints": [
+   [
+    47.5712,
+    -122.3579
+   ],
+   [
+    47.5673,
+    -122.3541
+   ],
+   [
+    47.5639,
+    -122.3524
+   ],
+   [
+    47.5582,
+    -122.3515
+   ],
+   [
+    47.5547,
+    -122.3477
+   ],
+   [
+    47.5503,
+    -122.3457
+   ],
+   [
+    47.5455,
+    -122.3446
+   ],
+   [
+    47.541,
+    -122.3428
+   ],
+   [
+    47.5397,
+    -122.3362
+   ],
+   [
+    47.5357,
+    -122.3331
+   ],
+   [
+    47.5334,
+    -122.3281
+   ],
+   [
+    47.532,
+    -122.3228
+   ]
+  ],
+  "notes": "Flat paved trail beside West Marginal Way from the Spokane St low bridge south past Herring's House Park toward SR 99. Industrial and exposed with truck traffic alongside but separated from it; the 2023 connection links it to the West Seattle Bridge and Alki trails.",
+  "sources": [
+   "https://www.traillink.com/trail/duwamish-bikeway/",
+   "https://www.wta.org/go-hiking/hikes/duwamish-trail",
+   "https://www.theurbanist.org/2023/12/07/completed-duwamish-trail-connection-led-to-doubling-of-walking-and-biking",
+   "https://www.openstreetmap.org/way/758833601",
+   "https://www.openstreetmap.org/way/1036092663"
+  ]
+ },
+ {
+  "id": "seward-park-loop",
+  "name": "Seward Park Loop",
+  "area": "Seward Park",
+  "kind": "loop",
+  "miles": 2.4,
+  "surfaces": {
+   "asphalt": 1.0
+  },
+  "elevation": "flat",
+  "start": {
+   "lat": 47.5512,
+   "lon": -122.257,
+   "label": "Seward Park main parking lot by the beach"
+  },
+  "bbox": [
+   47.5486,
+   -122.2576,
+   47.5622,
+   -122.2465
+  ],
+  "pathNames": [
+   "Shore Loop Road"
+  ],
+  "waypoints": [
+   [
+    47.5512,
+    -122.257
+   ],
+   [
+    47.549,
+    -122.254
+   ],
+   [
+    47.549,
+    -122.2524
+   ],
+   [
+    47.5521,
+    -122.247
+   ],
+   [
+    47.5547,
+    -122.247
+   ],
+   [
+    47.5574,
+    -122.2479
+   ],
+   [
+    47.5601,
+    -122.2493
+   ],
+   [
+    47.5621,
+    -122.2517
+   ],
+   [
+    47.561,
+    -122.2552
+   ],
+   [
+    47.5583,
+    -122.255
+   ],
+   [
+    47.5551,
+    -122.2547
+   ],
+   [
+    47.5512,
+    -122.257
+   ]
+  ],
+  "notes": "Flat paved loop around the Bailey Peninsula right at the Lake Washington shore, shared with bikes, strollers and walkers. Restrooms near the main lot; busiest on weekend afternoons, calmer early or midweek.",
+  "sources": [
+   "https://www.wta.org/go-hiking/hikes/seward-park",
+   "https://en.wikipedia.org/wiki/Seward_Park_(Seattle)",
+   "https://www.10adventures.com/hikes/seattle/seward-park-loop-trail",
+   "https://www.openstreetmap.org/way/158800185"
+  ]
+ },
+ {
+  "id": "seward-park-forest-trails",
+  "name": "Seward Park Forest Trails",
+  "area": "Seward Park",
+  "kind": "network",
+  "miles": 2.3,
+  "surfaces": {
+   "gravel": 0.6,
+   "dirt": 0.25,
+   "asphalt": 0.15
+  },
+  "elevation": "rolling",
+  "start": {
+   "lat": 47.5512,
+   "lon": -122.257,
+   "label": "Seward Park main parking lot by the beach"
+  },
+  "bbox": [
+   47.5494,
+   -122.2575,
+   47.562,
+   -122.2499
+  ],
+  "pathNames": [
+   "Sqebeqsed Trail",
+   "Bald Eagle Trail",
+   "Broken Tree Trail",
+   "Huckleberry Trail",
+   "Erratic Trail",
+   "Licorice Fern Trail",
+   "Andrews Bay Trail",
+   "Woodpecker Trail"
+  ],
+  "waypoints": [
+   [
+    47.5512,
+    -122.257
+   ],
+   [
+    47.5499,
+    -122.2553
+   ],
+   [
+    47.5518,
+    -122.2552
+   ],
+   [
+    47.5515,
+    -122.2516
+   ],
+   [
+    47.5529,
+    -122.2506
+   ],
+   [
+    47.5551,
+    -122.2504
+   ],
+   [
+    47.5573,
+    -122.2521
+   ],
+   [
+    47.5606,
+    -122.2506
+   ],
+   [
+    47.5618,
+    -122.2534
+   ],
+   [
+    47.559,
+    -122.252
+   ],
+   [
+    47.5562,
+    -122.253
+   ],
+   [
+    47.5548,
+    -122.2541
+   ]
+  ],
+  "notes": "Gravel and dirt trails through the park's old-growth interior, using the 0.9-mile Sqebeqsed (spine) trail as the backbone and returning on the shore loop. Roots and mud in wet months; the trails are short and interconnected, so loops are easy to add.",
+  "sources": [
+   "https://www.wta.org/go-hiking/hikes/seward-park",
+   "https://www.komoot.com/highlight/729551",
+   "https://www.theoutbound.com/washington/running/109583",
+   "https://www.openstreetmap.org/way/159428819"
+  ]
+ },
+ {
+  "id": "lake-washington-blvd-south",
+  "name": "Lake Washington Blvd: Mount Baker Beach to Seward Park",
+  "area": "Mount Baker / Lake Washington Blvd S",
+  "kind": "out-and-back",
+  "miles": 6.2,
+  "surfaces": {
+   "asphalt": 0.88,
+   "gravel": 0.07,
+   "dirt": 0.05
+  },
+  "elevation": "flat",
+  "start": {
+   "lat": 47.5856,
+   "lon": -122.287,
+   "label": "Mount Baker Park beach, Lake Washington Blvd S"
+  },
+  "bbox": [
+   47.5513,
+   -122.288,
+   47.5859,
+   -122.2596
+  ],
+  "pathNames": [
+   "Lake Washington Boulevard South"
+  ],
+  "waypoints": [
+   [
+    47.5856,
+    -122.287
+   ],
+   [
+    47.5821,
+    -122.2859
+   ],
+   [
+    47.5785,
+    -122.2835
+   ],
+   [
+    47.5745,
+    -122.2812
+   ],
+   [
+    47.5709,
+    -122.2801
+   ],
+   [
+    47.57,
+    -122.2748
+   ],
+   [
+    47.5678,
+    -122.2705
+   ],
+   [
+    47.5648,
+    -122.2671
+   ],
+   [
+    47.5618,
+    -122.2668
+   ],
+   [
+    47.5588,
+    -122.2635
+   ],
+   [
+    47.5552,
+    -122.2614
+   ],
+   [
+    47.5516,
+    -122.2599
+   ]
+  ],
+  "notes": "Paved lakeside path from Mount Baker Beach past Stan Sayres and Genesee Park to the Seward Park entrance, about 3.1 miles each way. Narrow and shared with walkers and bikes, with a few spots where the bank has eroded; add the Seward Park loop for more.",
+  "sources": [
+   "https://www.wta.org/go-hiking/hikes/lake-washington-boulevard",
+   "https://www.wta.org/go-hiking/trip-reports/trip_report.2023-11-29.1426545706",
+   "https://southseattleemerald.org/2022/10/25/task-force-weighs-redesign-options-for-lake-washington-boulevard",
+   "https://www.openstreetmap.org/way/1211752312",
+   "https://www.openstreetmap.org/way/160411613"
+  ]
+ },
+ {
+  "id": "genesee-park-loop",
+  "name": "Genesee Park Gravel Loop",
+  "area": "Genesee Park / Columbia City",
+  "kind": "loop",
+  "miles": 0.8,
+  "surfaces": {
+   "gravel": 0.85,
+   "dirt": 0.15
+  },
+  "elevation": "flat",
+  "start": {
+   "lat": 47.5653,
+   "lon": -122.2788,
+   "label": "Genesee Park, south end of the gravel loop"
+  },
+  "bbox": [
+   47.565,
+   -122.2795,
+   47.57,
+   -122.2768
+  ],
+  "pathNames": [],
+  "waypoints": [
+   [
+    47.5653,
+    -122.2788
+   ],
+   [
+    47.5666,
+    -122.279
+   ],
+   [
+    47.5678,
+    -122.2792
+   ],
+   [
+    47.5693,
+    -122.2793
+   ],
+   [
+    47.5698,
+    -122.2777
+   ],
+   [
+    47.5687,
+    -122.2774
+   ],
+   [
+    47.5671,
+    -122.277
+   ],
+   [
+    47.5656,
+    -122.2778
+   ],
+   [
+    47.5653,
+    -122.2788
+   ]
+  ],
+  "notes": "Short flat gravel loop around the Genesee Park meadows across Lake Washington Blvd from Stan Sayres. Good for repeats or as an add-on to the lakeside path; very busy during Seafair in early August.",
+  "sources": [
+   "https://hiiker.app/hikes/washington/king-county/genesee-park-loop",
+   "https://www.seattle.gov/documents/Departments/ParksAndRecreation/Reserve/2025%20Permit%20Maps%20-%20ADA/Genesee%20Map_Directions%202025.pdf",
+   "https://www.openstreetmap.org/way/160411624"
+  ]
+ },
+ {
+  "id": "jefferson-park-golf-loop",
+  "name": "Jefferson Park Golf Course Loop",
+  "area": "Beacon Hill (Jefferson Park)",
+  "kind": "loop",
+  "miles": 2.1,
+  "surfaces": {
+   "gravel": 0.65,
+   "concrete": 0.35
+  },
+  "elevation": "rolling",
+  "start": {
+   "lat": 47.5718,
+   "lon": -122.308,
+   "label": "Beacon Ave S and S Spokane St, north end of Jefferson Park"
+  },
+  "bbox": [
+   47.561,
+   -122.3083,
+   47.573,
+   -122.299
+  ],
+  "pathNames": [
+   "South Spokane Street",
+   "Cheasty Boulevard South",
+   "Beacon Avenue South"
+  ],
+  "waypoints": [
+   [
+    47.5718,
+    -122.308
+   ],
+   [
+    47.5719,
+    -122.305
+   ],
+   [
+    47.5719,
+    -122.3019
+   ],
+   [
+    47.5726,
+    -122.2993
+   ],
+   [
+    47.57,
+    -122.2993
+   ],
+   [
+    47.5682,
+    -122.2994
+   ],
+   [
+    47.5655,
+    -122.2997
+   ],
+   [
+    47.5637,
+    -122.3022
+   ],
+   [
+    47.5613,
+    -122.3048
+   ],
+   [
+    47.564,
+    -122.3058
+   ],
+   [
+    47.5677,
+    -122.3067
+   ],
+   [
+    47.5718,
+    -122.308
+   ]
+  ],
+  "notes": "Loop around the Jefferson Park golf course on Beacon Hill: gravel paths along S Spokane St and Cheasty Blvd S, back on the paved Beacon Ave S side. Little is published about this path, so it rests mainly on OpenStreetMap; the park next door has paved paths and a community center.",
+  "sources": [
+   "https://www.seattle.gov/Documents/Departments/ParksAndRecreation/PoliciesPlanning/Plans/Seattle%20Golf%20Master%20Plan.pdf",
+   "https://en.wikipedia.org/wiki/Jefferson_Park_(Seattle)",
+   "https://www.openstreetmap.org/way/1286488170",
+   "https://www.openstreetmap.org/way/1289262265",
+   "https://www.openstreetmap.org/way/1286472496"
+  ]
+ },
+ {
+  "id": "chief-sealth-trail",
+  "name": "Chief Sealth Trail",
+  "area": "Beacon Hill to Rainier Beach",
+  "kind": "point-to-point",
+  "miles": 3.6,
+  "surfaces": {
+   "asphalt": 0.95,
+   "concrete": 0.05
+  },
+  "elevation": "hilly",
+  "start": {
+   "lat": 47.5605,
+   "lon": -122.3133,
+   "label": "15th Ave S and S Angeline St (north end)"
+  },
+  "bbox": [
+   47.5122,
+   -122.3136,
+   47.5608,
+   -122.2699
+  ],
+  "pathNames": [
+   "Chief Sealth Trail"
+  ],
+  "waypoints": [
+   [
+    47.5605,
+    -122.3133
+   ],
+   [
+    47.5595,
+    -122.3113
+   ],
+   [
+    47.5569,
+    -122.3054
+   ],
+   [
+    47.5547,
+    -122.2998
+   ],
+   [
+    47.5499,
+    -122.2968
+   ],
+   [
+    47.5448,
+    -122.293
+   ],
+   [
+    47.5393,
+    -122.2891
+   ],
+   [
+    47.5352,
+    -122.2865
+   ],
+   [
+    47.5309,
+    -122.2832
+   ],
+   [
+    47.5244,
+    -122.2791
+   ],
+   [
+    47.5178,
+    -122.2747
+   ],
+   [
+    47.5125,
+    -122.2702
+   ]
+  ],
+  "notes": "Paved trail under the power lines from Beacon Hill to S Gazelle St near Kubota Garden, with steep dips and climbs at most street crossings and a hard final mile past Rainier Beach. Little shade; sources give 3.6 to 4.3 miles.",
+  "sources": [
+   "https://www.wta.org/go-hiking/hikes/chief-sealth-trail",
+   "https://www.traillink.com/trail/chief-sealth-trail/",
+   "https://sdotblog.seattle.gov/2017/10/24/pedal-your-way-through-seattle-5-trails-for-a-leisurely-fall-bike-adventure/",
+   "https://www.openstreetmap.org/way/29324207",
+   "https://www.openstreetmap.org/way/260376971"
+  ]
+ },
+ {
+  "id": "cheasty-greenspace-trails",
+  "name": "Cheasty Greenspace Trails",
+  "area": "Beacon Hill (Cheasty Greenspace)",
+  "kind": "network",
+  "miles": 1.3,
+  "surfaces": {
+   "dirt": 1.0
+  },
+  "elevation": "hilly",
+  "start": {
+   "lat": 47.5682,
+   "lon": -122.2993,
+   "label": "Cheasty Blvd S at S Andover St (north trailhead)"
+  },
+  "bbox": [
+   47.5634,
+   -122.3016,
+   47.5688,
+   -122.2981
+  ],
+  "pathNames": [
+   "Ninebark Trail",
+   "Mock Orange Trail"
+  ],
+  "waypoints": [
+   [
+    47.5686,
+    -122.2993
+   ],
+   [
+    47.5678,
+    -122.2987
+   ],
+   [
+    47.5671,
+    -122.2985
+   ],
+   [
+    47.5665,
+    -122.2989
+   ],
+   [
+    47.5654,
+    -122.2985
+   ],
+   [
+    47.5642,
+    -122.2991
+   ],
+   [
+    47.5636,
+    -122.3
+   ],
+   [
+    47.564,
+    -122.3014
+   ]
+  ],
+  "notes": "Short hilly dirt run out and back on the multi-use Ninebark Trail and the Mock Orange connector on the Beacon Hill slope. Trillium, Red Cedar and Cottonwood are bike-only, so check the posted map; both ends meet the gravel path along Cheasty Blvd S, so it pairs with the Jefferson Park golf course loop.",
+  "sources": [
+   "https://www.singletracks.com/mtb-trails/the-cheasty-greenspace-is-home-to-seattles-first-forested-urban-mtb-trail/",
+   "https://www.seattle.gov/documents/Departments/ParksAndRecreation/Projects/Cheasty/CheastyTrailsNorthLoopDNS_Analysis-FINAL.pdf",
+   "https://www.seattlebikeblog.com/2025/10/21/october-25-seattles-longest-mountain-bike-loop-trail-opens-in-cheasty-greenspace/",
+   "https://www.openstreetmap.org/way/1358289307",
+   "https://www.openstreetmap.org/way/1278931841"
+  ]
+ },
+ {
+  "id": "sodo-trail",
+  "name": "SODO Trail",
+  "area": "SoDo / Georgetown",
+  "kind": "out-and-back",
+  "miles": 2.0,
+  "surfaces": {
+   "asphalt": 1.0
+  },
+  "elevation": "flat",
+  "start": {
+   "lat": 47.5925,
+   "lon": -122.327,
+   "label": "S Royal Brougham Way near the stadiums (north end)"
+  },
+  "bbox": [
+   47.5776,
+   -122.3275,
+   47.5927,
+   -122.3268
+  ],
+  "pathNames": [
+   "SODO Trail"
+  ],
+  "waypoints": [
+   [
+    47.5925,
+    -122.327
+   ],
+   [
+    47.5894,
+    -122.3271
+   ],
+   [
+    47.586,
+    -122.3273
+   ],
+   [
+    47.5819,
+    -122.3273
+   ],
+   [
+    47.5778,
+    -122.3272
+   ]
+  ],
+  "notes": "Flat paved mile beside the SODO busway from S Royal Brougham Way to S Forest St, out and back. Industrial and plain with buses and light rail alongside, so it works best as a connector from the stadiums toward Georgetown.",
+  "sources": [
+   "https://www.traillink.com/trail/sodo-trail/",
+   "https://mountaineers.org/activities/routes-places/sodo-trail",
+   "https://en.wikipedia.org/wiki/SODO_Busway",
+   "https://www.openstreetmap.org/way/1202248387",
+   "https://www.openstreetmap.org/way/758621253"
+  ]
+ },
+ {
+  "id": "seahurst-park-trails",
+  "name": "Seahurst Park Beach and Forest Trails",
+  "area": "Burien (Seahurst Park)",
+  "kind": "network",
+  "miles": 2.8,
+  "surfaces": {
+   "dirt": 0.65,
+   "gravel": 0.3,
+   "asphalt": 0.05
+  },
+  "elevation": "hilly",
+  "start": {
+   "lat": 47.4776,
+   "lon": -122.3629,
+   "label": "Seahurst Park lower (beach) parking lot"
+  },
+  "bbox": [
+   47.4744,
+   -122.3665,
+   47.485,
+   -122.3519
+  ],
+  "pathNames": [
+   "Shoreline Trail",
+   "North Nature Trail",
+   "Seahurst Park Road Southwest"
+  ],
+  "waypoints": [
+   [
+    47.4775,
+    -122.3631
+   ],
+   [
+    47.4815,
+    -122.3609
+   ],
+   [
+    47.4815,
+    -122.3584
+   ],
+   [
+    47.4836,
+    -122.3575
+   ],
+   [
+    47.4848,
+    -122.3554
+   ],
+   [
+    47.4829,
+    -122.3522
+   ],
+   [
+    47.481,
+    -122.3556
+   ],
+   [
+    47.4802,
+    -122.3612
+   ],
+   [
+    47.4775,
+    -122.3631
+   ],
+   [
+    47.4759,
+    -122.3651
+   ],
+   [
+    47.4747,
+    -122.3662
+   ],
+   [
+    47.4775,
+    -122.3631
+   ]
+  ],
+  "notes": "Gravel beach path on Puget Sound plus steep dirt trails up the forested ravines above it. Restrooms near the lower lot; the trail web can be confusing, and the south shoreline trail ends with a run of low steps.",
+  "sources": [
+   "https://www.wta.org/go-hiking/hikes/seahurst-park",
+   "https://www.10adventures.com/hikes/seattle/seahurst-park-loop-trail/",
+   "https://www.hikingproject.com/directory/8013325/burien",
+   "https://www.mountaineers.org/activities/routes-places/seahurst-ed-munro-park",
+   "https://www.openstreetmap.org/way/165263437",
+   "https://www.openstreetmap.org/way/165263431"
+  ]
+ },
+ {
+  "id": "green-river-trail-tukwila",
+  "name": "Green River Trail: Fort Dent to S 180th St",
+  "area": "Tukwila",
+  "kind": "out-and-back",
+  "miles": 5.4,
+  "surfaces": {
+   "asphalt": 1.0
+  },
+  "elevation": "flat",
+  "start": {
+   "lat": 47.4685,
+   "lon": -122.249,
+   "label": "Fort Dent Park (Starfire Sports) parking"
+  },
+  "bbox": [
+   47.4398,
+   -122.25,
+   47.469,
+   -122.2438
+  ],
+  "pathNames": [
+   "Green River Trail"
+  ],
+  "waypoints": [
+   [
+    47.4685,
+    -122.249
+   ],
+   [
+    47.4659,
+    -122.2488
+   ],
+   [
+    47.4641,
+    -122.2493
+   ],
+   [
+    47.4595,
+    -122.2484
+   ],
+   [
+    47.455,
+    -122.2442
+   ],
+   [
+    47.4519,
+    -122.2472
+   ],
+   [
+    47.4496,
+    -122.2462
+   ],
+   [
+    47.4445,
+    -122.247
+   ],
+   [
+    47.4401,
+    -122.2463
+   ],
+   [
+    47.4409,
+    -122.2497
+   ]
+  ],
+  "notes": "Flat paved river trail from Fort Dent Park south past Southcenter to S 180th St, shared with cyclists and with little shade. It keeps going south into Kent, and the straight Interurban Trail runs parallel nearby.",
+  "sources": [
+   "https://www.wta.org/go-hiking/hikes/green-river-trail",
+   "https://www.10adventures.com/hikes/seattle/green-river-trail-tukwila-section/",
+   "https://www.seattlesouthside.com/directory/green-river-trail/",
+   "https://www.openstreetmap.org/way/4734000"
+  ]
+ },
+ {
+  "id": "cedar-river-trail-renton",
+  "name": "Cedar River Trail: Lake Washington to Cedar River Park",
+  "area": "Renton",
+  "kind": "out-and-back",
+  "miles": 4.0,
+  "surfaces": {
+   "asphalt": 0.9,
+   "concrete": 0.1
+  },
+  "elevation": "flat",
+  "start": {
+   "lat": 47.4986,
+   "lon": -122.2145,
+   "label": "Cedar River Trail Park lot, Nishiwaki Lane at Lake Washington"
+  },
+  "bbox": [
+   47.4788,
+   -122.2153,
+   47.5002,
+   -122.1956
+  ],
+  "pathNames": [
+   "Cedar River Trail"
+  ],
+  "waypoints": [
+   [
+    47.4999,
+    -122.215
+   ],
+   [
+    47.4972,
+    -122.2139
+   ],
+   [
+    47.4942,
+    -122.2129
+   ],
+   [
+    47.4913,
+    -122.212
+   ],
+   [
+    47.4882,
+    -122.2109
+   ],
+   [
+    47.4858,
+    -122.2084
+   ],
+   [
+    47.4838,
+    -122.2051
+   ],
+   [
+    47.4819,
+    -122.2015
+   ],
+   [
+    47.4804,
+    -122.2001
+   ],
+   [
+    47.4791,
+    -122.1959
+   ]
+  ],
+  "notes": "Paved river trail from the Lake Washington shore past the Renton airport and through downtown to Cedar River Park, with salmon in the river in fall. Flat with a gentle upriver grade; the trail stays paved for about 12 miles if you want more.",
+  "sources": [
+   "https://kingcounty.gov/en/dept/dnrp/nature-recreation/parks-recreation/king-county-parks/trails/leafline-trails/cedar-river",
+   "https://www.rentonwa.gov/city_hall/parks_and_recreation/parks_and_trails/find_a_park_or_trail/cedar_river_trail",
+   "https://greatruns.com/renton-cedar-river-trail/",
+   "https://www.openstreetmap.org/way/37822007",
+   "https://www.openstreetmap.org/way/619966918"
+  ]
+ },
+ {
+  "id": "gene-coulon-eastrail",
+  "name": "Gene Coulon Park and Eastrail South",
+  "area": "Renton (Lake Washington)",
+  "kind": "out-and-back",
+  "miles": 5.0,
+  "surfaces": {
+   "asphalt": 0.65,
+   "concrete": 0.15,
+   "gravel": 0.15,
+   "boardwalk": 0.05
+  },
+  "elevation": "flat",
+  "start": {
+   "lat": 47.5052,
+   "lon": -122.2015,
+   "label": "Gene Coulon Park main parking lot, Lake Washington Blvd N"
+  },
+  "bbox": [
+   47.503,
+   -122.2097,
+   47.5377,
+   -122.1952
+  ],
+  "pathNames": [
+   "Gene Coulon Beach Park Interpretive Walk",
+   "Eastrail"
+  ],
+  "waypoints": [
+   [
+    47.5052,
+    -122.2015
+   ],
+   [
+    47.5074,
+    -122.2019
+   ],
+   [
+    47.5095,
+    -122.2028
+   ],
+   [
+    47.5112,
+    -122.2036
+   ],
+   [
+    47.5131,
+    -122.2046
+   ],
+   [
+    47.5147,
+    -122.2066
+   ],
+   [
+    47.5165,
+    -122.2085
+   ],
+   [
+    47.5205,
+    -122.2094
+   ],
+   [
+    47.523,
+    -122.2075
+   ],
+   [
+    47.5287,
+    -122.2026
+   ],
+   [
+    47.5346,
+    -122.1976
+   ],
+   [
+    47.5374,
+    -122.1955
+   ]
+  ],
+  "notes": "Paved lakeshore path the length of Gene Coulon Park, then north on the asphalt Eastrail to Ripley Lane N and back. The park is busy in summer and bikes are not allowed in it; restrooms in the park.",
+  "sources": [
+   "https://www.wta.org/go-hiking/hikes/gene-coulon-memorial-beach-park",
+   "https://en.wikipedia.org/wiki/Gene_Coulon_Memorial_Beach_Park",
+   "https://www.traillink.com/trail/eastrail-south/",
+   "https://seattlebikeblog.com/2021/11/10/new-2-5-mile-section-of-eastrail-now-open-between-renton-and-i-90",
+   "https://www.openstreetmap.org/way/118847300",
+   "https://www.openstreetmap.org/way/1515091143"
+  ]
+ },
+ {
+  "id": "des-moines-creek-trail",
+  "name": "Des Moines Creek Trail",
+  "area": "Des Moines / SeaTac",
+  "kind": "out-and-back",
+  "miles": 4.0,
+  "surfaces": {
+   "asphalt": 1.0
+  },
+  "elevation": "rolling",
+  "start": {
+   "lat": 47.4223,
+   "lon": -122.3056,
+   "label": "North trailhead lot, S 200th St (SeaTac)"
+  },
+  "bbox": [
+   47.4055,
+   -122.3283,
+   47.423,
+   -122.3053
+  ],
+  "pathNames": [
+   "Des Moines Creek Trail",
+   "Lake to Sound Trail"
+  ],
+  "waypoints": [
+   [
+    47.4223,
+    -122.3056
+   ],
+   [
+    47.4192,
+    -122.3066
+   ],
+   [
+    47.4162,
+    -122.3079
+   ],
+   [
+    47.4135,
+    -122.3094
+   ],
+   [
+    47.4127,
+    -122.3138
+   ],
+   [
+    47.4115,
+    -122.317
+   ],
+   [
+    47.412,
+    -122.3214
+   ],
+   [
+    47.4101,
+    -122.3253
+   ],
+   [
+    47.4059,
+    -122.3279
+   ]
+  ],
+  "notes": "Paved trail down a wooded creek ravine from S 200th St to Des Moines Beach Park on Puget Sound, about 2 miles each way. Steady gentle grade, so the return is a long climb of about 230 feet; restrooms at the beach park.",
+  "sources": [
+   "https://www.wta.org/go-hiking/hikes/des-moines-creek-trail",
+   "https://www.traillink.com/trail/des-moines-creek-trail/",
+   "https://www.mountaineers.org/activities/routes-places/des-moines-creek-park-trail",
+   "https://www.openstreetmap.org/way/271202607"
+  ]
+ },
+ {
+  "id": "discovery-park-loop",
+  "name": "Discovery Park Loop Trail",
+  "area": "Magnolia",
+  "kind": "loop",
+  "miles": 2.8,
+  "surfaces": {
+   "gravel": 0.6,
+   "dirt": 0.32,
+   "asphalt": 0.08
+  },
+  "elevation": "rolling",
+  "start": {
+   "lat": 47.6573,
+   "lon": -122.4063,
+   "label": "Discovery Park east parking lot (Environmental Learning Center)"
+  },
+  "bbox": [
+   47.6543,
+   -122.4248,
+   47.6648,
+   -122.4055
+  ],
+  "pathNames": [
+   "Loop Trail"
+  ],
+  "waypoints": [
+   [
+    47.65728,
+    -122.40627
+   ],
+   [
+    47.65968,
+    -122.40689
+   ],
+   [
+    47.66275,
+    -122.41044
+   ],
+   [
+    47.66374,
+    -122.41523
+   ],
+   [
+    47.66445,
+    -122.41946
+   ],
+   [
+    47.66181,
+    -122.42382
+   ],
+   [
+    47.6582,
+    -122.42367
+   ],
+   [
+    47.6557,
+    -122.41948
+   ],
+   [
+    47.65463,
+    -122.41418
+   ],
+   [
+    47.65434,
+    -122.40844
+   ],
+   [
+    47.65728,
+    -122.40627
+   ]
+  ],
+  "notes": "Signed National Recreation Trail through forest and the bluff meadows, with about 150 ft of drop and climb and several paved road crossings. The visitor center is closed until summer 2027, so check which restrooms are open; the trail is unlit and the park is open 4:30 a.m. to 11 p.m.",
+  "sources": [
+   "https://www.wta.org/go-hiking/hikes/discovery-park-loop-trail",
+   "https://seattle.gov/parks/allparks/discovery-park",
+   "https://fodp.org/?p=1866"
+  ]
+ },
+ {
+  "id": "discovery-park-lighthouse",
+  "name": "Discovery Park Beach and Lighthouse Loop",
+  "area": "Magnolia",
+  "kind": "loop",
+  "miles": 4.4,
+  "surfaces": {
+   "gravel": 0.5,
+   "dirt": 0.25,
+   "asphalt": 0.22,
+   "boardwalk": 0.03
+  },
+  "elevation": "hilly",
+  "start": {
+   "lat": 47.6573,
+   "lon": -122.4063,
+   "label": "Discovery Park east parking lot (Environmental Learning Center)"
+  },
+  "bbox": [
+   47.6543,
+   -122.4349,
+   47.6676,
+   -122.4055
+  ],
+  "pathNames": [
+   "Loop Trail",
+   "South Beach Trail",
+   "North Beach Trail"
+  ],
+  "waypoints": [
+   [
+    47.65728,
+    -122.40627
+   ],
+   [
+    47.65442,
+    -122.41126
+   ],
+   [
+    47.6557,
+    -122.41948
+   ],
+   [
+    47.65884,
+    -122.4257
+   ],
+   [
+    47.66087,
+    -122.43225
+   ],
+   [
+    47.66275,
+    -122.43025
+   ],
+   [
+    47.66672,
+    -122.42334
+   ],
+   [
+    47.66394,
+    -122.42111
+   ],
+   [
+    47.66364,
+    -122.41514
+   ],
+   [
+    47.66158,
+    -122.40776
+   ],
+   [
+    47.65728,
+    -122.40627
+   ]
+  ],
+  "notes": "Loop Trail west, South Beach Trail down to West Point Lighthouse, the paved beach path north, then the North Beach Trail stairs back up to the Loop Trail. About 450 ft of climbing with several stair sets; the beach is exposed in wind and the trails are unlit.",
+  "sources": [
+   "https://www.wta.org/go-hiking/hikes/discovery-park-beach-and-history",
+   "https://www.wta.org/go-hiking/trip-reports/trip_report.2016-04-27.5750740011",
+   "https://fodp.org/?p=1866"
+  ]
+ },
+ {
+  "id": "magnolia-bluff",
+  "name": "Magnolia Boulevard Bluff",
+  "area": "Magnolia",
+  "kind": "out-and-back",
+  "miles": 4.5,
+  "surfaces": {
+   "concrete": 0.7,
+   "asphalt": 0.25,
+   "dirt": 0.05
+  },
+  "elevation": "rolling",
+  "start": {
+   "lat": 47.6336,
+   "lon": -122.3982,
+   "label": "Magnolia Park, Magnolia Blvd W"
+  },
+  "bbox": [
+   47.6335,
+   -122.4144,
+   47.6541,
+   -122.3979
+  ],
+  "pathNames": [
+   "Magnolia Boulevard West"
+  ],
+  "waypoints": [
+   [
+    47.63355,
+    -122.39815
+   ],
+   [
+    47.63584,
+    -122.39931
+   ],
+   [
+    47.63507,
+    -122.40305
+   ],
+   [
+    47.63642,
+    -122.40606
+   ],
+   [
+    47.63868,
+    -122.40965
+   ],
+   [
+    47.64104,
+    -122.41287
+   ],
+   [
+    47.64329,
+    -122.41384
+   ],
+   [
+    47.6457,
+    -122.41438
+   ],
+   [
+    47.64869,
+    -122.41412
+   ],
+   [
+    47.65125,
+    -122.41242
+   ],
+   [
+    47.6541,
+    -122.41214
+   ]
+  ],
+  "notes": "Walkway on the water side of the Olmsted boulevard with nonstop views of Elliott Bay, the Olympics and Mount Rainier, out to the Discovery Park south gate and back. Sunny and exposed with few services; stay off the informal trails down the bluff, and add the Loop Trail for a longer run.",
+  "sources": [
+   "https://seattleolmsted.org/?p=847",
+   "https://www.wta.org/go-hiking/trip-reports/trip_report.2014-06-07.3487936146",
+   "https://www.mountaineers.org/activities/routes-places/south-magnolia"
+  ]
+ },
+ {
+  "id": "elliott-bay-trail",
+  "name": "Elliott Bay Trail: Sculpture Park to Smith Cove",
+  "area": "Elliott Bay waterfront / Interbay",
+  "kind": "point-to-point",
+  "miles": 3.5,
+  "surfaces": {
+   "asphalt": 0.95,
+   "concrete": 0.05
+  },
+  "elevation": "flat",
+  "start": {
+   "lat": 47.6151,
+   "lon": -122.355,
+   "label": "Olympic Sculpture Park, Broad St and Alaskan Way"
+  },
+  "bbox": [
+   47.6151,
+   -122.3889,
+   47.6421,
+   -122.355
+  ],
+  "pathNames": [
+   "Elliott Bay Trail",
+   "Elliott Bay Marina Path"
+  ],
+  "waypoints": [
+   [
+    47.61512,
+    -122.35497
+   ],
+   [
+    47.61866,
+    -122.35999
+   ],
+   [
+    47.62202,
+    -122.36547
+   ],
+   [
+    47.62522,
+    -122.37077
+   ],
+   [
+    47.62731,
+    -122.37728
+   ],
+   [
+    47.63226,
+    -122.37807
+   ],
+   [
+    47.63648,
+    -122.38177
+   ],
+   [
+    47.64171,
+    -122.38179
+   ],
+   [
+    47.63938,
+    -122.38541
+   ],
+   [
+    47.63485,
+    -122.38779
+   ],
+   [
+    47.63131,
+    -122.3889
+   ]
+  ],
+  "notes": "Flat shoreline path through Myrtle Edwards and Centennial parks, then along the Terminal 91 fence around to Smith Cove Park and the marina. The rebuilt parks reopened June 2026 with separate walking and bike paths; the classic out-and-back to the Pier 86 grain terminal is about 3 mi.",
+  "sources": [
+   "https://www.traillink.com/trail/elliott-bay-trail/",
+   "https://www.seattlebikeblog.com/2026/06/01/myrtle-edwards-and-centennial-parks-will-reopen-june-4-following-one-final-overnight-closure/",
+   "https://www.mountaineers.org/activities/activities/day-hike-seattle-waterfront"
+  ]
+ },
+ {
+  "id": "downtown-waterfront",
+  "name": "Downtown Waterfront Promenade",
+  "area": "Downtown",
+  "kind": "out-and-back",
+  "miles": 3.3,
+  "surfaces": {
+   "concrete": 0.8,
+   "asphalt": 0.2
+  },
+  "elevation": "flat",
+  "start": {
+   "lat": 47.5985,
+   "lon": -122.336,
+   "label": "Waterfront Park south end, Alaskan Way at S King St"
+  },
+  "bbox": [
+   47.5985,
+   -122.354,
+   47.6145,
+   -122.336
+  ],
+  "pathNames": [
+   "Waterfront Trail",
+   "Waterfront Park Promenade",
+   "Elliott Bay Trail",
+   "Alaskan Way"
+  ],
+  "waypoints": [
+   [
+    47.59847,
+    -122.33598
+   ],
+   [
+    47.60081,
+    -122.33612
+   ],
+   [
+    47.6017,
+    -122.33707
+   ],
+   [
+    47.60319,
+    -122.33809
+   ],
+   [
+    47.60532,
+    -122.34004
+   ],
+   [
+    47.60715,
+    -122.34179
+   ],
+   [
+    47.60907,
+    -122.34497
+   ],
+   [
+    47.60995,
+    -122.34594
+   ],
+   [
+    47.61148,
+    -122.34854
+   ],
+   [
+    47.613,
+    -122.35128
+   ],
+   [
+    47.6145,
+    -122.35397
+   ]
+  ],
+  "notes": "The new Park Promenade along Alaskan Way from Pioneer Square past the piers and Pier 62 to the Olympic Sculpture Park, where it meets the Elliott Bay Trail. Wide but busy on summer weekends and cruise days; keep off the separate bike path, and there are public restrooms along the promenade.",
+  "sources": [
+   "https://waterfrontparkseattle.org/the-park",
+   "https://seattle.gov/waterfront/projects",
+   "https://harrell.seattle.gov/2025/07/29/mayor-harrell-city-of-seattle-and-partners-celebrate-ribbon-cutting-of-pier-58-and-announce-grand-opening-celebration-date-for-completed-waterfront-park"
+  ]
+ },
+ {
+  "id": "queen-anne-boulevard",
+  "name": "Queen Anne Boulevard Loop",
+  "area": "Queen Anne",
+  "kind": "loop",
+  "miles": 4.4,
+  "surfaces": {
+   "concrete": 0.85,
+   "asphalt": 0.1,
+   "gravel": 0.05
+  },
+  "elevation": "rolling",
+  "start": {
+   "lat": 47.6295,
+   "lon": -122.3599,
+   "label": "Kerry Park, W Highland Dr"
+  },
+  "bbox": [
+   47.6289,
+   -122.3702,
+   47.6458,
+   -122.3482
+  ],
+  "pathNames": [
+   "Queen Anne Boulevard",
+   "West Highland Drive",
+   "8th Avenue West",
+   "7th Avenue West",
+   "10th Avenue West",
+   "West McGraw Place",
+   "Bigelow Avenue North",
+   "Prospect Street"
+  ],
+  "waypoints": [
+   [
+    47.62952,
+    -122.3599
+   ],
+   [
+    47.63126,
+    -122.36775
+   ],
+   [
+    47.6377,
+    -122.3662
+   ],
+   [
+    47.64101,
+    -122.36998
+   ],
+   [
+    47.64545,
+    -122.36767
+   ],
+   [
+    47.6415,
+    -122.36348
+   ],
+   [
+    47.64139,
+    -122.3569
+   ],
+   [
+    47.64077,
+    -122.35028
+   ],
+   [
+    47.6353,
+    -122.34842
+   ],
+   [
+    47.62968,
+    -122.3515
+   ],
+   [
+    47.62952,
+    -122.3599
+   ]
+  ],
+  "notes": "Brown-signed boulevard circling the crown of Queen Anne Hill on quiet residential sidewalks, past Kerry Park, Marshall Park and Bhy Kracke Park viewpoints. Mostly gentle grades with a few short climbs; some guides give a shorter 3.7 mi version, and there are no restrooms on the route.",
+  "sources": [
+   "https://seattleolmsted.org/?p=624",
+   "https://www.qahistory.org/articles/boulevard-triangles",
+   "https://www.outdoorproject.com/node/84709"
+  ]
+ },
+ {
+  "id": "queen-anne-counterbalance",
+  "name": "Counterbalance Hill Repeats (Queen Anne Ave N)",
+  "area": "Queen Anne",
+  "kind": "out-and-back",
+  "miles": 1.2,
+  "surfaces": {
+   "concrete": 0.95,
+   "asphalt": 0.05
+  },
+  "elevation": "hilly",
+  "start": {
+   "lat": 47.6245,
+   "lon": -122.3569,
+   "label": "Queen Anne Ave N at Mercer St"
+  },
+  "bbox": [
+   47.6245,
+   -122.3569,
+   47.6323,
+   -122.3565
+  ],
+  "pathNames": [
+   "Queen Anne Avenue North"
+  ],
+  "waypoints": [
+   [
+    47.62449,
+    -122.35687
+   ],
+   [
+    47.62622,
+    -122.35659
+   ],
+   [
+    47.62773,
+    -122.35681
+   ],
+   [
+    47.62907,
+    -122.35654
+   ],
+   [
+    47.63046,
+    -122.35651
+   ],
+   [
+    47.63229,
+    -122.35686
+   ]
+  ],
+  "notes": "Classic 0.6 mi sidewalk climb up the Counterbalance from Lower Queen Anne to W Galer St, steepest near the top where the old streetcar grade was about 18 percent. Busy street with driveways and cross streets, so watch for cars; shops and cafes at both ends.",
+  "sources": [
+   "https://www.historylink.org/File/3027",
+   "https://dev.historylink.org/File/7057"
+  ]
+ },
+ {
+  "id": "kinnear-park",
+  "name": "Kinnear Park Trails",
+  "area": "Queen Anne / Interbay",
+  "kind": "network",
+  "miles": 0.5,
+  "surfaces": {
+   "dirt": 0.7,
+   "asphalt": 0.15,
+   "gravel": 0.1,
+   "boardwalk": 0.05
+  },
+  "elevation": "hilly",
+  "start": {
+   "lat": 47.6284,
+   "lon": -122.3688,
+   "label": "Upper Kinnear Park, W Olympic Pl"
+  },
+  "bbox": [
+   47.6267,
+   -122.3688,
+   47.6284,
+   -122.3645
+  ],
+  "pathNames": [],
+  "waypoints": [
+   [
+    47.62843,
+    -122.36876
+   ],
+   [
+    47.6281,
+    -122.36774
+   ],
+   [
+    47.62768,
+    -122.36699
+   ],
+   [
+    47.62747,
+    -122.36611
+   ],
+   [
+    47.62713,
+    -122.3652
+   ],
+   [
+    47.62669,
+    -122.36452
+   ]
+  ],
+  "notes": "Small two-level park on the west Queen Anne bluff with steep wooded paths and stairs between the upper lawn and the lower tennis court and dog area. Best for short hill laps or as a soft link toward the Elliott Bay Trail; there is a historic restroom building in the upper park.",
+  "sources": [
+   "https://seattle.gov/parks/allparks/kinnear-park",
+   "https://www.tclf.org/landscapes/kinnear-park"
+  ]
+ },
+ {
+  "id": "cheshiahud-lake-union-loop",
+  "name": "Cheshiahud Lake Union Loop",
+  "area": "Lake Union / South Lake Union / Eastlake",
+  "kind": "loop",
+  "miles": 6.2,
+  "surfaces": {
+   "concrete": 0.5,
+   "asphalt": 0.45,
+   "gravel": 0.03,
+   "boardwalk": 0.02
+  },
+  "elevation": "flat",
+  "start": {
+   "lat": 47.6273,
+   "lon": -122.3364,
+   "label": "Lake Union Park (MOHAI)"
+  },
+  "bbox": [
+   47.6264,
+   -122.3497,
+   47.6557,
+   -122.3183
+  ],
+  "pathNames": [
+   "Cheshiahud Lake Union Loop",
+   "Burke-Gilman Trail",
+   "Westlake Protected Bike Lane",
+   "North Northlake Way",
+   "Fairview Avenue East",
+   "Lake Union Park Bridge"
+  ],
+  "waypoints": [
+   [
+    47.62729,
+    -122.33638
+   ],
+   [
+    47.63406,
+    -122.34244
+   ],
+   [
+    47.64377,
+    -122.34581
+   ],
+   [
+    47.64922,
+    -122.34774
+   ],
+   [
+    47.64695,
+    -122.33429
+   ],
+   [
+    47.65315,
+    -122.32758
+   ],
+   [
+    47.65427,
+    -122.31933
+   ],
+   [
+    47.64563,
+    -122.32707
+   ],
+   [
+    47.63819,
+    -122.32848
+   ],
+   [
+    47.62968,
+    -122.32952
+   ],
+   [
+    47.62729,
+    -122.33638
+   ]
+  ],
+  "notes": "Signed loop around Lake Union on sidewalks, the Westlake waterfront path, the Burke-Gilman Trail past Gas Works Park, and the Fremont and University bridges. Almost entirely paved with little shade and some street crossings; restrooms at Lake Union Park and Gas Works Park, and GPS often reads 6.5 mi.",
+  "sources": [
+   "https://www.seattle.gov/parks/parks/cheshiahud-lake-union-loop",
+   "https://www.parentmap.com/article/hike-lake-union-bridges-boats-parks-and-troll",
+   "https://www.wta.org/go-hiking/hikes/chesiahud-lake-union-loop"
+  ]
+ },
+ {
+  "id": "howe-street-stairs",
+  "name": "Howe Street Stairs",
+  "area": "Eastlake / Capitol Hill",
+  "kind": "out-and-back",
+  "miles": 0.6,
+  "surfaces": {
+   "concrete": 0.9,
+   "asphalt": 0.1
+  },
+  "elevation": "hilly",
+  "start": {
+   "lat": 47.6358,
+   "lon": -122.3267,
+   "label": "Bottom of the Howe Street Stairs, Eastlake"
+  },
+  "bbox": [
+   47.6358,
+   -122.3268,
+   47.6359,
+   -122.3206
+  ],
+  "pathNames": [
+   "East Howe Street"
+  ],
+  "waypoints": [
+   [
+    47.63581,
+    -122.3268
+   ],
+   [
+    47.6358,
+    -122.32554
+   ],
+   [
+    47.63587,
+    -122.32443
+   ],
+   [
+    47.6358,
+    -122.32301
+   ],
+   [
+    47.63593,
+    -122.3223
+   ],
+   [
+    47.63587,
+    -122.32059
+   ]
+  ],
+  "notes": "Seattle's longest public staircase, 388 concrete steps in 13 flights from Eastlake up to Broadway and 10th Ave E, about 160 ft of climb. Popular for stair repeats and group workouts; it crosses a few streets and can be slick when wet.",
+  "sources": [
+   "https://www.atlasobscura.com/places/howe-street-stairs",
+   "https://mountaineers.org/activities/routes-places/capitol-hill",
+   "https://api.theoutbound.com/washington/running/run-the-howe-street-stairs"
+  ]
+ },
+ {
+  "id": "volunteer-park-loop",
+  "name": "Volunteer Park Loop",
+  "area": "Capitol Hill",
+  "kind": "loop",
+  "miles": 1.0,
+  "surfaces": {
+   "asphalt": 0.55,
+   "gravel": 0.35,
+   "dirt": 0.07,
+   "concrete": 0.03
+  },
+  "elevation": "rolling",
+  "start": {
+   "lat": 47.63,
+   "lon": -122.3148,
+   "label": "Volunteer Park, by the Asian Art Museum"
+  },
+  "bbox": [
+   47.6285,
+   -122.3182,
+   47.6321,
+   -122.3128
+  ],
+  "pathNames": [
+   "Volunteer Park Road",
+   "East Highland Drive"
+  ],
+  "waypoints": [
+   [
+    47.63004,
+    -122.31475
+   ],
+   [
+    47.62889,
+    -122.31496
+   ],
+   [
+    47.62861,
+    -122.31678
+   ],
+   [
+    47.62899,
+    -122.31809
+   ],
+   [
+    47.63031,
+    -122.318
+   ],
+   [
+    47.63151,
+    -122.31709
+   ],
+   [
+    47.6319,
+    -122.31544
+   ],
+   [
+    47.63188,
+    -122.31363
+   ],
+   [
+    47.63067,
+    -122.31286
+   ],
+   [
+    47.62944,
+    -122.31362
+   ],
+   [
+    47.63004,
+    -122.31475
+   ]
+  ],
+  "notes": "Perimeter loop of the Olmsted park on the paved park drive and gravel edge paths, past the water tower, conservatory and reservoir. Easy to repeat, with gentle grades; restrooms in the park, and it links north to Lake View Cemetery and Interlaken Park.",
+  "sources": [
+   "https://10adventures.com/hikes/seattle/volunteer-park-loop",
+   "https://www.heylo.com/event/b337e6d8-945a-42e8-b9f4-6ff6a4225284",
+   "https://spireseattle.com/run-this-way-best-seattle-trails/"
+  ]
+ },
+ {
+  "id": "interlaken-park",
+  "name": "Interlaken Park and Boulevard",
+  "area": "Capitol Hill / Montlake",
+  "kind": "loop",
+  "miles": 2.2,
+  "surfaces": {
+   "asphalt": 0.5,
+   "dirt": 0.4,
+   "gravel": 0.1
+  },
+  "elevation": "hilly",
+  "start": {
+   "lat": 47.6372,
+   "lon": -122.3089,
+   "label": "E Interlaken Blvd at 19th Ave E"
+  },
+  "bbox": [
+   47.633,
+   -122.3127,
+   47.6375,
+   -122.3038
+  ],
+  "pathNames": [
+   "East Interlaken Boulevard",
+   "Interlaken Drive East"
+  ],
+  "waypoints": [
+   [
+    47.63719,
+    -122.30889
+   ],
+   [
+    47.63626,
+    -122.30711
+   ],
+   [
+    47.6358,
+    -122.30385
+   ],
+   [
+    47.63409,
+    -122.30672
+   ],
+   [
+    47.63436,
+    -122.30741
+   ],
+   [
+    47.63557,
+    -122.30907
+   ],
+   [
+    47.63654,
+    -122.31073
+   ],
+   [
+    47.63547,
+    -122.31206
+   ],
+   [
+    47.63511,
+    -122.31258
+   ],
+   [
+    47.63552,
+    -122.31083
+   ],
+   [
+    47.63719,
+    -122.30889
+   ]
+  ],
+  "notes": "Car-free stretch of Interlaken Boulevard plus the steep forest trails in the ravine, including the dirt trail up to 15th Ave E. Shady and quiet but muddy in winter and unlit; no restrooms.",
+  "sources": [
+   "https://www.wta.org/go-hiking/hikes/interlaken-park",
+   "https://www.seattle.gov/parks/parks/interlaken-park",
+   "https://www.hikingproject.com/directory/8022348/interlaken-park"
+  ]
+ },
+ {
+  "id": "arboretum-loop",
+  "name": "Arboretum Loop Trail and Azalea Way",
+  "area": "Washington Park Arboretum",
+  "kind": "loop",
+  "miles": 2.5,
+  "surfaces": {
+   "asphalt": 0.4,
+   "gravel": 0.42,
+   "dirt": 0.13,
+   "concrete": 0.05
+  },
+  "elevation": "rolling",
+  "start": {
+   "lat": 47.6399,
+   "lon": -122.2944,
+   "label": "Graham Visitors Center"
+  },
+  "bbox": [
+   47.6271,
+   -122.2982,
+   47.6399,
+   -122.2943
+  ],
+  "pathNames": [
+   "Arboretum Loop Trail",
+   "Azalea Way",
+   "Lookout Loop",
+   "Arboretum Drive East"
+  ],
+  "waypoints": [
+   [
+    47.63987,
+    -122.2944
+   ],
+   [
+    47.63804,
+    -122.29673
+   ],
+   [
+    47.6349,
+    -122.2973
+   ],
+   [
+    47.63164,
+    -122.29674
+   ],
+   [
+    47.62908,
+    -122.29699
+   ],
+   [
+    47.62814,
+    -122.29677
+   ],
+   [
+    47.62982,
+    -122.29627
+   ],
+   [
+    47.63266,
+    -122.29447
+   ],
+   [
+    47.6358,
+    -122.29555
+   ],
+   [
+    47.63747,
+    -122.29652
+   ],
+   [
+    47.63987,
+    -122.2944
+   ]
+  ],
+  "notes": "South on the paved Arboretum Loop Trail, back north on the crushed-rock and lawn path of Azalea Way and the Lookout trails. Restrooms at the Graham Visitors Center; for an all-paved loop pair the Loop Trail with Arboretum Drive E.",
+  "sources": [
+   "https://botanicgardens.uw.edu/washington-park-arboretum/visit/maps-trails",
+   "https://botanicgardens.uw.edu/washington-park-arboretum/visit/accessibility-washington-park-arboretum",
+   "https://botanicgardens.uw.edu/?p=2416"
+  ]
+ },
+ {
+  "id": "montlake-foster-island",
+  "name": "Montlake Cut and Arboretum Waterfront Trail",
+  "area": "Montlake / Washington Park Arboretum",
+  "kind": "out-and-back",
+  "miles": 4.2,
+  "surfaces": {
+   "gravel": 0.5,
+   "dirt": 0.2,
+   "boardwalk": 0.15,
+   "asphalt": 0.1,
+   "concrete": 0.05
+  },
+  "elevation": "flat",
+  "start": {
+   "lat": 47.6463,
+   "lon": -122.3097,
+   "label": "West Montlake Park"
+  },
+  "bbox": [
+   47.6401,
+   -122.3097,
+   47.6471,
+   -122.2899
+  ],
+  "pathNames": [
+   "Lake Washington Ship Canal Waterside Trail",
+   "Arboretum Waterfront Trail",
+   "Foster Point Trail",
+   "East Foster Island Road"
+  ],
+  "waypoints": [
+   [
+    47.64631,
+    -122.30969
+   ],
+   [
+    47.64706,
+    -122.30538
+   ],
+   [
+    47.64701,
+    -122.30473
+   ],
+   [
+    47.64694,
+    -122.30257
+   ],
+   [
+    47.64627,
+    -122.30041
+   ],
+   [
+    47.64607,
+    -122.29653
+   ],
+   [
+    47.64629,
+    -122.29288
+   ],
+   [
+    47.64677,
+    -122.2903
+   ],
+   [
+    47.64434,
+    -122.29021
+   ],
+   [
+    47.64189,
+    -122.29236
+   ],
+   [
+    47.6401,
+    -122.29468
+   ]
+  ],
+  "notes": "Along the Montlake Cut, then the marsh boardwalks and floating walkways to Foster Island and south to the Arboretum visitors center. Part of the Foster Island floating walkway is closed for rebuilding from June 2026 to about early 2027, and high water can flood the trail.",
+  "sources": [
+   "https://wta.org/go-hiking/hikes/foster-and-marsh-island-loop",
+   "https://parkways.seattle.gov/2026/05/19/washington-park-arboretum-waterfront-trail-restoration-project-construction-begins-in-june/",
+   "https://seattle.gov/parks/about-us/current-projects/washington-park-arboretum-waterfront-trail"
+  ]
+ },
+ {
+  "id": "lake-washington-blvd-madison-leschi",
+  "name": "Lake Washington Blvd: Madison Park to Leschi",
+  "area": "Madison Park / Madrona / Leschi",
+  "kind": "point-to-point",
+  "miles": 2.8,
+  "surfaces": {
+   "concrete": 0.6,
+   "asphalt": 0.25,
+   "gravel": 0.15
+  },
+  "elevation": "rolling",
+  "start": {
+   "lat": 47.6354,
+   "lon": -122.2777,
+   "label": "Madison Park beach"
+  },
+  "bbox": [
+   47.6018,
+   -122.2863,
+   47.6354,
+   -122.2777
+  ],
+  "pathNames": [
+   "McGilvra Boulevard East",
+   "Lake Washington Boulevard East",
+   "Lake Washington Boulevard"
+  ],
+  "waypoints": [
+   [
+    47.63537,
+    -122.27766
+   ],
+   [
+    47.63329,
+    -122.28145
+   ],
+   [
+    47.62849,
+    -122.2815
+   ],
+   [
+    47.62553,
+    -122.2828
+   ],
+   [
+    47.62155,
+    -122.283
+   ],
+   [
+    47.61948,
+    -122.28206
+   ],
+   [
+    47.6161,
+    -122.28142
+   ],
+   [
+    47.61223,
+    -122.28171
+   ],
+   [
+    47.60852,
+    -122.28318
+   ],
+   [
+    47.60511,
+    -122.28455
+   ],
+   [
+    47.60176,
+    -122.28604
+   ]
+  ],
+  "notes": "South on McGilvra Blvd, then Lake Washington Blvd through Denny-Blaine and along the Madrona shoreline to Leschi, on sidewalks and lakeside paths. Rolling hills through Denny-Blaine and flat along the water; restrooms at Madison Park and Madrona Park.",
+  "sources": [
+   "https://www.mountaineers.org/activities/routes-places/seattle-olmsted-50-ballard-locks-to-rainier-beach/resources/section-4-seaolm-40-resources/sec4-seaolm50-30may2024.pdf",
+   "https://seattleolmsted.org/?p=208",
+   "https://historylink.org/File/10244"
+  ]
+ },
+ {
+  "id": "lake-washington-blvd-leschi-mount-baker",
+  "name": "Lake Washington Blvd: Leschi to Mount Baker Beach",
+  "area": "Leschi / Mount Baker",
+  "kind": "out-and-back",
+  "miles": 4.0,
+  "surfaces": {
+   "concrete": 0.5,
+   "asphalt": 0.35,
+   "gravel": 0.1,
+   "dirt": 0.05
+  },
+  "elevation": "flat",
+  "start": {
+   "lat": 47.6018,
+   "lon": -122.286,
+   "label": "Leschi Park and marina"
+  },
+  "bbox": [
+   47.5786,
+   -122.2878,
+   47.6018,
+   -122.2849
+  ],
+  "pathNames": [
+   "Lakeside Avenue South",
+   "Lake Washington Boulevard South"
+  ],
+  "waypoints": [
+   [
+    47.60176,
+    -122.28604
+   ],
+   [
+    47.59962,
+    -122.2862
+   ],
+   [
+    47.59687,
+    -122.28729
+   ],
+   [
+    47.59465,
+    -122.28772
+   ],
+   [
+    47.5922,
+    -122.28741
+   ],
+   [
+    47.5893,
+    -122.28612
+   ],
+   [
+    47.58648,
+    -122.28673
+   ],
+   [
+    47.5846,
+    -122.28763
+   ],
+   [
+    47.58213,
+    -122.28775
+   ],
+   [
+    47.58004,
+    -122.28565
+   ],
+   [
+    47.57954,
+    -122.28584
+   ]
+  ],
+  "notes": "Flat lakeside sidewalk and path from Leschi under the I-90 bridges past Colman Park to Mount Baker Park beach. Toilets at Mount Baker beach; on summer Bicycle Weekends the boulevard south of the beach to Seward Park closes to cars.",
+  "sources": [
+   "https://www.mountaineers.org/activities/routes-places/seattle-olmsted-50-ballard-locks-to-rainier-beach/resources/sec4-seaolm50-18oct2023.pdf",
+   "https://www.seattle.gov/parks/about-us/projects/bicycle-weekends",
+   "https://seattleolmsted.org/?p=208"
+  ]
+ },
+ {
+  "id": "i90-trail-floating-bridge",
+  "name": "I-90 Trail to Mercer Island",
+  "area": "Central District / Mount Baker",
+  "kind": "out-and-back",
+  "miles": 5.1,
+  "surfaces": {
+   "concrete": 0.6,
+   "asphalt": 0.4
+  },
+  "elevation": "rolling",
+  "start": {
+   "lat": 47.5898,
+   "lon": -122.3058,
+   "label": "I-90 Trail at Judkins Park"
+  },
+  "bbox": [
+   47.5895,
+   -122.3058,
+   47.591,
+   -122.2539
+  ],
+  "pathNames": [
+   "I 90 Trail",
+   "Mountains to Sound Trail",
+   "Mount Baker Ridge Bicycle/Pedestrian Tunnel"
+  ],
+  "waypoints": [
+   [
+    47.58982,
+    -122.30585
+   ],
+   [
+    47.59031,
+    -122.30165
+   ],
+   [
+    47.59034,
+    -122.29662
+   ],
+   [
+    47.59042,
+    -122.28889
+   ],
+   [
+    47.5905,
+    -122.28764
+   ],
+   [
+    47.5902,
+    -122.273
+   ],
+   [
+    47.58983,
+    -122.25797
+   ],
+   [
+    47.58982,
+    -122.25388
+   ]
+  ],
+  "notes": "Mountains to Sound Trail from Judkins Park past the new light rail station, through the Mount Baker Ridge bike tunnel and across the floating bridge to Mercer Island. Gentle grades, exposed and windy on the bridge, shared with fast bikes; the bridge path is occasionally closed for WSDOT work.",
+  "sources": [
+   "https://mtsgreenway.org/about/our-work/regional-trails-projects/mountains-to-sound-greenway-trail/",
+   "https://www.traillink.com/trail/i-90-trail/",
+   "https://seattletransitblog.com/2026/03/16/judkins-park-station-access-guide/"
+  ]
+ },
+ {
+  "id": "frink-park-trails",
+  "name": "Frink Park and Leschi Trails",
+  "area": "Leschi",
+  "kind": "network",
+  "miles": 1.3,
+  "surfaces": {
+   "dirt": 0.68,
+   "asphalt": 0.19,
+   "gravel": 0.08,
+   "concrete": 0.05
+  },
+  "elevation": "hilly",
+  "start": {
+   "lat": 47.6011,
+   "lon": -122.2866,
+   "label": "Leschi Park"
+  },
+  "bbox": [
+   47.5979,
+   -122.2925,
+   47.6016,
+   -122.2866
+  ],
+  "pathNames": [
+   "East Yesler Way",
+   "Leschi Viaduct",
+   "Lake Washington Boulevard South"
+  ],
+  "waypoints": [
+   [
+    47.60105,
+    -122.2866
+   ],
+   [
+    47.60163,
+    -122.28791
+   ],
+   [
+    47.60054,
+    -122.28929
+   ],
+   [
+    47.59943,
+    -122.2906
+   ],
+   [
+    47.59849,
+    -122.29104
+   ],
+   [
+    47.59823,
+    -122.29193
+   ],
+   [
+    47.59957,
+    -122.29218
+   ],
+   [
+    47.60026,
+    -122.2913
+   ],
+   [
+    47.60054,
+    -122.28929
+   ],
+   [
+    47.60163,
+    -122.28791
+   ],
+   [
+    47.60105,
+    -122.2866
+   ]
+  ],
+  "notes": "Steep dirt trails and steps through a wooded Olmsted ravine with a creek and small waterfall, crossing Lake Washington Blvd S on the way up from Leschi Park. About 400 ft of climbing per loop, muddy in winter and unlit; park at Leschi Park.",
+  "sources": [
+   "https://www.wta.org/go-hiking/hikes/frink-park",
+   "https://archive.seattletimes.com/archive/20040108/nwwwalk08/frink-park-trail",
+   "https://olmsted.org/olmsted-trail/jobs/frink-park"
+  ]
+ }
 ]

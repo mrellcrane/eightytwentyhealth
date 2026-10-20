@@ -173,8 +173,9 @@ final class RouteCatalogTests: XCTestCase {
             XCTAssertFalse(route.notes.isEmpty, route.id)
             XCTAssertFalse((route.notes + route.name + (route.access ?? "")).contains("\u{2014}"), "em-dash in \(route.id)")
         }
-        // Somewhere to run on every surface, and tracks among the routes.
-        for surface in RunSurface.allCases {
+        // A route for every surface you'd pick on its own (boardwalks are only ever stretches),
+        // and tracks among the routes.
+        for surface in RunSurface.allCases where surface != .boardwalk {
             XCTAssertTrue(catalog.routes.contains { $0.matches([surface]) }, "no route mostly on \(surface)")
         }
         XCTAssertGreaterThan(catalog.routes.filter { $0.kind == .track }.count, 10)

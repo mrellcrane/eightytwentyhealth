@@ -82,7 +82,9 @@ class Network:
             if named:
                 cost *= 0.35
             surface = edge_surface(s)
-            coords = list(s["geom"].coords)
+            # Extra vertices every ~40 m, so a waypoint snaps to the path beside it rather than
+            # to the far end of a long straight piece (bridges, tunnels).
+            coords = list(s["geom"].segmentize(0.0004).coords)
             for a, b in zip(coords, coords[1:]):
                 ka, kb = self.key(a), self.key(b)
                 length = meters(LineString([a, b]))
@@ -222,11 +224,16 @@ def build(segments, data_dir, routes_path):
             length = drawn * 2 if r["kind"] == "out-and-back" else drawn
             ratio = length / (miles * MILE)
             computed = shares(info["surfaces"])
-            # Trust the map's surfaces where OSM spells most of them out; otherwise the research.
-            surfaces = computed if info["mapped"] >= 0.6 else r["surfaces"]
-            check = (f"drawn {length / MILE:.2f} mi vs researched {miles} (x{ratio:.2f}); snaps {info['snaps']} m; "
-                     f"OSM surfaces ({info['mapped']:.0%} tagged) {computed} vs researched {r['surfaces']}")
-            if not 0.6 <= ratio <= 1.6 or max(info["snaps"]) > 150:
+            # OSM's own split where it tags nearly all of the drawn line (it's per-segment data and
+            # matches the colored paths underneath); otherwise the researched split, which weighs
+            # OSM against the trail's own pages. Big disagreements get a look.
+            use_osm = info["mapped"] >= 0.8 and 0.85 <= ratio <= 1.15
+            surfaces = computed if use_osm else r["surfaces"]
+            gap = sum(abs(computed.get(k, 0) - surfaces.get(k, 0)) for k in set(computed) | set(surfaces))
+            computed_label = "OSM" if use_osm else "research"
+            check = (f"[{computed_label}] drawn {length / MILE:.2f} mi vs researched {miles} (x{ratio:.2f}); snaps {info['snaps']} m; "
+                     f"OSM surfaces ({info['mapped']:.0%} tagged) {computed} vs researched {surfaces}")
+            if not 0.6 <= ratio <= 1.6 or max(info["snaps"]) > 150 or (info["mapped"] >= 0.6 and gap > 0.6 and not use_osm):
                 problems.append(f"{r['id']}: {check}")
             # A trail's own length is what a runner means; keep the researched one if the drawing is off.
             if not 0.85 <= ratio <= 1.15:
