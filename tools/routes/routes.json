@@ -1,0 +1,445 @@
+[
+  {
+    "id": "lower-woodland-track",
+    "name": "Lower Woodland Park Track",
+    "area": "Woodland Park",
+    "kind": "track",
+    "miles": 0.25,
+    "surfaces": {
+      "dirt": 1.0
+    },
+    "elevation": "flat",
+    "start": {
+      "lat": 47.66969,
+      "lon": -122.34163,
+      "label": "Center of the Lower Woodland track (Field 7), off West Green Lake Way N"
+    },
+    "lanes": null,
+    "access": "Seattle Parks track, open with the park 4 am to 11:30 pm when not reserved. Lincoln High School track and cross country use it heavily after school.",
+    "notes": "Unpaved dirt oval that runners call the Green Lake dirt oval. SPS and Seattle Parks plan to rebuild it as a 4-lane track, which will close Field 7 during construction (design and permitting as of 2026).",
+    "sources": [
+      "https://www.seattle.gov/parks/parks/woodland-park",
+      "https://www.wallyhood.org/2025/11/november-6th-update-meeting-for-lhs-athletic-field/",
+      "https://www.seattle.gov/documents/Departments/ParksAndRecreation/BriefingPapers/BPRC%20Memo%20-%20Lincoln%20HS%207-23-26_ADA.pdf",
+      "https://www.letsrun.com/forum/flat_read.php?thread=3532850",
+      "https://www.openstreetmap.org/relation/6205462"
+    ]
+  },
+  {
+    "id": "queen-anne-bowl-track",
+    "name": "Queen Anne Bowl Track",
+    "area": "Queen Anne",
+    "kind": "track",
+    "miles": 0.23,
+    "surfaces": {
+      "gravel": 1.0
+    },
+    "elevation": "flat",
+    "start": {
+      "lat": 47.64559,
+      "lon": -122.35961,
+      "label": "Center of the Queen Anne Bowl Playfield track, 2806 3rd Ave W"
+    },
+    "lanes": null,
+    "access": "Seattle Parks playfield and track, open 4 am to 11:30 pm. Popular with youth sports groups and runners.",
+    "notes": "A 400-yard (about 366 m) unpaved loop of crushed rock and dirt around a turf field, so it is not a true 400 m. Street parking only; David Rodgers Park is next door.",
+    "sources": [
+      "https://seattle.gov/parks/allparks/queen-anne-bowl-playfield",
+      "https://www.yearofseattleparks.com/2011/11/01/queen-anne-bowl-playfield/",
+      "https://www.letsrun.com/forum/flat_read.php?thread=12142451",
+      "https://www.openstreetmap.org/relation/276066"
+    ]
+  },
+  {
+    "id": "montlake-playfield-track",
+    "name": "Montlake Playfield Track",
+    "area": "Montlake",
+    "kind": "track",
+    "miles": 0.25,
+    "surfaces": {
+      "dirt": 1.0
+    },
+    "elevation": "flat",
+    "start": {
+      "lat": 47.64257,
+      "lon": -122.30828,
+      "label": "Center of the Montlake Playfield track, around the turf football field"
+    },
+    "lanes": null,
+    "access": "Seattle Parks playfield that lists a track among its amenities; public park, but the infield can be booked for games and practices.",
+    "notes": "Dirt track around a synthetic turf field next to Montlake Community Center, which has restrooms. Maps measure it near 400 m, but one runner called it about 370 yards, so treat the lap as approximate.",
+    "sources": [
+      "https://seattle.gov/parks/allparks/montlake-playfield",
+      "https://www.letsrun.com/forum/flat_read.php?thread=3140706",
+      "https://www.openstreetmap.org/relation/5465517"
+    ]
+  },
+  {
+    "id": "hiawatha-playfield-track",
+    "name": "Hiawatha Playfield Track",
+    "area": "West Seattle (Admiral)",
+    "kind": "track",
+    "miles": 0.25,
+    "surfaces": {
+      "track": 1.0
+    },
+    "elevation": "flat",
+    "start": {
+      "lat": 47.57805,
+      "lon": -122.38545,
+      "label": "Center of the Hiawatha Playfield track, beside West Seattle High School"
+    },
+    "lanes": 3,
+    "access": "Seattle Parks playfield, open to the public 4 am to 11:30 pm.",
+    "notes": "Rubberized 3-lane, 400 m track around a turf field, resurfaced in 2023. Hiawatha Community Center is on the east side of the playfield.",
+    "sources": [
+      "https://www.seattle.gov/parks/parks/hiawatha-playfield",
+      "https://parkways.seattle.gov/2023/09/08/hiawatha-playfield-reopening/",
+      "https://www.openstreetmap.org/relation/537369"
+    ]
+  },
+  {
+    "id": "west-seattle-stadium-track",
+    "name": "West Seattle Stadium Track",
+    "area": "West Seattle (Fairmount Park)",
+    "kind": "track",
+    "miles": 0.25,
+    "surfaces": {
+      "track": 1.0
+    },
+    "elevation": "flat",
+    "start": {
+      "lat": 47.56305,
+      "lon": -122.37407,
+      "label": "Center of the West Seattle Stadium track, 4432 35th Ave SW"
+    },
+    "lanes": 8,
+    "access": "Seattle Parks stadium, open to the public when not rented. Grounds open 4 am to 11:30 pm; parking lot gates 7 am to 9 pm. Closed during games and meets.",
+    "notes": "Rubberized track replaced in 2017. Parking lot off 35th Ave SW next to the West Seattle Golf Course.",
+    "sources": [
+      "https://seattle.gov/parks/parks/west-seattle-stadium",
+      "https://parkways.seattle.gov/2017/09/29/west-seattle-stadium-track-renovation-project-complete/",
+      "https://www.letsrun.com/forum/flat_read.php?thread=5173195",
+      "https://www.openstreetmap.org/relation/10531234"
+    ]
+  },
+  {
+    "id": "nathan-hale-track",
+    "name": "Nathan Hale Playfield Track",
+    "area": "Meadowbrook",
+    "kind": "track",
+    "miles": 0.25,
+    "surfaces": {
+      "track": 1.0
+    },
+    "elevation": "flat",
+    "start": {
+      "lat": 47.70782,
+      "lon": -122.29215,
+      "label": "Center of the Nathan Hale High School stadium track, 30th Ave NE"
+    },
+    "lanes": 8,
+    "access": "Seattle Parks lists Nathan Hale Playfield with a track, open 4 am to 11:30 pm. Runners use it when Nathan Hale High School is not; closed for school events and games.",
+    "notes": "All-weather track in the high school stadium with a parking lot beside it. Meadowbrook Playfield and Community Center are just south.",
+    "sources": [
+      "https://seattle.gov/parks/find/parks/nathan-hale-playfield",
+      "https://www.yearofseattleparks.com/?p=32",
+      "https://www.letsrun.com/forum/flat_read.php?thread=10016821",
+      "https://www.openstreetmap.org/relation/544257"
+    ]
+  },
+  {
+    "id": "garfield-track",
+    "name": "Garfield Playfield Track",
+    "area": "Central District",
+    "kind": "track",
+    "miles": 0.25,
+    "surfaces": {
+      "track": 1.0
+    },
+    "elevation": "flat",
+    "start": {
+      "lat": 47.6052,
+      "lon": -122.30063,
+      "label": "Center of the Garfield High School track, east of the school near 25th Ave"
+    },
+    "lanes": 6,
+    "access": "Seattle Parks lists the track at Garfield Playfield (park hours 6 am to 10 pm). Runners report it open outside Garfield High School practices and events.",
+    "notes": "Six-lane all-weather track, often called the closest good track to downtown. The Garfield Super Block renovation (play area, restroom, loop path) began in 2025, so parts of the site may be fenced.",
+    "sources": [
+      "https://seattle.gov/parks/allparks/garfield-playfield",
+      "https://seattle.gov/parks/about-us/projects/garfield-super-block-renovation",
+      "https://www.letsrun.com/forum/flat_read.php?thread=10889356",
+      "https://www.letsrun.com/forum/flat_read.php?thread=12142451",
+      "https://www.openstreetmap.org/relation/2472848"
+    ]
+  },
+  {
+    "id": "roosevelt-hs-track",
+    "name": "Roosevelt High School Track",
+    "area": "Roosevelt",
+    "kind": "track",
+    "miles": 0.25,
+    "surfaces": {
+      "track": 1.0
+    },
+    "elevation": "flat",
+    "start": {
+      "lat": 47.67706,
+      "lon": -122.31446,
+      "label": "Center of the Roosevelt High School track, on 12th Ave NE across from Roosevelt station"
+    },
+    "lanes": 4,
+    "access": "Seattle Public Schools track with no gate, open to walk-in runners outside school use. May be off-limits during practices, such as summer football.",
+    "notes": "Rubberized track across the street from Roosevelt light rail station. Seattle Frontrunners hold Tuesday track sessions here, and it is often crowded.",
+    "sources": [
+      "https://www.letsrun.com/forum/flat_read.php?thread=12142451",
+      "https://www.letsrun.com/forum/flat_read.php?thread=10016821",
+      "https://www.meetup.com/seattle-frontrunners/events/315703887/",
+      "https://www.openstreetmap.org/relation/537398"
+    ]
+  },
+  {
+    "id": "ballard-hs-track",
+    "name": "Ballard High School Track",
+    "area": "Ballard",
+    "kind": "track",
+    "miles": 0.25,
+    "surfaces": {
+      "track": 1.0
+    },
+    "elevation": "flat",
+    "start": {
+      "lat": 47.67695,
+      "lon": -122.37314,
+      "label": "Center of the Ballard High School track, between NW 65th and NW 67th St"
+    },
+    "lanes": null,
+    "access": "Seattle Public Schools track. Runners report it unlocked in summer and outside school hours, but the gates are sometimes locked.",
+    "notes": "All-weather track on the east side of the Ballard High School campus. Access is inconsistent, so check the gate before planning a workout.",
+    "sources": [
+      "https://www.letsrun.com/forum/flat_read.php?thread=10016821",
+      "https://www.letsrun.com/forum/flat_read.php?thread=12142451",
+      "https://www.openstreetmap.org/relation/4289538"
+    ]
+  },
+  {
+    "id": "franklin-hs-track",
+    "name": "Franklin High School Track",
+    "area": "Mount Baker",
+    "kind": "track",
+    "miles": 0.25,
+    "surfaces": {
+      "track": 1.0
+    },
+    "elevation": "flat",
+    "start": {
+      "lat": 47.57673,
+      "lon": -122.29552,
+      "label": "Center of the Franklin High School track, west of the school building"
+    },
+    "lanes": null,
+    "access": "Seattle Public Schools track that runners report open to the public outside school hours, typically weekday evenings and weekends, barring school events.",
+    "notes": "Rubberized track a short walk from Mount Baker light rail station. One runner was unsure whether the gates are always unlocked.",
+    "sources": [
+      "https://www.letsrun.com/forum/flat_read.php?thread=10889356",
+      "https://www.letsrun.com/forum/flat_read.php?thread=12142451",
+      "https://www.openstreetmap.org/relation/537424"
+    ]
+  },
+  {
+    "id": "sw-athletic-complex-track",
+    "name": "Nino Cantu Southwest Athletic Complex Track",
+    "area": "Westwood",
+    "kind": "track",
+    "miles": 0.25,
+    "surfaces": {
+      "track": 1.0
+    },
+    "elevation": "flat",
+    "start": {
+      "lat": 47.52723,
+      "lon": -122.36691,
+      "label": "Center of the Southwest Athletic Complex track, SW Thistle St and 26th Ave SW"
+    },
+    "lanes": null,
+    "access": "Seattle Public Schools stadium used daily by community walkers and runners outside school and game times. Busy with high school football and meets in season.",
+    "notes": "Track rebuilt in 2018, across from Chief Sealth International High School. The Longfellow Creek trail runs beside the complex.",
+    "sources": [
+      "https://westseattleblog.com/forums-2/topic/public-running-track/",
+      "https://www.westsideseattle.com/node/54868",
+      "https://westseattleblog.com/2018/05/followup-southwest-athletic-complex-work-begins",
+      "https://www.openstreetmap.org/relation/5511880"
+    ]
+  },
+  {
+    "id": "mercer-island-hs-track",
+    "name": "Mercer Island High School Track (Islander Stadium)",
+    "area": "Mercer Island",
+    "kind": "track",
+    "miles": 0.25,
+    "surfaces": {
+      "track": 1.0
+    },
+    "elevation": "flat",
+    "start": {
+      "lat": 47.57187,
+      "lon": -122.22172,
+      "label": "Center of the Islander Stadium track, Mercer Island High School"
+    },
+    "lanes": 8,
+    "access": "Open to the public with a district key card ($5 a year, free for 65 and over): weekdays 5 to 7 am and 4:30 to 10 pm, weekends and holidays 5 am to 10 pm, unless the district is using it.",
+    "notes": "Get the key card from the district Maintenance and Operations office. The stadium closed for a few days in August 2025 for track painting.",
+    "sources": [
+      "https://www.mercerislandschools.org/programs-and-services/maintenance-operations",
+      "https://wm.mercerislandschools.org/news/~board/misd-news/post/islander-stadium-to-close-next-week-for-track-painting",
+      "https://www.mi-reporter.com/news/permit-renewals-for-community-access-to-the-mihs-track-are-due/",
+      "https://www.openstreetmap.org/relation/2071714"
+    ]
+  },
+  {
+    "id": "lake-washington-hs-track",
+    "name": "Lake Washington High School Track",
+    "area": "Kirkland (Rose Hill)",
+    "kind": "track",
+    "miles": 0.25,
+    "surfaces": {
+      "track": 1.0
+    },
+    "elevation": "flat",
+    "start": {
+      "lat": 47.67423,
+      "lon": -122.179,
+      "label": "Center of the Lake Washington High School stadium track, NE 80th St"
+    },
+    "lanes": 8,
+    "access": "LWSD tracks are closed to the public during the school day (7:30 am to 4 or 5 pm) and open evenings and weekends when no school activity is scheduled.",
+    "notes": "Stadium track at Lake Washington High School, 12033 NE 80th St. Expect closures for games and meets.",
+    "sources": [
+      "https://www.lwsd.org/services/facilities/facility-use",
+      "https://www.lwsd.org/services/facilities/building-use",
+      "https://www.openstreetmap.org/relation/7586542"
+    ]
+  },
+  {
+    "id": "juanita-hs-track",
+    "name": "Juanita High School Track",
+    "area": "Kirkland (Juanita)",
+    "kind": "track",
+    "miles": 0.25,
+    "surfaces": {
+      "track": 1.0
+    },
+    "elevation": "flat",
+    "start": {
+      "lat": 47.71438,
+      "lon": -122.19855,
+      "label": "Center of the Juanita High School stadium track, NE 132nd St"
+    },
+    "lanes": 8,
+    "access": "LWSD tracks are closed to the public during the school day (7:30 am to 4 or 5 pm) and open evenings and weekends when no school activity is scheduled.",
+    "notes": "Lit 8-lane all-weather track at Juanita High School, 10601 NE 132nd St. Expect closures for games and meets.",
+    "sources": [
+      "https://www.lwsd.org/services/facilities/facility-use",
+      "https://www.lwsd.org/services/facilities/building-use",
+      "https://www.openstreetmap.org/relation/7584554"
+    ]
+  },
+  {
+    "id": "redmond-hs-track",
+    "name": "Redmond High School Track",
+    "area": "Redmond (Education Hill)",
+    "kind": "track",
+    "miles": 0.25,
+    "surfaces": {
+      "track": 1.0
+    },
+    "elevation": "flat",
+    "start": {
+      "lat": 47.69437,
+      "lon": -122.10992,
+      "label": "Center of the track around Walter L. Seabloom Field, Redmond High School"
+    },
+    "lanes": null,
+    "access": "LWSD tracks are closed to the public during the school day (7:30 am to 4 or 5 pm) and open evenings and weekends when no school activity is scheduled.",
+    "notes": "Stadium track at Redmond High School, 17272 NE 104th St. Expect closures for games and meets.",
+    "sources": [
+      "https://www.lwsd.org/services/facilities/facility-use",
+      "https://www.lwsd.org/services/facilities/building-use",
+      "https://www.openstreetmap.org/relation/7136351"
+    ]
+  },
+  {
+    "id": "renton-memorial-stadium-track",
+    "name": "Renton Memorial Stadium Track",
+    "area": "Renton",
+    "kind": "track",
+    "miles": 0.25,
+    "surfaces": {
+      "track": 1.0
+    },
+    "elevation": "flat",
+    "start": {
+      "lat": 47.48871,
+      "lon": -122.20963,
+      "label": "Center of the Renton Memorial Stadium track, Logan Ave N"
+    },
+    "lanes": null,
+    "access": "Renton School District stadium. District policy makes athletic fields available to the community after hours when no district activity is scheduled; no posted drop-in hours were found.",
+    "notes": "All-weather rubberized track replaced in 2020, used by three high schools for football, soccer and track meets. The Cedar River Trail passes about 100 m away.",
+    "sources": [
+      "https://www.rentonschools.us/departments/business-services/facilities-rental",
+      "https://rentonhs.rentonschools.us/athletics/renton-memorial-stadium",
+      "https://www.rentonschools.us/locations/renton-memorial-stadium",
+      "https://www.openstreetmap.org/relation/149096"
+    ]
+  },
+  {
+    "id": "shoreline-stadium-track",
+    "name": "Shoreline Stadium Track",
+    "area": "Shoreline",
+    "kind": "track",
+    "miles": 0.25,
+    "surfaces": {
+      "track": 1.0
+    },
+    "elevation": "flat",
+    "start": {
+      "lat": 47.76505,
+      "lon": -122.32514,
+      "label": "Center of the Shoreline Stadium track at the Shoreline Center, 18560 1st Ave NE"
+    },
+    "lanes": null,
+    "access": "Shoreline School District stadium. Open to anyone by registering for Club Northwest's all-comers meets on summer Wednesday evenings; drop-in access at other times is not confirmed.",
+    "notes": "Home track for Shoreline high schools, next to Shoreline North/185th light rail station. Rentals go through the district athletic office.",
+    "sources": [
+      "https://clubnorthwest.org/all-comers",
+      "https://www.ssd412.org/departments/facility-use",
+      "https://www.openstreetmap.org/relation/5504219"
+    ]
+  },
+  {
+    "id": "einstein-ms-track",
+    "name": "Einstein Middle School Track",
+    "area": "Shoreline (Richmond Highlands)",
+    "kind": "track",
+    "miles": 0.25,
+    "surfaces": {
+      "track": 1.0
+    },
+    "elevation": "flat",
+    "start": {
+      "lat": 47.76904,
+      "lon": -122.36447,
+      "label": "Center of the Einstein Middle School track, west of the school building"
+    },
+    "lanes": 6,
+    "access": "Shoreline School District track that local runners use outside school hours; no official public hours were found.",
+    "notes": "Flat 6-lane track at a school rebuilt in 2020, next to Hillwood Park. Local runners describe it as a convenient option with a good surface.",
+    "sources": [
+      "https://nextdoor.com/pages/shoreline-stadium-shoreline-wa/",
+      "https://einstein.ssd412.org/about-us",
+      "https://www.openstreetmap.org/relation/18141973"
+    ]
+  }
+]

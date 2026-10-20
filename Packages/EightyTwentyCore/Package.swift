@@ -10,7 +10,8 @@ let package = Package(
         .library(name: "EightyTwentyCore", targets: ["EightyTwentyCore"]),
     ],
     targets: [
-        .target(name: "EightyTwentyCore"),
+        // Seattle-area trails and researched routes for the run map (tools/routes builds it).
+        .target(name: "EightyTwentyCore", resources: [.copy("Routes/seattle-routes.json")]),
         .testTarget(
             name: "EightyTwentyCoreTests",
             dependencies: ["EightyTwentyCore"],

@@ -4,6 +4,8 @@ import MapKit
 import EightyTwentyCore
 
 /// Record a run or walk like Strava: Start, Pause/Resume, Finish (hold), then Save or Discard.
+/// Before you start, the map shows where to run: every path colored by surface and the
+/// researched routes and tracks (`RouteCatalog`), filtered by the surface chips.
 struct RunView: View {
     /// What to record when nothing is in progress. Nil means whatever you picked last.
     var activity: ActivityKind? = nil
@@ -13,7 +15,19 @@ struct RunView: View {
     @AppStorage(PrefKey.recordActivity) private var lastActivity = ActivityKind.run.rawValue
     @AppStorage(PrefKey.cueEvery) private var cueEvery = 1.0
     @AppStorage(PrefKey.cueSpeak) private var cueSpeak = true
+    @AppStorage(PrefKey.routeSurfaces) private var surfacesStored = ""
+    @AppStorage(PrefKey.showTrails) private var showTrails = true
+    @AppStorage(PrefKey.followedRoute) private var followedRouteID = ""
     @State private var camera: MapCameraPosition = .userLocation(fallback: .automatic)
+    @State private var library = RouteLibrary.shared
+    @State private var mapBox: GeoBox?
+    @State private var visibleTrails: [TrailLine] = []
+    @State private var visibleRoutes: [RunRoute] = []
+    @State private var selection: RouteSelection?
+    /// Where you were when you opened the card or the list. Read then rather than in
+    /// `body`, so the map isn't rebuilt on every GPS fix while you stand there.
+    @State private var pickedFrom: GeoPoint?
+    @State private var showingRoutes = false
     @State private var confirmDiscard = false
     @State private var saving = false
     @State private var saved = false
@@ -25,6 +39,19 @@ struct RunView: View {
     /// "run" or "walk", for buttons.
     private var noun: String { recorder.activity.title.lowercased() }
     private var tint: Color { recorder.activity == .walk ? .green : .orange }
+    private var surfaces: Set<RunSurface> { RunSurface.set(from: surfacesStored) }
+    /// Paths and routes show while you pick where to go. While recording and after, only
+    /// the route you chose stays, so the map is about your run (and stays light).
+    private var showsLayers: Bool { recorder.state == .idle }
+    private var followedRoute: RunRoute? {
+        followedRouteID.isEmpty ? nil : library.catalog.route(id: followedRouteID)
+    }
+    /// Only read in actions, never in `body` (see `pickedFrom`).
+    private var here: GeoPoint? { recorder.lastLocation.map { GeoPoint($0.coordinate) } }
+
+    /// Past this many degrees of latitude (about 15 km), paths are too dense to draw; routes still show.
+    private static let trailSpan = 0.14
+    private static let maxTrails = 450
 
     var body: some View {
         VStack(spacing: 0) {
@@ -49,6 +76,24 @@ struct RunView: View {
             ToolbarItem(placement: .primaryAction) { updatesMenu }
         }
         .onChange(of: cueEvery) { recorder.updateCues() }
+        .onChange(of: surfacesStored) { refreshLayers() }
+        .onChange(of: showTrails) { refreshLayers() }
+        .task {
+            await library.load()
+            refreshLayers()
+        }
+        .sheet(isPresented: $showingRoutes) {
+            NearbyRoutesView(
+                catalog: library.catalog,
+                origin: pickedFrom ?? mapBox?.center ?? GeoPoint(latitude: 47.6062, longitude: -122.3321),
+                surfaces: surfaces,
+                usesMiles: usesMiles,
+                showTrails: $showTrails
+            ) { route in
+                select(.route(route))
+                withAnimation { camera = .region(route.box.padded(by: 0.15).region) }
+            }
+        }
         .onAppear {
             if recorder.state == .idle {
                 recorder.activity = activity ?? ActivityKind(rawValue: lastActivity) ?? .run
@@ -61,6 +106,8 @@ struct RunView: View {
         }
         .onChange(of: recorder.state) { _, state in
             UIApplication.shared.isIdleTimerDisabled = state == .running
+            if state != .idle { selection = nil }
+            refreshLayers()
         }
         .confirmationDialog("Discard this \(noun)?", isPresented: $confirmDiscard, titleVisibility: .visible) {
             Button("Discard", role: .destructive) { recorder.reset(usesMiles: usesMiles); saved = false }
@@ -107,17 +154,153 @@ struct RunView: View {
     // MARK: Map
 
     private var map: some View {
-        Map(position: $camera) {
-            UserAnnotation()
-            // One line per segment, so a pause doesn't draw a straight line across town.
-            ForEach(Array(recorder.tracker.segments.filter { $0.count > 1 }.enumerated()), id: \.offset) { _, segment in
-                MapPolyline(coordinates: segment.map { CLLocationCoordinate2D(latitude: $0.latitude, longitude: $0.longitude) })
-                    .stroke(tint, lineWidth: 5)
+        MapReader { proxy in
+            Map(position: $camera) {
+                UserAnnotation()
+                trailLayer
+                routeLayer
+                // One line per segment, so a pause doesn't draw a straight line across town.
+                ForEach(Array(recorder.tracker.segments.filter { $0.count > 1 }.enumerated()), id: \.offset) { _, segment in
+                    MapPolyline(coordinates: segment.map { CLLocationCoordinate2D(latitude: $0.latitude, longitude: $0.longitude) })
+                        .stroke(tint, lineWidth: 5)
+                }
+            }
+            .mapStyle(.standard(emphasis: .muted))
+            .mapControls {
+                MapUserLocationButton()
+            }
+            .onMapCameraChange(frequency: .onEnd) { context in
+                mapBox = GeoBox(context.region)
+                refreshLayers()
+            }
+            .onTapGesture { screenPoint in
+                tap(at: screenPoint, proxy: proxy)
             }
         }
-        .mapControls {
-            MapUserLocationButton()
+        .overlay(alignment: .top) {
+            if showsLayers {
+                SurfaceFilterBar(stored: $surfacesStored) {
+                    pickedFrom = here
+                    showingRoutes = true
+                }
+                    .padding(.top, 8)
+                    .padding(.trailing, 52) // clear of the location button
+            }
         }
+        .overlay(alignment: .bottom) {
+            if let selection, showsLayers {
+                RouteCard(
+                    selection: selection,
+                    catalog: library.catalog,
+                    origin: pickedFrom,
+                    usesMiles: usesMiles,
+                    followedRouteID: $followedRouteID
+                ) {
+                    self.selection = nil
+                }
+                .padding(10)
+            } else if showsLayers, !visibleTrails.isEmpty {
+                Text("© OpenStreetMap contributors")
+                    .font(.caption2)
+                    .padding(.horizontal, 6)
+                    .padding(.vertical, 2)
+                    .background(.regularMaterial, in: Capsule())
+                    .frame(maxWidth: .infinity, alignment: .trailing)
+                    .padding(8)
+            }
+        }
+    }
+
+    /// Every path in view, in its surface's color; faded where the surface is a guess.
+    @MapContentBuilder
+    private var trailLayer: some MapContent {
+        ForEach(visibleTrails) { line in
+            MapPolyline(coordinates: line.points.map(\.coordinate))
+                .stroke(line.surface.color.opacity(line.surfaceMapped ? 0.9 : 0.5), lineWidth: 3)
+        }
+        if case .trail(let trail) = selection {
+            let coordinates = trail.points.map(\.coordinate)
+            MapPolyline(coordinates: coordinates).stroke(.white, lineWidth: 9)
+            MapPolyline(coordinates: coordinates).stroke(trail.surface.color, lineWidth: 5)
+        }
+    }
+
+    /// Researched routes and tracks with a pin at each start; while recording, just the one you picked.
+    @MapContentBuilder
+    private var routeLayer: some MapContent {
+        ForEach(visibleRoutes) { route in
+            routeLines(route, emphasized: isPicked(route))
+        }
+        if let followedRoute, !showsLayers {
+            routeLines(followedRoute, emphasized: true)
+        }
+        ForEach(visibleRoutes) { route in
+            Annotation(route.name, coordinate: route.start.coordinate, anchor: .center) {
+                Button {
+                    select(.route(route))
+                } label: {
+                    Image(systemName: route.kind == .track ? "circle.circle" : "figure.run")
+                        .font(.caption.weight(.bold))
+                        .foregroundStyle(.white)
+                        .frame(width: 26, height: 26)
+                        .background(route.mainSurface.color, in: Circle())
+                        .overlay(Circle().stroke(.white, lineWidth: 2))
+                }
+                .accessibilityLabel(route.name)
+            }
+            .annotationTitles((mapBox?.latitudeSpan ?? 1) < 0.03 ? .automatic : .hidden)
+        }
+    }
+
+    /// A route drawn Strava style: its main surface's color over a white casing.
+    @MapContentBuilder
+    private func routeLines(_ route: RunRoute, emphasized: Bool) -> some MapContent {
+        ForEach(Array(route.lines.enumerated()), id: \.offset) { _, line in
+            let coordinates = line.map(\.coordinate)
+            MapPolyline(coordinates: coordinates)
+                .stroke(.white, style: StrokeStyle(lineWidth: emphasized ? 10 : 7, lineCap: .round, lineJoin: .round))
+            MapPolyline(coordinates: coordinates)
+                .stroke(route.mainSurface.color, style: StrokeStyle(lineWidth: emphasized ? 6 : 4, lineCap: .round, lineJoin: .round))
+        }
+    }
+
+    private func isPicked(_ route: RunRoute) -> Bool {
+        if case .route(let picked) = selection, picked.id == route.id { return true }
+        return route.id == followedRouteID
+    }
+
+    /// Recomputes what's drawn: on camera moves, filter changes, and when recording starts or ends.
+    private func refreshLayers() {
+        guard showsLayers, let box = mapBox else {
+            visibleTrails = []
+            visibleRoutes = []
+            return
+        }
+        let catalog = library.catalog
+        visibleRoutes = box.latitudeSpan < 0.6 ? catalog.routes(in: box, surfaces: surfaces) : []
+        visibleTrails = showTrails && box.latitudeSpan < Self.trailSpan
+            ? catalog.trails(in: box, surfaces: surfaces, limit: Self.maxTrails)
+            : []
+    }
+
+    /// Picks the route or path under your finger, with about 24 points of slack.
+    private func tap(at screenPoint: CGPoint, proxy: MapProxy) {
+        guard showsLayers,
+              let tapped = proxy.convert(screenPoint, from: .local),
+              let edge = proxy.convert(CGPoint(x: screenPoint.x + 24, y: screenPoint.y), from: .local)
+        else { return }
+        let point = GeoPoint(tapped)
+        let hit = RouteCatalog.hit(at: point, tolerance: point.distance(to: GeoPoint(edge)), routes: visibleRoutes, trails: visibleTrails)
+        switch hit {
+        case .route(let route): select(.route(route))
+        case .trail(let trail): select(.trail(trail))
+        case nil: selection = nil
+        }
+    }
+
+    private func select(_ picked: RouteSelection) {
+        pickedFrom = here
+        selection = picked
     }
 
     // MARK: Stats
