@@ -5043,5 +5043,1178 @@
    "https://archive.seattletimes.com/archive/20040108/nwwwalk08/frink-park-trail",
    "https://olmsted.org/olmsted-trail/jobs/frink-park"
   ]
+ },
+ {
+  "id": "green-lake-inner",
+  "name": "Green Lake Inner Loop",
+  "area": "Green Lake",
+  "kind": "loop",
+  "miles": 2.8,
+  "surfaces": {
+   "asphalt": 0.9,
+   "dirt": 0.1
+  },
+  "elevation": "flat",
+  "start": {
+   "lat": 47.68021,
+   "lon": -122.32918,
+   "label": "Green Lake Community Center (E Green Lake Dr N)"
+  },
+  "bbox": [
+   47.6713,
+   -122.3464,
+   47.685,
+   -122.329
+  ],
+  "pathNames": [
+   "Green Lake Trail"
+  ],
+  "waypoints": [
+   [
+    47.68021,
+    -122.32918
+   ],
+   [
+    47.68205,
+    -122.33211
+   ],
+   [
+    47.68462,
+    -122.33608
+   ],
+   [
+    47.68295,
+    -122.33979
+   ],
+   [
+    47.68104,
+    -122.34358
+   ],
+   [
+    47.67693,
+    -122.34584
+   ],
+   [
+    47.67313,
+    -122.34393
+   ],
+   [
+    47.67178,
+    -122.34019
+   ],
+   [
+    47.67398,
+    -122.33582
+   ],
+   [
+    47.67749,
+    -122.33258
+   ]
+  ],
+  "notes": "Paved 2.8-mile path at the water's edge, split into a pedestrian lane on the lake side and a counterclockwise wheeled lane. Mostly asphalt, with a dirt shoulder in places for softer footing. Very crowded on sunny afternoons and weekends; restrooms and drinking fountains at several spots around the lake.",
+  "sources": [
+   "https://seattle.gov/parks/about-us/projects/green-lake-inner-loop",
+   "https://parkways.seattle.gov/2022/10/28/safely-walk-run-and-roll-around-green-lake/",
+   "https://greatruns.com/seattle-green-lake/"
+  ],
+  "surfaceSource": "research"
+ },
+ {
+  "id": "green-lake-outer",
+  "name": "Green Lake Outer Loop",
+  "area": "Green Lake",
+  "kind": "loop",
+  "miles": 3.2,
+  "surfaces": {
+   "dirt": 0.85,
+   "concrete": 0.15
+  },
+  "elevation": "flat",
+  "start": {
+   "lat": 47.68107,
+   "lon": -122.32667,
+   "label": "E Green Lake Dr N by the Community Center"
+  },
+  "bbox": [
+   47.6698,
+   -122.3467,
+   47.6856,
+   -122.3258
+  ],
+  "pathNames": [],
+  "waypoints": [
+   [
+    47.68107,
+    -122.32667
+   ],
+   [
+    47.68251,
+    -122.332
+   ],
+   [
+    47.6855,
+    -122.33673
+   ],
+   [
+    47.68243,
+    -122.34088
+   ],
+   [
+    47.67947,
+    -122.34523
+   ],
+   [
+    47.67442,
+    -122.34579
+   ],
+   [
+    47.67041,
+    -122.34221
+   ],
+   [
+    47.67212,
+    -122.33802
+   ],
+   [
+    47.67547,
+    -122.3334
+   ],
+   [
+    47.67842,
+    -122.32928
+   ]
+  ],
+  "notes": "Dirt path beside the streets ringing the park, with short sidewalk stretches and several street crossings; the Dizzy Daze timed race runs it counterclockwise. Quieter than the inner path but next to traffic and puddly after rain.",
+  "sources": [
+   "https://ultrasignup.com/register.aspx?dtid=64128",
+   "https://parkways.seattle.gov/2022/10/28/safely-walk-run-and-roll-around-green-lake/",
+   "https://www.theurbanist.org/2023/02/14/pedestrians-were-erased-from-green-lake-outer-loop-planning/"
+  ],
+  "surfaceSource": "research"
+ },
+ {
+  "id": "burke-gilman-seattle",
+  "name": "Burke-Gilman Trail (Seattle)",
+  "area": "Ballard to Lake City",
+  "kind": "point-to-point",
+  "miles": 15.6,
+  "surfaces": {
+   "asphalt": 0.93,
+   "concrete": 0.07
+  },
+  "elevation": "flat",
+  "start": {
+   "lat": 47.68778,
+   "lon": -122.40249,
+   "label": "Golden Gardens Park south entrance (Seaview Ave NW)"
+  },
+  "bbox": [
+   47.6469,
+   -122.4062,
+   47.7338,
+   -122.265
+  ],
+  "pathNames": [
+   "Burke-Gilman Trail",
+   "Shilshole Avenue Northwest"
+  ],
+  "waypoints": [
+   [
+    47.68778,
+    -122.40249
+   ],
+   [
+    47.66862,
+    -122.40309
+   ],
+   [
+    47.66859,
+    -122.388
+   ],
+   [
+    47.66142,
+    -122.37069
+   ],
+   [
+    47.6505,
+    -122.355
+   ],
+   [
+    47.64692,
+    -122.33403
+   ],
+   [
+    47.65435,
+    -122.32688
+   ],
+   [
+    47.65529,
+    -122.30264
+   ],
+   [
+    47.66198,
+    -122.29201
+   ],
+   [
+    47.69073,
+    -122.26836
+   ],
+   [
+    47.71505,
+    -122.27788
+   ],
+   [
+    47.73371,
+    -122.28467
+   ]
+  ],
+  "notes": "Wide paved rail trail from Golden Gardens past the Ballard Locks, Fremont, Gas Works Park, the UW and Matthews Beach to the city line at NE 145th St, busy with fast bikes so keep right, with restrooms at Golden Gardens, Gas Works and Matthews Beach. The Ballard Missing Link (about 1.4 miles between the Locks and 11th Ave NW) is still on streets along Shilshole Ave NW, and most runners do one stretch as an out-and-back.",
+  "sources": [
+   "https://www.seattle.gov/transportation/projects-and-programs/programs/bike-program/bgtmissinglink",
+   "https://en.wikipedia.org/wiki/Burke%E2%80%93Gilman_Trail",
+   "https://www.theurbanist.org/seattle-advances-design-for-leary-way-bikeway-while-advocates-push-for-shilshole/"
+  ]
+ },
+ {
+  "id": "golden-gardens",
+  "name": "Golden Gardens Beach and Bluff Trails",
+  "area": "Golden Gardens / Sunset Hill",
+  "kind": "network",
+  "miles": 2.2,
+  "surfaces": {
+   "gravel": 0.4,
+   "dirt": 0.35,
+   "asphalt": 0.17,
+   "concrete": 0.08
+  },
+  "elevation": "hilly",
+  "start": {
+   "lat": 47.6914,
+   "lon": -122.40379,
+   "label": "Golden Gardens main beach lot (bathhouse)"
+  },
+  "bbox": [
+   47.6879,
+   -122.4051,
+   47.6963,
+   -122.3991
+  ],
+  "pathNames": [
+   "Trail #1",
+   "Trail #2",
+   "Trail #4",
+   "Trail #5",
+   "Trail #7",
+   "Trail #8"
+  ],
+  "waypoints": [
+   [
+    47.6914,
+    -122.40379
+   ],
+   [
+    47.69333,
+    -122.40473
+   ],
+   [
+    47.69109,
+    -122.40344
+   ],
+   [
+    47.68797,
+    -122.40302
+   ],
+   [
+    47.68926,
+    -122.40005
+   ],
+   [
+    47.69054,
+    -122.39964
+   ],
+   [
+    47.693,
+    -122.40147
+   ],
+   [
+    47.69625,
+    -122.40275
+   ],
+   [
+    47.69368,
+    -122.40256
+   ],
+   [
+    47.69066,
+    -122.40119
+   ]
+  ],
+  "notes": "Flat paved paths along the beach and north meadow, then forested 1930s WPA trails and stone stairs up the bluff toward the NW 85th St and 32nd Ave NW entrance, roughly 250 ft of climbing. Beach is packed on summer evenings; restrooms at the bathhouse; upper trails get muddy.",
+  "sources": [
+   "https://www.wta.org/go-hiking/hikes/golden-gardens-park",
+   "https://www.mountaineers.org/activities/routes-places/golden-gardens",
+   "https://www.outdoorproject.com/united-states/washington/golden-gardens-park"
+  ]
+ },
+ {
+  "id": "carkeek-park",
+  "name": "Carkeek Park: Piper's Creek and South Ridge",
+  "area": "Carkeek Park / Broadview",
+  "kind": "loop",
+  "miles": 2.7,
+  "surfaces": {
+   "gravel": 0.6,
+   "dirt": 0.35,
+   "boardwalk": 0.02,
+   "asphalt": 0.03
+  },
+  "elevation": "hilly",
+  "start": {
+   "lat": 47.71168,
+   "lon": -122.3766,
+   "label": "Carkeek Park lower lot near the playground"
+  },
+  "bbox": [
+   47.7037,
+   -122.3781,
+   47.7117,
+   -122.363
+  ],
+  "pathNames": [
+   "Piper's Creek Trail",
+   "South Ridge Trail",
+   "Hillside Trail",
+   "Salmonberry Trail",
+   "Brick Road Trail",
+   "Wetlands Trail"
+  ],
+  "waypoints": [
+   [
+    47.71168,
+    -122.3766
+   ],
+   [
+    47.71098,
+    -122.3718
+   ],
+   [
+    47.71016,
+    -122.3673
+   ],
+   [
+    47.70643,
+    -122.36443
+   ],
+   [
+    47.70395,
+    -122.36315
+   ],
+   [
+    47.70724,
+    -122.36494
+   ],
+   [
+    47.71065,
+    -122.36818
+   ],
+   [
+    47.70883,
+    -122.36945
+   ],
+   [
+    47.70954,
+    -122.37347
+   ],
+   [
+    47.71023,
+    -122.37683
+   ]
+  ],
+  "notes": "Gravel Piper's Creek Trail climbs gently up the salmon-stream ravine to the upper trailhead, then the dirt South Ridge Trail rolls along the wooded bluff with stair sections before dropping back to the lower lots, about 400 to 500 ft of climbing. Restrooms near the Environmental Learning Center and lower lots; signage is sparse and trails get muddy.",
+  "sources": [
+   "https://www.wta.org/go-hiking/hikes/carkeek-park",
+   "https://www.hikingproject.com/trail/7023820/carkeek-park",
+   "https://gotrail.run/en/event/carkeek-cooler-trail-run"
+  ]
+ },
+ {
+  "id": "woodland-park",
+  "name": "Woodland Park Trails",
+  "area": "Woodland Park / Phinney",
+  "kind": "network",
+  "miles": 1.8,
+  "surfaces": {
+   "dirt": 0.45,
+   "gravel": 0.33,
+   "asphalt": 0.22
+  },
+  "elevation": "rolling",
+  "start": {
+   "lat": 47.66533,
+   "lon": -122.34217,
+   "label": "N 50th St path near Green Lake Way N"
+  },
+  "bbox": [
+   47.6651,
+   -122.3468,
+   47.6721,
+   -122.3401
+  ],
+  "pathNames": [],
+  "waypoints": [
+   [
+    47.66533,
+    -122.34217
+   ],
+   [
+    47.66513,
+    -122.34548
+   ],
+   [
+    47.66598,
+    -122.34361
+   ],
+   [
+    47.66767,
+    -122.3454
+   ],
+   [
+    47.66899,
+    -122.3467
+   ],
+   [
+    47.6713,
+    -122.34558
+   ],
+   [
+    47.67082,
+    -122.34298
+   ],
+   [
+    47.66942,
+    -122.34015
+   ],
+   [
+    47.66657,
+    -122.34057
+   ]
+  ],
+  "notes": "Wooded dirt trails over the hill east of Aurora between N 50th St and Green Lake, linked by gravel paths along N 50th St and Green Lake Way N; easy to add onto a Green Lake run. Trails are unsigned and some are informal; restrooms and water near the Lower Woodland playfields and picnic shelters.",
+  "sources": [
+   "https://seattle.gov/parks/parks/woodland-park",
+   "https://yearofseattleparks.com/?p=218"
+  ]
+ },
+ {
+  "id": "ravenna-cowen",
+  "name": "Ravenna and Cowen Park Ravine Loop",
+  "area": "Ravenna / Roosevelt",
+  "kind": "loop",
+  "miles": 1.7,
+  "surfaces": {
+   "gravel": 0.58,
+   "dirt": 0.38,
+   "boardwalk": 0.02,
+   "concrete": 0.02
+  },
+  "elevation": "rolling",
+  "start": {
+   "lat": 47.67222,
+   "lon": -122.31369,
+   "label": "Cowen Park (west end of the ravine)"
+  },
+  "bbox": [
+   47.6703,
+   -122.3137,
+   47.6737,
+   -122.3024
+  ],
+  "pathNames": [
+   "Ravenna Park Bridge"
+  ],
+  "waypoints": [
+   [
+    47.67222,
+    -122.31369
+   ],
+   [
+    47.6726,
+    -122.3109
+   ],
+   [
+    47.67206,
+    -122.30866
+   ],
+   [
+    47.67192,
+    -122.30538
+   ],
+   [
+    47.67057,
+    -122.30244
+   ],
+   [
+    47.67196,
+    -122.30346
+   ],
+   [
+    47.67223,
+    -122.30638
+   ],
+   [
+    47.67242,
+    -122.3078
+   ],
+   [
+    47.67367,
+    -122.31093
+   ]
+  ],
+  "notes": "Gravel creekside trail down the shady Ravenna ravine from Cowen Park east toward 25th Ave NE, returning on the dirt north-rim trail, with short steep pitches, stairs and footbridges. Cool in summer and muddy in winter, with restrooms in both parks and about 4.5 miles of connected trails if you want more.",
+  "sources": [
+   "https://www.wta.org/go-hiking/hikes/cowen-and-ravenna-parks",
+   "https://trailrunproject.com/trail/7045893/ravenna-park-main-trail",
+   "https://www.parentmap.com/article/city-forest-walks-seattle-and-eastside-families/5"
+  ]
+ },
+ {
+  "id": "union-bay-natural-area",
+  "name": "Union Bay Natural Area and Yesler Swamp",
+  "area": "U District / Laurelhurst",
+  "kind": "loop",
+  "miles": 1.7,
+  "surfaces": {
+   "gravel": 0.68,
+   "boardwalk": 0.15,
+   "asphalt": 0.12,
+   "dirt": 0.05
+  },
+  "elevation": "flat",
+  "start": {
+   "lat": 47.65791,
+   "lon": -122.29097,
+   "label": "Center for Urban Horticulture lot (3501 NE 41st St)"
+  },
+  "bbox": [
+   47.654,
+   -122.2956,
+   47.6583,
+   -122.287
+  ],
+  "pathNames": [
+   "Loop Trail",
+   "Northeast Wahkiakum Lane",
+   "Yesler Swamp Trail"
+  ],
+  "waypoints": [
+   [
+    47.65791,
+    -122.29097
+   ],
+   [
+    47.6566,
+    -122.2938
+   ],
+   [
+    47.65546,
+    -122.29475
+   ],
+   [
+    47.65403,
+    -122.29416
+   ],
+   [
+    47.65466,
+    -122.29114
+   ],
+   [
+    47.65639,
+    -122.29214
+   ],
+   [
+    47.65814,
+    -122.29079
+   ],
+   [
+    47.6581,
+    -122.28834
+   ],
+   [
+    47.65705,
+    -122.28713
+   ],
+   [
+    47.65834,
+    -122.2885
+   ]
+  ],
+  "notes": "Flat packed-gravel loop through the UW wetland reserve on the old Montlake landfill, plus the Yesler Swamp boardwalk loop east of the Center for Urban Horticulture. A bird refuge with no dogs or bikes, so run considerately around birders; restrooms at the Center for Urban Horticulture on weekdays.",
+  "sources": [
+   "https://www.wta.org/go-hiking/hikes/union-bay-nature-area",
+   "https://thewholeu.uw.edu/2014/05/22/birding-and-hiking-on-the-loop-trail",
+   "https://birdweb.org/birdweb/site/seattle_-_union_bay_natural_area_(montlake_fill)/3"
+  ]
+ },
+ {
+  "id": "magnuson-park",
+  "name": "Magnuson Park Wetlands and Shore Loop",
+  "area": "Sand Point",
+  "kind": "loop",
+  "miles": 3.4,
+  "surfaces": {
+   "gravel": 0.45,
+   "asphalt": 0.4,
+   "dirt": 0.15
+  },
+  "elevation": "flat",
+  "start": {
+   "lat": 47.67637,
+   "lon": -122.2609,
+   "label": "Just inside the NE 65th St park entrance"
+  },
+  "bbox": [
+   47.6759,
+   -122.261,
+   47.6845,
+   -122.2479
+  ],
+  "pathNames": [
+   "Cross Park Trail North",
+   "Cross Park Trail South",
+   "Frog Pond Trail",
+   "Beach Walk",
+   "Lake Shore Drive Northeast"
+  ],
+  "waypoints": [
+   [
+    47.67637,
+    -122.2609
+   ],
+   [
+    47.67771,
+    -122.25688
+   ],
+   [
+    47.67601,
+    -122.25326
+   ],
+   [
+    47.67827,
+    -122.24901
+   ],
+   [
+    47.68187,
+    -122.25055
+   ],
+   [
+    47.68331,
+    -122.24929
+   ],
+   [
+    47.68325,
+    -122.25517
+   ],
+   [
+    47.68202,
+    -122.25871
+   ],
+   [
+    47.68072,
+    -122.25511
+   ],
+   [
+    47.67837,
+    -122.25847
+   ]
+  ],
+  "notes": "Flat mix of paved paths along the Lake Washington shore and gravel trails through the restored wetlands and meadows of the former naval air station. Rarely crowded except near the swimming beach and the big off-leash area; restrooms near the swimming beach and the boat launch.",
+  "sources": [
+   "https://www.wta.org/go-hiking/hikes/magnuson-park",
+   "https://www.10adventures.com/hikes/seattle/warren-g-magnuson-park-loop/"
+  ]
+ },
+ {
+  "id": "jackson-park-perimeter",
+  "name": "Jackson Park Perimeter Trail",
+  "area": "Pinehurst / Northgate / Lake City",
+  "kind": "loop",
+  "miles": 2.2,
+  "surfaces": {
+   "gravel": 0.7,
+   "concrete": 0.22,
+   "dirt": 0.08
+  },
+  "elevation": "rolling",
+  "start": {
+   "lat": 47.72695,
+   "lon": -122.31713,
+   "label": "Trail lot on NE 135th St near 11th Ave NE"
+  },
+  "bbox": [
+   47.725,
+   -122.3234,
+   47.734,
+   -122.3128
+  ],
+  "pathNames": [
+   "Jackson Park Perimeter Trail"
+  ],
+  "waypoints": [
+   [
+    47.72695,
+    -122.31713
+   ],
+   [
+    47.72679,
+    -122.31334
+   ],
+   [
+    47.72927,
+    -122.31357
+   ],
+   [
+    47.73126,
+    -122.31549
+   ],
+   [
+    47.73393,
+    -122.317
+   ],
+   [
+    47.73396,
+    -122.32081
+   ],
+   [
+    47.73251,
+    -122.32321
+   ],
+   [
+    47.7288,
+    -122.3233
+   ],
+   [
+    47.72503,
+    -122.32342
+   ],
+   [
+    47.72518,
+    -122.31984
+   ]
+  ],
+  "notes": "Crushed-gravel loop around Jackson Park Golf Course with a shady forest stretch on the south side and sidewalk links along NE 145th St and 15th Ave NE. Freeway noise along the I-5 side and a few stair sections; the once-muddy west side has been regraveled.",
+  "sources": [
+   "https://www.hikingproject.com/trail/7101595/jackson-park-trail",
+   "https://www.wta.org/go-hiking/hikes/jackson-park",
+   "https://parkways.seattle.gov/2015/06/24/celebrate-improvements-at-jackson-park-golf-on-june-27/"
+  ]
+ },
+ {
+  "id": "maple-leaf-reservoir",
+  "name": "Maple Leaf Reservoir Park Loops",
+  "area": "Maple Leaf",
+  "kind": "network",
+  "miles": 0.9,
+  "surfaces": {
+   "asphalt": 0.6,
+   "gravel": 0.4
+  },
+  "elevation": "flat",
+  "start": {
+   "lat": 47.68949,
+   "lon": -122.31524,
+   "label": "South side of the park (NE 82nd St entrance)"
+  },
+  "bbox": [
+   47.6895,
+   -122.3173,
+   47.6914,
+   -122.3137
+  ],
+  "pathNames": [],
+  "waypoints": [
+   [
+    47.68949,
+    -122.31524
+   ],
+   [
+    47.68973,
+    -122.31419
+   ],
+   [
+    47.69052,
+    -122.31395
+   ],
+   [
+    47.69138,
+    -122.31454
+   ],
+   [
+    47.69143,
+    -122.31569
+   ],
+   [
+    47.69118,
+    -122.3169
+   ],
+   [
+    47.69013,
+    -122.31719
+   ],
+   [
+    47.68968,
+    -122.31609
+   ]
+  ],
+  "notes": "Smooth half-mile paved loop around the lidded reservoir plus a 0.3-mile gravel loop on the lawn inside it, good for easy laps or strides with views of downtown and Mount Rainier. Restroom and drinking fountain by the play area at the south end; rarely crowded.",
+  "sources": [
+   "https://www.parentmap.com/article/best-bike-paths-for-kids-seattle-bellevue-eastside/3",
+   "https://www.bergerpartnership.com/work/maple-leaf-park/"
+  ]
+ },
+ {
+  "id": "interurban-shoreline",
+  "name": "Interurban Trail (Shoreline)",
+  "area": "Shoreline",
+  "kind": "point-to-point",
+  "miles": 3.4,
+  "surfaces": {
+   "asphalt": 0.9,
+   "concrete": 0.1
+  },
+  "elevation": "rolling",
+  "start": {
+   "lat": 47.7342,
+   "lon": -122.34793,
+   "label": "N 145th St at the Seattle city line (Linden Ave N)"
+  },
+  "bbox": [
+   47.7342,
+   -122.3479,
+   47.7777,
+   -122.3345
+  ],
+  "pathNames": [
+   "Shoreline Interurban Trail",
+   "Interurban Trail"
+  ],
+  "waypoints": [
+   [
+    47.7342,
+    -122.34793
+   ],
+   [
+    47.74018,
+    -122.34603
+   ],
+   [
+    47.74437,
+    -122.34473
+   ],
+   [
+    47.75055,
+    -122.34418
+   ],
+   [
+    47.7567,
+    -122.34464
+   ],
+   [
+    47.76231,
+    -122.34567
+   ],
+   [
+    47.76719,
+    -122.34417
+   ],
+   [
+    47.77252,
+    -122.34115
+   ],
+   [
+    47.77412,
+    -122.33616
+   ],
+   [
+    47.77759,
+    -122.33521
+   ]
+  ],
+  "notes": "Paved multi-use trail on the old Interurban rail line from N 145th St to N 205th St, crossing Aurora and N 155th St on the Interurban pedestrian bridges and passing Echo Lake and Shoreline City Hall. Gentle grades and several street crossings; continues north into Edmonds and south as a bikeway along Linden Ave N.",
+  "sources": [
+   "https://shorelinewa.gov/home/showpublisheddocument/1663/636948226864930000",
+   "https://cosweb.shorelinewa.gov/uploads/attachments/par/art/pages/interurbanbridges.html"
+  ]
+ },
+ {
+  "id": "hamlin-park",
+  "name": "Hamlin Park Forest Trails",
+  "area": "Shoreline (Ridgecrest / Briarcrest)",
+  "kind": "network",
+  "miles": 1.9,
+  "surfaces": {
+   "dirt": 0.72,
+   "gravel": 0.08,
+   "asphalt": 0.2
+  },
+  "elevation": "hilly",
+  "start": {
+   "lat": 47.74516,
+   "lon": -122.30688,
+   "label": "Hamlin Park main lot (off Hamlin Park Rd from 15th Ave NE)"
+  },
+  "bbox": [
+   47.7451,
+   -122.3129,
+   47.7492,
+   -122.3056
+  ],
+  "pathNames": [],
+  "waypoints": [
+   [
+    47.74516,
+    -122.30688
+   ],
+   [
+    47.74633,
+    -122.31007
+   ],
+   [
+    47.7455,
+    -122.31291
+   ],
+   [
+    47.74533,
+    -122.31158
+   ],
+   [
+    47.74658,
+    -122.31273
+   ],
+   [
+    47.74822,
+    -122.31034
+   ],
+   [
+    47.74842,
+    -122.30854
+   ],
+   [
+    47.74774,
+    -122.30677
+   ],
+   [
+    47.74679,
+    -122.30637
+   ]
+  ],
+  "notes": "Shoreline's largest forest park, a maze of unsigned dirt singletrack around a central gravel trail on hilly ground; trip reports describe a 2-mile running loop marked with white arrows. The trails drain well in wet weather; restroom near the main lot.",
+  "sources": [
+   "https://www.wta.org/go-hiking/hikes/hamlin-park-shoreline",
+   "https://www.wta.org/go-hiking/trip-reports/trip_report.2015-02-21.3813361067"
+  ]
+ },
+ {
+  "id": "shoreview-boeing-creek",
+  "name": "Shoreview and Boeing Creek Park Trails",
+  "area": "Shoreline (Innis Arden / Highlands)",
+  "kind": "network",
+  "miles": 1.9,
+  "surfaces": {
+   "dirt": 0.9,
+   "asphalt": 0.1
+  },
+  "elevation": "hilly",
+  "start": {
+   "lat": 47.75117,
+   "lon": -122.36601,
+   "label": "Shoreview Park lot (700 NW Innis Arden Way)"
+  },
+  "bbox": [
+   47.7505,
+   -122.3686,
+   47.7558,
+   -122.3611
+  ],
+  "pathNames": [
+   "Boeing Creek Trail",
+   "Hidden Lake Trail"
+  ],
+  "waypoints": [
+   [
+    47.75117,
+    -122.36601
+   ],
+   [
+    47.75103,
+    -122.36842
+   ],
+   [
+    47.7532,
+    -122.36647
+   ],
+   [
+    47.75421,
+    -122.36579
+   ],
+   [
+    47.75578,
+    -122.36274
+   ],
+   [
+    47.75367,
+    -122.3616
+   ],
+   [
+    47.75392,
+    -122.36359
+   ],
+   [
+    47.75129,
+    -122.36335
+   ],
+   [
+    47.75232,
+    -122.36475
+   ]
+  ],
+  "notes": "Steep dirt trails through big conifers down into the Boeing Creek ravine from Shoreview Park, with several short loops that can be combined; the Hidden Lake dam was removed in 2022. Restrooms and parking at Shoreview Park; muddy and rooty in winter.",
+  "sources": [
+   "https://www.wta.org/go-hiking/hikes/boeing-creek-park",
+   "https://www.mountaineers.org/activities/trip-reports/shoreview-boeing-creek-parks",
+   "https://www.trailforks.com/trails/hidden-lake-loop/"
+  ]
+ },
+ {
+  "id": "richmond-beach-saltwater",
+  "name": "Richmond Beach Saltwater Park Hill Loop",
+  "area": "Richmond Beach (Shoreline)",
+  "kind": "loop",
+  "miles": 1.6,
+  "surfaces": {
+   "gravel": 0.45,
+   "asphalt": 0.25,
+   "dirt": 0.15,
+   "concrete": 0.15
+  },
+  "elevation": "hilly",
+  "start": {
+   "lat": 47.76692,
+   "lon": -122.38255,
+   "label": "Upper park entrance (2021 NW 190th St)"
+  },
+  "bbox": [
+   47.762,
+   -122.3868,
+   47.7669,
+   -122.3814
+  ],
+  "pathNames": [],
+  "waypoints": [
+   [
+    47.76691,
+    -122.38255
+   ],
+   [
+    47.76455,
+    -122.38158
+   ],
+   [
+    47.76436,
+    -122.38291
+   ],
+   [
+    47.76378,
+    -122.38554
+   ],
+   [
+    47.76441,
+    -122.38614
+   ],
+   [
+    47.76257,
+    -122.38424
+   ],
+   [
+    47.76301,
+    -122.38488
+   ],
+   [
+    47.76405,
+    -122.3839
+   ],
+   [
+    47.76599,
+    -122.38441
+   ]
+  ],
+  "notes": "Drops from the upper entrance down the bluff to the beach, crosses the railroad on a long, steep pedestrian bridge, follows the short beach trail and climbs back, about 150 to 200 ft of climbing per lap with Puget Sound and Olympic views. Restrooms by the parking lots; the bridge shakes when trains pass.",
+  "sources": [
+   "https://www.seattleaquarium.org/wp-content/uploads/2025/01/Richmond-Beach-Saltwater-Park-One-Pager.pdf",
+   "https://www.thetraveler.org/richmond-beach-saltwater-park-a-shoreline-escape-near-seattle/"
+  ]
+ },
+ {
+  "id": "burke-gilman-lake-forest-park",
+  "name": "Burke-Gilman Trail (Lake Forest Park)",
+  "area": "Lake Forest Park",
+  "kind": "out-and-back",
+  "miles": 4.5,
+  "surfaces": {
+   "asphalt": 1.0
+  },
+  "elevation": "flat",
+  "start": {
+   "lat": 47.75783,
+   "lon": -122.26429,
+   "label": "Log Boom Park / Tracy Owen Station (Kenmore)"
+  },
+  "bbox": [
+   47.7338,
+   -122.2865,
+   47.758,
+   -122.264
+  ],
+  "pathNames": [
+   "Burke-Gilman Trail"
+  ],
+  "waypoints": [
+   [
+    47.75783,
+    -122.26429
+   ],
+   [
+    47.75736,
+    -122.26905
+   ],
+   [
+    47.7546,
+    -122.27374
+   ],
+   [
+    47.75239,
+    -122.27872
+   ],
+   [
+    47.74892,
+    -122.28262
+   ],
+   [
+    47.74379,
+    -122.28449
+   ],
+   [
+    47.73867,
+    -122.28594
+   ],
+   [
+    47.73376,
+    -122.28469
+   ]
+  ],
+  "notes": "Paved trail from Log Boom Park west along the north end of Lake Washington, past Lake Forest Park Town Center, then south beside Bothell Way NE to the Seattle line at NE 145th St and back. Flat and steady, busy with bikes on weekends; restrooms and parking at Log Boom Park.",
+  "sources": [
+   "https://en.wikipedia.org/wiki/Burke%E2%80%93Gilman_Trail",
+   "https://www.kenmorewa.gov/Home/Components/FacilityDirectory/FacilityDirectory/14/103?fsiteid=1"
+  ]
  }
 ]

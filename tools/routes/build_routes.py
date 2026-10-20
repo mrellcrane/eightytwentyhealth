@@ -234,6 +234,11 @@ def track_ovals(data_dir):
 
 def main(data_dir):
     segments = classify_segments(data_dir)
+    routes = []
+    routes_path = os.path.join(HERE, "routes.json")
+    if os.path.exists(routes_path):
+        import route_lines
+        routes = route_lines.build(segments, data_dir, routes_path)
     trails = build_trails(segments) + track_ovals(data_dir)
     by_surface = Counter()
     for t in trails:
@@ -242,12 +247,6 @@ def main(data_dir):
           {k: f"{v / 1609.344:.0f} mi" for k, v in by_surface.most_common()})
     mapped = sum(t[4] for t in trails if t[1]) / max(1, sum(by_surface.values()))
     print(f"surface tagged in OSM for {mapped:.0%} of the length")
-
-    routes = []
-    routes_path = os.path.join(HERE, "routes.json")
-    if os.path.exists(routes_path):
-        import route_lines
-        routes = route_lines.build(segments, data_dir, routes_path)
 
     doc = {"attribution": ATTRIBUTION, "trails": [t[:4] for t in trails], "routes": routes}
     with open(OUT, "w") as f:

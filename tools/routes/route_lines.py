@@ -63,7 +63,7 @@ def segment_tree(segments):
 
 
 class Network:
-    def __init__(self, segments, box, wanted_names):
+    def __init__(self, segments, box, wanted_names, preferred_surfaces=()):
         self.adj = defaultdict(list)
         self.coord = {}
         self.named_nodes = set()
@@ -82,6 +82,10 @@ class Network:
             if named:
                 cost *= 0.35
             surface = edge_surface(s)
+            # Where a soft path runs beside a paved one (Green Lake's outer loop), stay on the
+            # surface the route is known for.
+            if surface[0] in preferred_surfaces:
+                cost *= 0.75
             # Extra vertices every ~40 m, so a waypoint snaps to the path beside it rather than
             # to the far end of a long straight piece (bridges, tunnels).
             coords = list(s["geom"].segmentize(0.0004).coords)
@@ -147,7 +151,8 @@ def route_line(route, segments):
     lons = [w[1] for w in waypoints] + [start[1]]
     pad = 0.01
     box = (min(lons) - pad, min(lats) - pad, max(lons) + pad, max(lats) + pad)
-    net = Network(segments, box, [norm(n) for n in route.get("pathNames") or [] if norm(n)])
+    preferred = {k for k, v in route["surfaces"].items() if v >= 0.3}
+    net = Network(segments, box, [norm(n) for n in route.get("pathNames") or [] if norm(n)], preferred)
     if route["kind"] == "loop" and len(waypoints) > 2 and math.dist(waypoints[0], waypoints[-1]) > 0.0005:
         waypoints = waypoints + [waypoints[0]]
     nodes, snaps = [], []
@@ -227,17 +232,17 @@ def build(segments, data_dir, routes_path):
             # OSM's own split where it tags nearly all of the drawn line (it's per-segment data and
             # matches the colored paths underneath); otherwise the researched split, which weighs
             # OSM against the trail's own pages. Big disagreements get a look.
-            use_osm = info["mapped"] >= 0.8 and 0.85 <= ratio <= 1.15
+            use_osm = info["mapped"] >= 0.8 and 0.85 <= ratio <= 1.15 and r.get("surfaceSource") != "research"
             surfaces = computed if use_osm else r["surfaces"]
             gap = sum(abs(computed.get(k, 0) - surfaces.get(k, 0)) for k in set(computed) | set(surfaces))
             computed_label = "OSM" if use_osm else "research"
             check = (f"[{computed_label}] drawn {length / MILE:.2f} mi vs researched {miles} (x{ratio:.2f}); snaps {info['snaps']} m; "
-                     f"OSM surfaces ({info['mapped']:.0%} tagged) {computed} vs researched {surfaces}")
+                     f"OSM surfaces ({info['mapped']:.0%} tagged) {computed} vs researched {r['surfaces']}")
             if not 0.6 <= ratio <= 1.6 or max(info["snaps"]) > 150 or (info["mapped"] >= 0.6 and gap > 0.6 and not use_osm):
                 problems.append(f"{r['id']}: {check}")
-            # A trail's own length is what a runner means; keep the researched one if the drawing is off.
-            if not 0.85 <= ratio <= 1.15:
-                length = miles * MILE
+            # Show the researched length (the published figure where there is one, the number
+            # runners know); the drawn line is checked against it above.
+            length = miles * MILE
         print(f"  {r['id']}: {check}")
         out.append({
             "id": r["id"], "name": r["name"], "area": r["area"], "kind": r["kind"], "meters": round(length),
@@ -250,3 +255,4 @@ def build(segments, data_dir, routes_path):
     for p in problems:
         print("  CHECK", p)
     return out
+
