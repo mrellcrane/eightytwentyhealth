@@ -169,6 +169,16 @@ Below it, "How long and how often" (Basso 2019; Parsons 2017: people in 8-week c
 - **Lock Screen and Dynamic Island**: a Live Activity (`RecordingWidgets` extension, `RecordingAttributes` shared with the app) shows time, distance and average pace. The clock ticks on its own; distance updates at most every 5 seconds, right away on pause, resume and each distance update. Ended on finish, and at launch if one was left behind.
 - **Distance updates** (`Run/DistanceCues`, tested): every 0.25, 0.5, 1 or 2 mi or km (default 1), a notification like "2 miles in 18:40 / Average 9:20 /mi. Last mile 9:45.", also read out loud by default (`CueAnnouncer`, ducking music; the `audio` background mode lets it speak with the screen locked). The bell on the recorder changes it, mid-recording too.
 
+### Where to run: the route map
+
+Before you start, the recorder's map shows where to run around Seattle, Strava style (`Routes/RouteCatalog`, tested; data in `Routes/seattle-routes.json`, built by `tools/routes`, see its README).
+
+- **Every path, colored by surface**: about 10,700 lines (1,600 miles) of OpenStreetMap footpaths, trails, bike paths, forest roads and track ovals, from Des Moines to Shoreline and Puget Sound to Issaquah. Sidewalks, crossings and unnamed walkways outside parks are left out. Surfaces fold into asphalt, concrete, gravel, dirt, boardwalk and track. Overture's copy of OSM only says "paved", so the real `surface` tags come from the OSM planet file. About 60% of the length is tagged; the rest is guessed from what most paths of the same kind, in or out of a park, are made of, and is drawn faded with a note in its card.
+- **Researched routes and tracks**: classic loops, trails, park trail webs and public tracks (October 2026, sources in `tools/routes/routes.json`), each drawn by routing its waypoints along the real network. A route's surface split comes from OSM where it tags 80% or more of the drawn line, otherwise from the research. Tracks are only ones a source says the public can use, with the rules.
+- **Filter**: surface chips across the top. With all on they're the color key; tapping one shows only that surface, then taps add or remove. A route shows when at least half of it is on the picked surfaces. "Routes" lists them nearest first (all, loops, trails or tracks) and can turn off the path layer.
+- **Tap** a path or route for its card (surface, length, how far, notes, access, Apple Maps directions to the start). "Keep on map" pins a route so it stays drawn while you record; the rest of the layers hide while recording so the map stays about your run.
+- Paths draw only when the map spans under ~15 km, at most 450 at a time, longest first. Credit: "© OpenStreetMap contributors" on the map and in cards (ODbL).
+
 ## Naps
 
 Record > Nap: pick an alarm length (10 to 90 minutes, falling asleep included; default 15, the catalog's `power-nap`, about 10 minutes of sleep once you drift off), lie down, and an alarm wakes you. `Nap/Nap` (core, tested) holds the nap and its math; `NapGuide` the lengths and heads-ups: under 15 minutes, 30 or more (grogginess first, Brooks & Lack 2006), and later than the catalog's nap hours (12-16).
@@ -200,6 +210,7 @@ Record > Nap: pick an alarm length (10 to 90 minutes, falling asleep included; d
 | Sync | | `Services/Sync/SyncService`, `BackgroundRefresh` |
 | Backup | `Backup/BackupDocument` (format, merge, pruning) | `Services/Backup/BackupService`, `Persistence/Repository` |
 | Run and walk recorder | `Run/RunTracker`, `Run/Polyline`, `Run/DistanceCues` | `Services/Location/RunRecorder`, `RecordingLiveActivity`, `CueAnnouncer`, `Features/Run`, `Widgets/` (Live Activity) |
+| Route map | `Routes/RunSurface`, `Routes/Geo`, `Routes/RouteCatalog` (+ `seattle-routes.json`, from `tools/routes`) | `Features/Run/RunView` (layers, tap), `Features/Run/RouteViews` (library, chips, card, nearby list) |
 | Training | `Training/RunningPlan` (weekly miles, green/yellow/red), `Training/TrainingAdvisor` (cardio/strength/both today), `Training/RunScreenshotParser` | `Features/Run/RunningView`, `Shared/TrainingInput`, `Services/ScreenshotReader`, Today's training card |
 | Meditation | `Meditation/MeditationTimer`, `Meditation/MeditationGuide` (styles, plan, findings) | `Features/Meditation`, `Services/Notifications` |
 | Nap | `Nap/Nap` (`Nap`, `NapGuide`) | `Features/Nap/NapView` (`NapSession`), `Services/Notifications/NapAlarm` (AlarmKit, notification fallback) |
