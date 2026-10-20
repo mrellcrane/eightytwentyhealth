@@ -1,0 +1,1429 @@
+[
+ {
+  "center": [
+   47.42435,
+   -122.45616
+  ],
+  "name": "Vashon High School Track",
+  "area": "Vashon Island",
+  "owner": "Vashon Island School District (community use run by Vashon Park District)",
+  "access": "limited",
+  "note": "Vashon High School track, open to the public after school through the Vashon Park District's Commons agreement. In 2018 the open hours were 3 to 9 pm on weekdays and 9 am to 5 pm on weekends.",
+  "sources": [
+   "https://www.vashonbeachcomber.com/?p=20031",
+   "https://vashonparks.org/vashon-commons",
+   "https://www.vashonbeachcomber.com/2018/09/19/community-celebrates-new-track-and-field/"
+  ]
+ },
+ {
+  "center": [
+   47.57305,
+   -122.39134
+  ],
+  "name": "Madison Middle School Track",
+  "area": "West Seattle",
+  "owner": "Seattle Public Schools",
+  "access": "after-hours",
+  "note": "Seattle Public Schools track, open to the public before and after school when students or a permitted group are not using it. Shorter than a full 400 m track.",
+  "sources": [
+   "https://www.seattleschools.org/wp-content/uploads/2021/07/4200SP.C.pdf",
+   "https://www.seattleschools.org/about/school-board/policies/4200sp-c-unauthorized-persons-on-school-property/"
+  ]
+ },
+ {
+  "center": [
+   47.67815,
+   -122.38054
+  ],
+  "name": "Salmon Bay School Track",
+  "area": "Ballard",
+  "owner": "Seattle Public Schools",
+  "access": "after-hours",
+  "note": "Seattle Public Schools track, open to the public before and after school when students or a permitted group are not using it. A short loop, well under 400 m.",
+  "sources": [
+   "https://www.seattleschools.org/wp-content/uploads/2021/07/4200SP.C.pdf",
+   "https://www.seattleschools.org/about/school-board/policies/4200sp-c-unauthorized-persons-on-school-property/"
+  ]
+ },
+ {
+  "center": [
+   47.65076,
+   -122.35885
+  ],
+  "name": "Seattle Pacific University Track (Wallace Field)",
+  "area": "North Queen Anne",
+  "owner": "Seattle Pacific University",
+  "access": "unknown",
+  "note": "Four-lane practice track at Wallace Field used by Seattle Pacific's track and soccer teams. No public use policy was found.",
+  "sources": [
+   "https://spufalcons.com/facilities/wallace-field/210"
+  ]
+ },
+ {
+  "center": [
+   47.60714,
+   -122.31748
+  ],
+  "name": "Seattle University Park Track (Logan Field)",
+  "area": "Capitol Hill",
+  "owner": "Seattle University",
+  "access": "open",
+  "note": "Seattle University's track around Logan Field. Open to the public in daylight when no team practice or event is scheduled.",
+  "sources": [
+   "https://www.zafiri.com/seattle",
+   "https://www.seattle.gov/documents/Departments/Neighborhoods/MajorInstitutions/SeattleUniversity/Notes20120112.pdf",
+   "https://goseattleu.com/news/2012/09/20/first-day-of-practice-at-new-seattle-university-park"
+  ]
+ },
+ {
+  "center": [
+   47.65676,
+   -122.29824
+  ],
+  "name": "Husky Track",
+  "area": "University District",
+  "owner": "University of Washington",
+  "access": "closed",
+  "note": "UW's varsity track, built for its athletes. Non-students can only use it as a guest of a member, apart from public events such as the All-City Mile.",
+  "sources": [
+   "https://gohuskies.com/sports/2013/9/19/209263717",
+   "https://www.zafiri.com/seattle",
+   "https://www.washington.edu/ima/member/"
+  ]
+ },
+ {
+  "center": [
+   47.68085,
+   -122.29419
+  ],
+  "name": "Eckstein Middle School Track",
+  "area": "Wedgwood",
+  "owner": "Seattle Public Schools",
+  "access": "after-hours",
+  "note": "Seattle Public Schools track, open to the public before and after school when students or a permitted group are not using it. OpenStreetMap marks it private, so the gate may be locked.",
+  "sources": [
+   "https://www.seattleschools.org/wp-content/uploads/2021/07/4200SP.C.pdf",
+   "https://www.seattleschools.org/about/school-board/policies/4200sp-c-unauthorized-persons-on-school-property/"
+  ]
+ },
+ {
+  "center": [
+   47.60269,
+   -122.29214
+  ],
+  "name": "Leschi Elementary Track",
+  "area": "Leschi",
+  "owner": "Seattle Public Schools",
+  "access": "after-hours",
+  "note": "Seattle Public Schools track, open to the public before and after school when students or a permitted group are not using it. A short loop, well under 400 m.",
+  "sources": [
+   "https://www.seattleschools.org/wp-content/uploads/2021/07/4200SP.C.pdf",
+   "https://www.seattleschools.org/about/school-board/policies/4200sp-c-unauthorized-persons-on-school-property/"
+  ]
+ },
+ {
+  "center": [
+   47.54814,
+   -122.28184
+  ],
+  "name": "Brighton Playfield Loop",
+  "area": "Brighton (Rainier Valley)",
+  "owner": "Seattle Parks and Recreation",
+  "access": "open",
+  "note": "Paved loop around the turf field at a Seattle Parks playfield, open 6 am to 10 pm. It is a path rather than a lane track.",
+  "sources": [
+   "https://www.seattle.gov/parks/allparks/brighton-playfield",
+   "https://seattle.gov/documents/departments/parksandrecreation/projects/brighton/projectprogramoutline%20notes9-6-16.pdf"
+  ]
+ },
+ {
+  "center": [
+   47.56566,
+   -122.31241
+  ],
+  "name": "Jefferson Park Track",
+  "area": "Beacon Hill",
+  "owner": "Seattle Parks and Recreation",
+  "access": "open",
+  "note": "Rubberized track around the Jefferson Playfield turf, repaired in 2023. Seattle Parks, open with the park 4 am to 11:30 pm.",
+  "sources": [
+   "https://www.seattle.gov/parks/parks/jefferson-park"
+  ]
+ },
+ {
+  "center": [
+   47.55217,
+   -122.3156
+  ],
+  "name": "Cleveland Playfield Track",
+  "area": "Beacon Hill",
+  "owner": "Seattle Parks and Recreation (shared with Seattle Public Schools)",
+  "access": "open",
+  "note": "Seattle Parks lists a quarter-mile track at Cleveland Playfield, open 4 am to 11:30 pm. Cleveland High School shares it, so expect practices and games.",
+  "sources": [
+   "https://seattle.gov/parks/allparks/cleveland-playfield",
+   "https://www.kiro7.com/news/local/after-years-of-delays-cleveland-stem-high-school-finally-has-home-field/948539476"
+  ]
+ },
+ {
+  "center": [
+   47.53568,
+   -122.22855
+  ],
+  "name": "Islander Middle School Track",
+  "area": "Mercer Island",
+  "owner": "Mercer Island School District (scheduled by Mercer Island Parks)",
+  "access": "after-hours",
+  "note": "School track and turf that the city rents out when students are not using them. Residents report it open for informal use with no key card, unlike the high school stadium.",
+  "sources": [
+   "https://www.mercerisland.gov/sites/default/files/fileattachments/parks_and_recreation/page/2561/2026_athletic_facilities_reservation_guide.pdf",
+   "https://www.mi-reporter.com/news/island-forum-mihs-stadium-access-is-an-important-community-asset"
+  ]
+ },
+ {
+  "center": [
+   47.52391,
+   -122.26804
+  ],
+  "name": "Rainier Beach High School Track",
+  "area": "Rainier Beach",
+  "owner": "Seattle Public Schools",
+  "access": "after-hours",
+  "note": "Seattle Public Schools track, open to the public before and after school when students or a permitted group are not using it. The campus rebuild runs through late 2026, so parts of the fields may be fenced off.",
+  "sources": [
+   "https://www.seattleschools.org/wp-content/uploads/2021/07/4200SP.C.pdf",
+   "https://www.seattleschools.org/about/school-board/policies/4200sp-c-unauthorized-persons-on-school-property/",
+   "https://www.seattleschools.org/departments/capital-projects-and-planning/projects/rainier-beach/"
+  ]
+ },
+ {
+  "center": [
+   47.47506,
+   -122.27648
+  ],
+  "name": "Foster High School Track",
+  "area": "Tukwila",
+  "owner": "Tukwila School District",
+  "access": "after-hours",
+  "note": "Tukwila School District rules say fields should be open for community use after hours unless weather, maintenance or a school event rules it out.",
+  "sources": [
+   "https://www.tukwilaschools.org/departments/maintenance-operations/facility-use-request"
+  ]
+ },
+ {
+  "center": [
+   47.4785,
+   -122.29965
+  ],
+  "name": "Glacier Middle School Track",
+  "area": "SeaTac",
+  "owner": "Highline Public Schools",
+  "access": "unknown",
+  "note": "Highline Public Schools track; the district rents fields and tracks to groups but posts no rule on drop-in running.",
+  "sources": [
+   "https://www.highlineschools.org/departments/facilities/facility-use-rentals",
+   "https://www.highlineschools.org/about/board-policies/policy-details/~board/board-policies/post/policy-4330-use-of-school-facilities"
+  ]
+ },
+ {
+  "center": [
+   47.50944,
+   -122.32022
+  ],
+  "name": "Beverly Park Elementary Track",
+  "area": "Boulevard Park",
+  "owner": "Highline Public Schools",
+  "access": "unknown",
+  "note": "Highline Public Schools track; the district rents fields and tracks to groups but posts no rule on drop-in running.",
+  "sources": [
+   "https://www.highlineschools.org/departments/facilities/facility-use-rentals",
+   "https://www.highlineschools.org/about/board-policies/policy-details/~board/board-policies/post/policy-4330-use-of-school-facilities"
+  ]
+ },
+ {
+  "center": [
+   47.50141,
+   -122.345
+  ],
+  "name": "Evergreen High School Track",
+  "area": "White Center",
+  "owner": "Highline Public Schools",
+  "access": "unknown",
+  "note": "Highline Public Schools track; the district rents fields and tracks to groups but posts no rule on drop-in running.",
+  "sources": [
+   "https://www.highlineschools.org/departments/facilities/facility-use-rentals",
+   "https://www.highlineschools.org/about/board-policies/policy-details/~board/board-policies/post/policy-4330-use-of-school-facilities",
+   "https://www.highlineschools.org/departments/school-construction/2022-bond-projects/evergreen-high-school"
+  ]
+ },
+ {
+  "center": [
+   47.4791,
+   -122.32983
+  ],
+  "name": "Kennedy Catholic High School Track",
+  "area": "Burien",
+  "owner": "Kennedy Catholic High School (private)",
+  "access": "closed",
+  "note": "Private Catholic high school's turf field and track. No public use policy was found, so treat it as private.",
+  "sources": [
+   "https://www.westsideseattle.com/node/43031",
+   "https://b-townblog.com/kennedy-president-backs-away-from-blaming-city-for-blocking-football-facility/"
+  ]
+ },
+ {
+  "center": [
+   47.46463,
+   -122.33
+  ],
+  "name": "Highline Memorial Stadium Track",
+  "area": "Burien",
+  "owner": "Highline Public Schools",
+  "access": "unknown",
+  "note": "Highline Public Schools stadium, booked through the district athletics office. No rule on drop-in running was found.",
+  "sources": [
+   "https://www.highlineschools.org/departments/facilities/facility-use-rentals",
+   "https://www.highlineschools.org/about/board-policies/policy-details/~board/board-policies/post/policy-4330-use-of-school-facilities",
+   "https://resources.finalsite.net/images/v1643220218/highlineschoolsorg/njbtc1jsm0tbo591p0zl/HighlineMemorialStadium_TrackResurfaceProject_BAR.pdf"
+  ]
+ },
+ {
+  "center": [
+   47.45879,
+   -122.33866
+  ],
+  "name": "Sylvester Middle School Track",
+  "area": "Burien",
+  "owner": "Highline Public Schools",
+  "access": "unknown",
+  "note": "Highline Public Schools track; the district rents fields and tracks to groups but posts no rule on drop-in running. The turf field and track were rebuilt in 2024.",
+  "sources": [
+   "https://www.highlineschools.org/departments/facilities/facility-use-rentals",
+   "https://www.highlineschools.org/about/board-policies/policy-details/~board/board-policies/post/policy-4330-use-of-school-facilities",
+   "https://www.highlineschools.org/departments/communications/news/new-posts/~board/district-news/post/sylvester-celebrates-new-field-mini-pitch-with-sounders"
+  ]
+ },
+ {
+  "center": [
+   47.43268,
+   -122.33104
+  ],
+  "name": "Criminal Justice Training Center Track",
+  "area": "Burien",
+  "owner": "Washington State Criminal Justice Training Commission",
+  "access": "closed",
+  "note": "Track on the state police academy campus, where visitors must check in at the front desk. No public use was found, so treat it as closed.",
+  "sources": [
+   "https://cjtc.wa.gov/training-education/juvenile-services-academy"
+  ]
+ },
+ {
+  "center": [
+   47.4215,
+   -122.32819
+  ],
+  "name": "Olympic Interim Site Track",
+  "area": "Des Moines",
+  "owner": "Highline Public Schools",
+  "access": "unknown",
+  "note": "Highline Public Schools track; the district rents fields and tracks to groups but posts no rule on drop-in running. The site houses Pacific Middle School during its rebuild, through 2027.",
+  "sources": [
+   "https://www.highlineschools.org/departments/facilities/facility-use-rentals",
+   "https://www.highlineschools.org/about/board-policies/policy-details/~board/board-policies/post/policy-4330-use-of-school-facilities",
+   "https://pacific.highlineschools.org/about/interim-site"
+  ]
+ },
+ {
+  "center": [
+   47.38861,
+   -122.30426
+  ],
+  "name": "Highline College Track",
+  "area": "Des Moines",
+  "owner": "Highline College",
+  "access": "limited",
+  "note": "State rules let community members use Highline College's playing fields only with a permit from the athletic department, when college activities are not scheduled.",
+  "sources": [
+   "https://regulations.justia.com/states/washington/title-132i/chapter-132i-140/section-132i-140-160"
+  ]
+ },
+ {
+  "center": [
+   47.39974,
+   -122.30622
+  ],
+  "name": "Mount Rainier High School Track",
+  "area": "Des Moines",
+  "owner": "Highline Public Schools",
+  "access": "unknown",
+  "note": "Highline Public Schools track; the district rents fields and tracks to groups but posts no rule on drop-in running.",
+  "sources": [
+   "https://www.highlineschools.org/departments/facilities/facility-use-rentals",
+   "https://www.highlineschools.org/about/board-policies/policy-details/~board/board-policies/post/policy-4330-use-of-school-facilities"
+  ]
+ },
+ {
+  "center": [
+   47.43693,
+   -122.27805
+  ],
+  "name": "Tyee High School Track",
+  "area": "SeaTac",
+  "owner": "Highline Public Schools",
+  "access": "unknown",
+  "note": "Highline Public Schools track; the district rents fields and tracks to groups but posts no rule on drop-in running.",
+  "sources": [
+   "https://www.highlineschools.org/departments/facilities/facility-use-rentals",
+   "https://www.highlineschools.org/about/board-policies/policy-details/~board/board-policies/post/policy-4330-use-of-school-facilities"
+  ]
+ },
+ {
+  "center": [
+   47.38565,
+   -122.22871
+  ],
+  "name": "Mill Creek Middle School Track",
+  "area": "Kent",
+  "owner": "Kent School District",
+  "access": "unknown",
+  "note": "Kent School District track; the district rents fields and tracks to groups but posts no rule on drop-in running.",
+  "sources": [
+   "https://www.kent.k12.wa.us/page/facility-use-rentals/"
+  ]
+ },
+ {
+  "center": [
+   47.38861,
+   -122.09839
+  ],
+  "name": "Maple View Middle School Track",
+  "area": "Covington",
+  "owner": "Tahoma School District",
+  "access": "unknown",
+  "note": "Tahoma School District track; the district books fields through rentals and posts no rule on drop-in running.",
+  "sources": [
+   "https://www.tahomasd.us/academic-programs-services/facility-use",
+   "https://mapleview.tahomasd.us/extracurriculars/athletics"
+  ]
+ },
+ {
+  "center": [
+   47.39336,
+   -122.17956
+  ],
+  "name": "Meridian Middle School Track",
+  "area": "Kent",
+  "owner": "Kent School District",
+  "access": "unknown",
+  "note": "Kent School District track; the district rents fields and tracks to groups but posts no rule on drop-in running.",
+  "sources": [
+   "https://www.kent.k12.wa.us/page/facility-use-rentals/"
+  ]
+ },
+ {
+  "center": [
+   47.41789,
+   -122.17084
+  ],
+  "name": "Kentridge High School Track",
+  "area": "Kent (East Hill)",
+  "owner": "Kent School District",
+  "access": "unknown",
+  "note": "Kent School District track; the district rents fields and tracks to groups but posts no rule on drop-in running. A coached group, Runplugged, runs paid workouts here that are open to the public on Wednesday mornings.",
+  "sources": [
+   "https://www.kent.k12.wa.us/page/facility-use-rentals/",
+   "https://racematcher.com/race/runplugged-weekly-coached-track-workouts-wa"
+  ]
+ },
+ {
+  "center": [
+   47.43285,
+   -122.1732
+  ],
+  "name": "Meeker Middle School Track",
+  "area": "Kent",
+  "owner": "Kent School District",
+  "access": "unknown",
+  "note": "Kent School District track; the district rents fields and tracks to groups but posts no rule on drop-in running.",
+  "sources": [
+   "https://www.kent.k12.wa.us/page/facility-use-rentals/"
+  ]
+ },
+ {
+  "center": [
+   47.43495,
+   -122.11271
+  ],
+  "name": "Northwood Middle School Track",
+  "area": "Renton (Fairwood area)",
+  "owner": "Kent School District",
+  "access": "unknown",
+  "note": "Kent School District track; the district rents fields and tracks to groups but posts no rule on drop-in running.",
+  "sources": [
+   "https://www.kent.k12.wa.us/page/facility-use-rentals/"
+  ]
+ },
+ {
+  "center": [
+   47.45311,
+   -122.1658
+  ],
+  "name": "Lindbergh High School Track",
+  "area": "Renton (Fairwood area)",
+  "owner": "Renton School District",
+  "access": "after-hours",
+  "note": "Renton School District rules say fields should be open for community use after hours when no district activity is on; groups of five or more need a rental.",
+  "sources": [
+   "https://www.rentonschools.us/departments/business-services/facilities-rental",
+   "https://www.rentonschools.us/departments/business-services/facilities-rental/frequently-asked-questions"
+  ]
+ },
+ {
+  "center": [
+   47.45913,
+   -122.19836
+  ],
+  "name": "Nelsen Middle School Track",
+  "area": "Renton",
+  "owner": "Renton School District",
+  "access": "after-hours",
+  "note": "Renton School District rules say fields should be open for community use after hours when no district activity is on; groups of five or more need a rental.",
+  "sources": [
+   "https://www.rentonschools.us/departments/business-services/facilities-rental",
+   "https://www.rentonschools.us/departments/business-services/facilities-rental/frequently-asked-questions"
+  ]
+ },
+ {
+  "center": [
+   47.46465,
+   -122.14061
+  ],
+  "name": "Wonderland Estates Loop",
+  "area": "Renton (Maple Valley Highway)",
+  "owner": "Wonderland Estates (King County Housing Authority)",
+  "access": "closed",
+  "note": "Small loop inside Wonderland Estates, a 55-and-over manufactured home community. It is private residential property, not a public track.",
+  "sources": [
+   "https://www.kcha.org/housing/manufactured/wonderland-estates"
+  ]
+ },
+ {
+  "center": [
+   47.47223,
+   -122.11511
+  ],
+  "name": "Maywood Middle School Track",
+  "area": "Renton (east)",
+  "owner": "Issaquah School District",
+  "access": "after-hours",
+  "note": "Issaquah School District rules let individuals use school tracks outside regular school hours when no school activity or rental is on.",
+  "sources": [
+   "https://www.isd411.org/about-us/regulations/4000-series/4260/4260p"
+  ]
+ },
+ {
+  "center": [
+   47.4784,
+   -122.11903
+  ],
+  "name": "Liberty High School Track",
+  "area": "Renton (east)",
+  "owner": "Issaquah School District",
+  "access": "limited",
+  "note": "Issaquah School District stadium track; district rules allow only event participants inside the stadium fence and no public drop-in hours were found, so expect it to be locked.",
+  "sources": [
+   "https://www.isd411.org/about-us/regulations/4000-series/4260/4260p"
+  ]
+ },
+ {
+  "center": [
+   47.52084,
+   -122.02766
+  ],
+  "name": "Issaquah High School Track",
+  "area": "Issaquah",
+  "owner": "Issaquah School District",
+  "access": "limited",
+  "note": "Issaquah School District stadium track. District rules allow only event participants inside the stadium fence, and a 2009 report said public use needed a paid yearly key.",
+  "sources": [
+   "https://www.isd411.org/about-us/regulations/4000-series/4260/4260p",
+   "https://www.mi-reporter.com/?p=3466"
+  ]
+ },
+ {
+  "center": [
+   47.50033,
+   -122.15466
+  ],
+  "name": "Hazen High School Track",
+  "area": "Renton Highlands",
+  "owner": "Renton School District",
+  "access": "after-hours",
+  "note": "Renton School District rules say fields should be open for community use after hours when no district activity is on; groups of five or more need a rental. The Hazen turf field has a digital padlock, so the gate may be locked.",
+  "sources": [
+   "https://www.rentonschools.us/departments/business-services/facilities-rental",
+   "https://www.rentonschools.us/departments/business-services/facilities-rental/frequently-asked-questions"
+  ]
+ },
+ {
+  "center": [
+   47.531,
+   -122.06398
+  ],
+  "name": "Cougar Mountain Middle School Track",
+  "area": "Issaquah",
+  "owner": "Issaquah School District",
+  "access": "after-hours",
+  "note": "Issaquah School District rules let individuals use school tracks outside regular school hours when no school activity or rental is on.",
+  "sources": [
+   "https://www.isd411.org/about-us/regulations/4000-series/4260/4260p"
+  ]
+ },
+ {
+  "center": [
+   47.52428,
+   -122.03065
+  ],
+  "name": "Issaquah Middle School Track",
+  "area": "Issaquah",
+  "owner": "Issaquah School District",
+  "access": "after-hours",
+  "note": "Issaquah School District rules let individuals use school tracks outside regular school hours when no school activity or rental is on.",
+  "sources": [
+   "https://www.isd411.org/about-us/regulations/4000-series/4260/4260p"
+  ]
+ },
+ {
+  "center": [
+   47.55031,
+   -122.1809
+  ],
+  "name": "Ringdall Track",
+  "area": "Bellevue (Factoria)",
+  "owner": "Bellevue School District",
+  "access": "after-hours",
+  "note": "Bellevue School District track, open for individual use when the school or a renter is not using it; the district locks its fields otherwise, so the infield may be off limits. Ringdall is a district interim campus used while other schools are rebuilt.",
+  "sources": [
+   "https://www.bsd405.org/programs-and-services/facilities/facilities-frequently-asked-questions",
+   "https://www.bsd405.org/programs-and-services/facilities/fields",
+   "https://en.wikipedia.org/wiki/Bellevue_School_District"
+  ]
+ },
+ {
+  "center": [
+   47.56915,
+   -122.1735
+  ],
+  "name": "Newport High School Track",
+  "area": "Bellevue (Factoria)",
+  "owner": "Bellevue School District",
+  "access": "limited",
+  "note": "Bellevue School District stadium track. Enclosed high school tracks are locked; rent a key from the school to run when teams and renters are not using it.",
+  "sources": [
+   "https://www.bsd405.org/programs-and-services/facilities/facilities-frequently-asked-questions",
+   "https://www.bsd405.org/programs-and-services/facilities/fields",
+   "https://www.mi-reporter.com/?p=3466"
+  ]
+ },
+ {
+  "center": [
+   47.57358,
+   -122.16102
+  ],
+  "name": "Tyee Middle School Track",
+  "area": "Bellevue (Eastgate)",
+  "owner": "Bellevue School District",
+  "access": "after-hours",
+  "note": "Bellevue School District track, open for individual use when the school or a renter is not using it; the district locks its fields otherwise, so the infield may be off limits.",
+  "sources": [
+   "https://www.bsd405.org/programs-and-services/facilities/facilities-frequently-asked-questions",
+   "https://www.bsd405.org/programs-and-services/facilities/fields"
+  ]
+ },
+ {
+  "center": [
+   47.57959,
+   -122.0342
+  ],
+  "name": "Pine Lake Middle School Track",
+  "area": "Sammamish",
+  "owner": "Issaquah School District",
+  "access": "after-hours",
+  "note": "Issaquah School District rules let individuals use school tracks outside regular school hours when no school activity or rental is on.",
+  "sources": [
+   "https://www.isd411.org/about-us/regulations/4000-series/4260/4260p"
+  ]
+ },
+ {
+  "center": [
+   47.57897,
+   -122.00438
+  ],
+  "name": "Beaver Lake Middle School Track",
+  "area": "Sammamish",
+  "owner": "Issaquah School District",
+  "access": "after-hours",
+  "note": "Issaquah School District rules let individuals use school tracks outside regular school hours when no school activity or rental is on.",
+  "sources": [
+   "https://www.isd411.org/about-us/regulations/4000-series/4260/4260p"
+  ]
+ },
+ {
+  "center": [
+   47.55843,
+   -122.0118
+  ],
+  "name": "Pacific Cascade Middle School Track",
+  "area": "Issaquah",
+  "owner": "Issaquah School District",
+  "access": "after-hours",
+  "note": "Issaquah School District rules let individuals use school tracks outside regular school hours when no school activity or rental is on.",
+  "sources": [
+   "https://www.isd411.org/about-us/regulations/4000-series/4260/4260p"
+  ]
+ },
+ {
+  "center": [
+   47.61246,
+   -122.02945
+  ],
+  "name": "Eastlake High School Track",
+  "area": "Sammamish",
+  "owner": "Lake Washington School District",
+  "access": "after-hours",
+  "note": "Lake Washington School District track, closed to the public during the school day (about 7:30 am to 4 or 5 pm). Open evenings and weekends when no school activity is on.",
+  "sources": [
+   "https://www.lwsd.org/services/facilities/facility-use",
+   "https://www.lwsd.org/services/facilities/building-use"
+  ]
+ },
+ {
+  "center": [
+   47.60842,
+   -122.02613
+  ],
+  "name": "Eastside Catholic School Track",
+  "area": "Sammamish",
+  "owner": "Eastside Catholic School (private)",
+  "access": "closed",
+  "note": "Private Catholic school's stadium track. No public use policy was found, so treat it as private.",
+  "sources": [
+   "https://www.eastsidecatholic.org/about-us/ec-at-a-glance",
+   "https://www.issaquahreporter.com/2008/08/14/eastside-catholic-will-open-new-stadium-sept-27/"
+  ]
+ },
+ {
+  "center": [
+   47.60053,
+   -122.03426
+  ],
+  "name": "Skyline High School Track",
+  "area": "Sammamish",
+  "owner": "Issaquah School District",
+  "access": "limited",
+  "note": "Issaquah School District stadium track; district rules allow only event participants inside the stadium fence and no public drop-in hours were found, so expect it to be locked.",
+  "sources": [
+   "https://www.isd411.org/about-us/regulations/4000-series/4260/4260p"
+  ]
+ },
+ {
+  "center": [
+   47.5974,
+   -122.12528
+  ],
+  "name": "Tillicum Middle School Track",
+  "area": "Bellevue (Lake Hills)",
+  "owner": "Bellevue School District",
+  "access": "after-hours",
+  "note": "Bellevue School District track, open for individual use when the school or a renter is not using it; the district locks its fields otherwise, so the infield may be off limits.",
+  "sources": [
+   "https://www.bsd405.org/programs-and-services/facilities/facilities-frequently-asked-questions",
+   "https://www.bsd405.org/programs-and-services/facilities/fields"
+  ]
+ },
+ {
+  "center": [
+   47.60243,
+   -122.19848
+  ],
+  "name": "Bellevue High School Track",
+  "area": "Bellevue",
+  "owner": "Bellevue School District",
+  "access": "limited",
+  "note": "Bellevue School District stadium track. Enclosed high school tracks are locked; rent a key from the school to run when teams and renters are not using it.",
+  "sources": [
+   "https://www.bsd405.org/programs-and-services/facilities/facilities-frequently-asked-questions",
+   "https://www.bsd405.org/programs-and-services/facilities/fields",
+   "https://www.mi-reporter.com/?p=3466"
+  ]
+ },
+ {
+  "center": [
+   47.60807,
+   -122.17605
+  ],
+  "name": "Wilburton Hill Park Track",
+  "area": "Bellevue (Wilburton)",
+  "owner": "City of Bellevue Parks",
+  "access": "open",
+  "note": "City park track around the sports field at Wilburton Hill Community Park; the city's walking guide suggests laps on it. Open during park hours.",
+  "sources": [
+   "https://bellevuewa.gov/city-government/departments/parks/sports-and-athletics/tracks/walks"
+  ]
+ },
+ {
+  "center": [
+   47.60483,
+   -122.17333
+  ],
+  "name": "International School Track",
+  "area": "Bellevue (Wilburton)",
+  "owner": "Bellevue School District",
+  "access": "after-hours",
+  "note": "Bellevue School District track, open for individual use when the school or a renter is not using it; the district locks its fields otherwise, so the infield may be off limits.",
+  "sources": [
+   "https://www.bsd405.org/programs-and-services/facilities/facilities-frequently-asked-questions",
+   "https://www.bsd405.org/programs-and-services/facilities/fields"
+  ]
+ },
+ {
+  "center": [
+   47.60861,
+   -122.15056
+  ],
+  "name": "Sammamish High School Track",
+  "area": "Bellevue",
+  "owner": "Bellevue School District",
+  "access": "limited",
+  "note": "Bellevue School District stadium track. Enclosed high school tracks are locked; rent a key from the school to run when teams and renters are not using it.",
+  "sources": [
+   "https://www.bsd405.org/programs-and-services/facilities/facilities-frequently-asked-questions",
+   "https://www.bsd405.org/programs-and-services/facilities/fields",
+   "https://www.mi-reporter.com/?p=3466"
+  ]
+ },
+ {
+  "center": [
+   47.61302,
+   -122.14986
+  ],
+  "name": "Odle Middle School Track",
+  "area": "Bellevue",
+  "owner": "Bellevue School District",
+  "access": "after-hours",
+  "note": "Bellevue School District track, open for individual use when the school or a renter is not using it; the district locks its fields otherwise, so the infield may be off limits.",
+  "sources": [
+   "https://www.bsd405.org/programs-and-services/facilities/facilities-frequently-asked-questions",
+   "https://www.bsd405.org/programs-and-services/facilities/fields"
+  ]
+ },
+ {
+  "center": [
+   47.62939,
+   -122.21162
+  ],
+  "name": "Chinook Middle School Track",
+  "area": "Clyde Hill",
+  "owner": "Bellevue School District",
+  "access": "after-hours",
+  "note": "Bellevue School District track, open for individual use when the school or a renter is not using it; the district locks its fields otherwise, so the infield may be off limits.",
+  "sources": [
+   "https://www.bsd405.org/programs-and-services/facilities/facilities-frequently-asked-questions",
+   "https://www.bsd405.org/programs-and-services/facilities/fields"
+  ]
+ },
+ {
+  "center": [
+   47.63045,
+   -122.12571
+  ],
+  "name": "Interlake High School Track",
+  "area": "Bellevue",
+  "owner": "Bellevue School District",
+  "access": "limited",
+  "note": "Bellevue School District stadium track. Enclosed high school tracks are locked; rent a key from the school to run when teams and renters are not using it.",
+  "sources": [
+   "https://www.bsd405.org/programs-and-services/facilities/facilities-frequently-asked-questions",
+   "https://www.bsd405.org/programs-and-services/facilities/fields",
+   "https://www.mi-reporter.com/?p=3466"
+  ]
+ },
+ {
+  "center": [
+   47.62489,
+   -122.13966
+  ],
+  "name": "Highland Middle School Track",
+  "area": "Bellevue",
+  "owner": "Bellevue School District",
+  "access": "after-hours",
+  "note": "Bellevue School District track, open for individual use when the school or a renter is not using it; the district locks its fields otherwise, so the infield may be off limits.",
+  "sources": [
+   "https://www.bsd405.org/programs-and-services/facilities/facilities-frequently-asked-questions",
+   "https://www.bsd405.org/programs-and-services/facilities/fields"
+  ]
+ },
+ {
+  "center": [
+   47.61852,
+   -122.01866
+  ],
+  "name": "Inglewood Middle School Track",
+  "area": "Sammamish",
+  "owner": "Lake Washington School District",
+  "access": "after-hours",
+  "note": "Lake Washington School District track, closed to the public during the school day (about 7:30 am to 4 or 5 pm). Open evenings and weekends when no school activity is on.",
+  "sources": [
+   "https://www.lwsd.org/services/facilities/facility-use",
+   "https://www.lwsd.org/services/facilities/building-use"
+  ]
+ },
+ {
+  "center": [
+   47.66633,
+   -122.05868
+  ],
+  "name": "Evergreen Middle School Track",
+  "area": "Redmond (Sammamish Plateau)",
+  "owner": "Lake Washington School District",
+  "access": "after-hours",
+  "note": "Lake Washington School District track, closed to the public during the school day (about 7:30 am to 4 or 5 pm). Open evenings and weekends when no school activity is on.",
+  "sources": [
+   "https://www.lwsd.org/services/facilities/facility-use",
+   "https://www.lwsd.org/services/facilities/building-use"
+  ]
+ },
+ {
+  "center": [
+   47.84419,
+   -122.31312
+  ],
+  "name": "Meadowdale High School Track",
+  "area": "Lynnwood",
+  "owner": "Edmonds School District",
+  "access": "unknown",
+  "note": "Edmonds School District track; the district rents fields to groups but posts no rule on drop-in running.",
+  "sources": [
+   "https://www.edmonds.wednet.edu/community/community-use-of-district-facilities"
+  ]
+ },
+ {
+  "center": [
+   47.79519,
+   -122.30668
+  ],
+  "name": "Evergreen Playfield Track",
+  "area": "Mountlake Terrace",
+  "owner": "City of Mountlake Terrace Parks",
+  "access": "open",
+  "note": "Quarter-mile unpaved track at the city's Evergreen Playfield Complex, next to the Recreation Pavilion. Public city park.",
+  "sources": [
+   "https://cityofmlt.com/Facilities/Facility/Details/Evergreen-Playfield-Complex-4"
+  ]
+ },
+ {
+  "center": [
+   47.81252,
+   -122.3331
+  ],
+  "name": "College Place Middle School Track",
+  "area": "Lynnwood",
+  "owner": "Edmonds School District",
+  "access": "unknown",
+  "note": "Edmonds School District track; the district rents fields to groups but posts no rule on drop-in running.",
+  "sources": [
+   "https://www.edmonds.wednet.edu/community/community-use-of-district-facilities"
+  ]
+ },
+ {
+  "center": [
+   47.80516,
+   -122.33901
+  ],
+  "name": "Edmonds-Woodway High School Track",
+  "area": "Edmonds",
+  "owner": "Edmonds School District",
+  "access": "unknown",
+  "note": "Edmonds School District track; the district rents fields to groups but posts no rule on drop-in running.",
+  "sources": [
+   "https://www.edmonds.wednet.edu/community/community-use-of-district-facilities"
+  ]
+ },
+ {
+  "center": [
+   47.84518,
+   -122.32308
+  ],
+  "name": "Meadowdale Middle School Track",
+  "area": "Lynnwood",
+  "owner": "Edmonds School District",
+  "access": "unknown",
+  "note": "Edmonds School District track; the district rents fields to groups but posts no rule on drop-in running.",
+  "sources": [
+   "https://www.edmonds.wednet.edu/community/community-use-of-district-facilities"
+  ]
+ },
+ {
+  "center": [
+   47.78778,
+   -122.3713
+  ],
+  "name": "Edmonds Heights K-12 Track",
+  "area": "Edmonds",
+  "owner": "Edmonds School District",
+  "access": "unknown",
+  "note": "Edmonds School District track; the district rents fields to groups but posts no rule on drop-in running.",
+  "sources": [
+   "https://www.edmonds.wednet.edu/community/community-use-of-district-facilities"
+  ]
+ },
+ {
+  "center": [
+   47.78263,
+   -122.35848
+  ],
+  "name": "Madrona K-8 Track",
+  "area": "Edmonds",
+  "owner": "Edmonds School District",
+  "access": "unknown",
+  "note": "Edmonds School District track; the district rents fields to groups but posts no rule on drop-in running.",
+  "sources": [
+   "https://www.edmonds.wednet.edu/community/community-use-of-district-facilities"
+  ]
+ },
+ {
+  "center": [
+   47.75328,
+   -122.34953
+  ],
+  "name": "Shorewood High School Track",
+  "area": "Shoreline",
+  "owner": "Shoreline School District",
+  "access": "unknown",
+  "note": "Shoreline School District track; the district rents fields through its athletic office but posts no rule on drop-in running.",
+  "sources": [
+   "https://www.ssd412.org/departments/facility-use"
+  ]
+ },
+ {
+  "center": [
+   47.75077,
+   -122.36238
+  ],
+  "name": "Shoreline Community College Track",
+  "area": "Shoreline",
+  "owner": "Shoreline Community College",
+  "access": "closed",
+  "note": "Not open for drop-in running: the college rents the track to community groups only with athletic director approval. OpenStreetMap marks it no access.",
+  "sources": [
+   "https://www.shoreline.edu/roomrentals/forms/documents/addendum_B_3000_gym-athletics.pdf"
+  ]
+ },
+ {
+  "center": [
+   47.69746,
+   -122.37999
+  ],
+  "name": "Whitman Middle School Track",
+  "area": "Crown Hill",
+  "owner": "Seattle Public Schools",
+  "access": "after-hours",
+  "note": "Seattle Public Schools track, open to the public before and after school when students or a permitted group are not using it.",
+  "sources": [
+   "https://www.seattleschools.org/wp-content/uploads/2021/07/4200SP.C.pdf",
+   "https://www.seattleschools.org/about/school-board/policies/4200sp-c-unauthorized-persons-on-school-property/"
+  ]
+ },
+ {
+  "center": [
+   47.69529,
+   -122.3392
+  ],
+  "name": "Robert Eagle Staff Middle School Track",
+  "area": "Licton Springs",
+  "owner": "Seattle Public Schools",
+  "access": "after-hours",
+  "note": "Seattle Public Schools track, open to the public before and after school when students or a permitted group are not using it. Walking track around the lit turf field on the Wilson-Pacific campus.",
+  "sources": [
+   "https://www.seattleschools.org/wp-content/uploads/2021/07/4200SP.C.pdf",
+   "https://www.seattleschools.org/about/school-board/policies/4200sp-c-unauthorized-persons-on-school-property/",
+   "https://www.seattleschools.org/wp-content/uploads/2024/04/Building-for-Learning-2022-Eagle-Staff.pdf"
+  ]
+ },
+ {
+  "center": [
+   47.74995,
+   -122.31676
+  ],
+  "name": "Ridgecrest Elementary Track",
+  "area": "Shoreline",
+  "owner": "Shoreline School District",
+  "access": "unknown",
+  "note": "Shoreline School District track; the district rents fields through its athletic office but posts no rule on drop-in running.",
+  "sources": [
+   "https://www.ssd412.org/departments/facility-use"
+  ]
+ },
+ {
+  "center": [
+   47.74558,
+   -122.30417
+  ],
+  "name": "Kellogg Middle School Track",
+  "area": "Shoreline",
+  "owner": "Shoreline School District",
+  "access": "unknown",
+  "note": "Shoreline School District track; the district rents fields through its athletic office but posts no rule on drop-in running.",
+  "sources": [
+   "https://www.ssd412.org/departments/facility-use"
+  ]
+ },
+ {
+  "center": [
+   47.74152,
+   -122.306
+  ],
+  "name": "Shorecrest High School Track",
+  "area": "Shoreline",
+  "owner": "Shoreline School District",
+  "access": "unknown",
+  "note": "Shoreline School District track; the district rents fields through its athletic office but posts no rule on drop-in running.",
+  "sources": [
+   "https://www.ssd412.org/departments/facility-use"
+  ]
+ },
+ {
+  "center": [
+   47.80136,
+   -122.29045
+  ],
+  "name": "Mountlake Terrace High School Track",
+  "area": "Mountlake Terrace",
+  "owner": "Edmonds School District",
+  "access": "unknown",
+  "note": "Edmonds School District track; the district rents fields to groups but posts no rule on drop-in running.",
+  "sources": [
+   "https://www.edmonds.wednet.edu/community/community-use-of-district-facilities"
+  ]
+ },
+ {
+  "center": [
+   47.79935,
+   -122.2775
+  ],
+  "name": "Brier Terrace Middle School Track",
+  "area": "Brier",
+  "owner": "Edmonds School District",
+  "access": "unknown",
+  "note": "Edmonds School District track; the district rents fields to groups but posts no rule on drop-in running.",
+  "sources": [
+   "https://www.edmonds.wednet.edu/community/community-use-of-district-facilities"
+  ]
+ },
+ {
+  "center": [
+   47.8175,
+   -122.27416
+  ],
+  "name": "Former Alderwood Middle School Track",
+  "area": "Lynnwood",
+  "owner": "Edmonds School District",
+  "access": "closed",
+  "note": "The old Alderwood Middle School campus is being torn down and rebuilt as Salish Middle School, due to open in fall 2028. Treat the track as closed during construction.",
+  "sources": [
+   "https://www.edmonds.wednet.edu/our-district/capital-projects/construction-projects/new-middle-school/project-updates",
+   "https://www.lynnwoodwa.gov/Public-notices/NOD-New-Middle-School-at-former-Alderwood-Middle-School"
+  ]
+ },
+ {
+  "center": [
+   47.84128,
+   -122.24733
+  ],
+  "name": "Alderwood Middle School Track",
+  "area": "Lynnwood (Martha Lake)",
+  "owner": "Edmonds School District",
+  "access": "unknown",
+  "note": "Edmonds School District track; the district rents fields to groups but posts no rule on drop-in running.",
+  "sources": [
+   "https://www.edmonds.wednet.edu/community/community-use-of-district-facilities",
+   "https://www.heraldnet.com/2017/01/11/new-elementary-middle-schools-open-in-edmonds-district/"
+  ]
+ },
+ {
+  "center": [
+   47.83325,
+   -122.24182
+  ],
+  "name": "Lynnwood High School Track",
+  "area": "Bothell (North Road)",
+  "owner": "Edmonds School District",
+  "access": "unknown",
+  "note": "Edmonds School District track; the district rents fields to groups but posts no rule on drop-in running.",
+  "sources": [
+   "https://www.edmonds.wednet.edu/community/community-use-of-district-facilities"
+  ]
+ },
+ {
+  "center": [
+   47.78299,
+   -122.19784
+  ],
+  "name": "Canyon Park Middle School Track",
+  "area": "Bothell",
+  "owner": "Northshore School District",
+  "access": "after-hours",
+  "note": "Northshore School District track, closed to the public on school days from 7:30 am to 4 pm and open evenings and weekends when not reserved.",
+  "sources": [
+   "https://www.nsd.org/our-district/departments/facilities/field-rental"
+  ]
+ },
+ {
+  "center": [
+   47.74065,
+   -122.2201
+  ],
+  "name": "Inglemoor High School Track",
+  "area": "Kenmore",
+  "owner": "Northshore School District",
+  "access": "after-hours",
+  "note": "Northshore School District track, closed to the public on school days from 7:30 am to 4 pm and open evenings and weekends when not reserved.",
+  "sources": [
+   "https://www.nsd.org/our-district/departments/facilities/field-rental"
+  ]
+ },
+ {
+  "center": [
+   47.76072,
+   -122.22078
+  ],
+  "name": "Bothell High School Track",
+  "area": "Bothell",
+  "owner": "Northshore School District",
+  "access": "after-hours",
+  "note": "Northshore School District track, closed to the public on school days from 7:30 am to 4 pm and open evenings and weekends when not reserved.",
+  "sources": [
+   "https://www.nsd.org/our-district/departments/facilities/field-rental"
+  ]
+ },
+ {
+  "center": [
+   47.72104,
+   -122.23412
+  ],
+  "name": "Finn Hill Middle School Track",
+  "area": "Kirkland (Finn Hill)",
+  "owner": "Lake Washington School District",
+  "access": "after-hours",
+  "note": "Lake Washington School District track, closed to the public during the school day (about 7:30 am to 4 or 5 pm). Open evenings and weekends when no school activity is on.",
+  "sources": [
+   "https://www.lwsd.org/services/facilities/facility-use",
+   "https://www.lwsd.org/services/facilities/building-use"
+  ]
+ },
+ {
+  "center": [
+   47.69096,
+   -122.19861
+  ],
+  "name": "Kirkland Middle School Track",
+  "area": "Kirkland",
+  "owner": "Lake Washington School District",
+  "access": "after-hours",
+  "note": "Lake Washington School District track, closed to the public during the school day (about 7:30 am to 4 or 5 pm). Open evenings and weekends when no school activity is on.",
+  "sources": [
+   "https://www.lwsd.org/services/facilities/facility-use",
+   "https://www.lwsd.org/services/facilities/building-use"
+  ]
+ },
+ {
+  "center": [
+   47.72864,
+   -122.16685
+  ],
+  "name": "Kamiakin Middle School Track",
+  "area": "Kirkland (Kingsgate)",
+  "owner": "Lake Washington School District",
+  "access": "after-hours",
+  "note": "Lake Washington School District track, closed to the public during the school day (about 7:30 am to 4 or 5 pm). Open evenings and weekends when no school activity is on.",
+  "sources": [
+   "https://www.lwsd.org/services/facilities/facility-use",
+   "https://www.lwsd.org/services/facilities/building-use"
+  ]
+ },
+ {
+  "center": [
+   47.74111,
+   -122.1788
+  ],
+  "name": "Northshore Middle School Track",
+  "area": "Bothell",
+  "owner": "Northshore School District",
+  "access": "after-hours",
+  "note": "Northshore School District track, closed to the public on school days from 7:30 am to 4 pm and open evenings and weekends when not reserved.",
+  "sources": [
+   "https://www.nsd.org/our-district/departments/facilities/field-rental"
+  ]
+ },
+ {
+  "center": [
+   47.76778,
+   -122.11854
+  ],
+  "name": "Leota Middle School Track",
+  "area": "Woodinville",
+  "owner": "Northshore School District",
+  "access": "after-hours",
+  "note": "Northshore School District track, closed to the public on school days from 7:30 am to 4 pm and open evenings and weekends when not reserved.",
+  "sources": [
+   "https://www.nsd.org/our-district/departments/facilities/field-rental"
+  ]
+ },
+ {
+  "center": [
+   47.69053,
+   -122.12091
+  ],
+  "name": "Redmond Middle School Track",
+  "area": "Redmond (Education Hill)",
+  "owner": "Lake Washington School District",
+  "access": "after-hours",
+  "note": "Lake Washington School District track, closed to the public during the school day (about 7:30 am to 4 or 5 pm). Open evenings and weekends when no school activity is on.",
+  "sources": [
+   "https://www.lwsd.org/services/facilities/facility-use",
+   "https://www.lwsd.org/services/facilities/building-use"
+  ]
+ },
+ {
+  "center": [
+   47.68619,
+   -122.03104
+  ],
+  "name": "Timberline Middle School Track",
+  "area": "Redmond Ridge",
+  "owner": "Lake Washington School District",
+  "access": "after-hours",
+  "note": "Lake Washington School District track, closed to the public during the school day (about 7:30 am to 4 or 5 pm). Open evenings and weekends when no school activity is on.",
+  "sources": [
+   "https://www.lwsd.org/services/facilities/facility-use",
+   "https://www.lwsd.org/services/facilities/building-use",
+   "https://www.lwsd.org/services/facilities/construction/2016-bond-projects/timberline-middle-school"
+  ]
+ },
+ {
+  "center": [
+   47.73553,
+   -121.95021
+  ],
+  "name": "Cedarcrest High School Track",
+  "area": "Duvall",
+  "owner": "Riverview School District",
+  "access": "unknown",
+  "note": "Riverview School District track; the district rents facilities to groups but posts no rule on drop-in running.",
+  "sources": [
+   "https://www.rsd407.org/facility"
+  ]
+ },
+ {
+  "center": [
+   47.76661,
+   -122.05359
+  ],
+  "name": "Timbercrest Middle School Track",
+  "area": "Woodinville",
+  "owner": "Northshore School District",
+  "access": "after-hours",
+  "note": "Northshore School District track, closed to the public on school days from 7:30 am to 4 pm and open evenings and weekends when not reserved.",
+  "sources": [
+   "https://www.nsd.org/our-district/departments/facilities/field-rental"
+  ]
+ },
+ {
+  "center": [
+   47.849,
+   -121.98916
+  ],
+  "name": "Park Place Middle School Track",
+  "area": "Monroe",
+  "owner": "Monroe School District",
+  "access": "after-hours",
+  "note": "Monroe School District opened this track to the public during non-school daylight hours in 2023. Individuals need no permit; groups must reserve.",
+  "sources": [
+   "https://www.monroe.wednet.edu/about/news/news-details/~board/monroe-school-district/post/additional-outdoor-facilities-now-open-for-community-use",
+   "https://www.monroe.wednet.edu/about/news/news-details/~board/monroe-school-district/post/unlocking-recreation-community-access-to-outdoor-facilities"
+  ]
+ },
+ {
+  "center": [
+   47.84208,
+   -122.0081
+  ],
+  "name": "Monroe High School Track",
+  "area": "Monroe",
+  "owner": "Monroe School District",
+  "access": "after-hours",
+  "note": "Monroe School District opened this track to the public after school in daylight. On weekends you can park outside the locked lot gate and walk in.",
+  "sources": [
+   "https://www.monroe.wednet.edu/about/news/news-details/~board/monroe-school-district/post/additional-outdoor-facilities-now-open-for-community-use",
+   "https://www.monroe.wednet.edu/about/news/news-details/~board/monroe-school-district/post/unlocking-recreation-community-access-to-outdoor-facilities"
+  ]
+ },
+ {
+  "center": [
+   47.79898,
+   -122.10811
+  ],
+  "name": "Hidden River Middle School Track",
+  "area": "Maltby",
+  "owner": "Monroe School District",
+  "access": "limited",
+  "note": "Open to the public after school on weekdays in daylight. No weekend access, because the district lacks staff to open and close the gates.",
+  "sources": [
+   "https://www.monroe.wednet.edu/about/news/news-details/~board/monroe-school-district/post/additional-outdoor-facilities-now-open-for-community-use",
+   "https://www.monroe.wednet.edu/about/news/news-details/~board/monroe-school-district/post/unlocking-recreation-community-access-to-outdoor-facilities"
+  ]
+ },
+ {
+  "center": [
+   47.76971,
+   -122.16162
+  ],
+  "name": "Woodinville High School Track",
+  "area": "Woodinville",
+  "owner": "Northshore School District",
+  "access": "after-hours",
+  "note": "Northshore School District track, closed to the public on school days from 7:30 am to 4 pm and open evenings and weekends when not reserved. The school posts outdoor hours of 6 am to 10 pm outside the school day.",
+  "sources": [
+   "https://www.nsd.org/our-district/departments/facilities/field-rental",
+   "https://woodinville.nsd.org/resources/facilities-grounds"
+  ]
+ },
+ {
+  "center": [
+   47.80248,
+   -122.18817
+  ],
+  "name": "Skyview Middle School Track",
+  "area": "Bothell",
+  "owner": "Northshore School District",
+  "access": "after-hours",
+  "note": "Northshore School District track, closed to the public on school days from 7:30 am to 4 pm and open evenings and weekends when not reserved.",
+  "sources": [
+   "https://www.nsd.org/our-district/departments/facilities/field-rental"
+  ]
+ },
+ {
+  "center": [
+   47.82639,
+   -122.17967
+  ],
+  "name": "North Creek High School Track",
+  "area": "Bothell",
+  "owner": "Northshore School District",
+  "access": "after-hours",
+  "note": "Northshore School District track, closed to the public on school days from 7:30 am to 4 pm and open evenings and weekends when not reserved.",
+  "sources": [
+   "https://www.nsd.org/our-district/departments/facilities/field-rental"
+  ]
+ }
+]
