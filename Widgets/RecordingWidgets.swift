@@ -61,7 +61,7 @@ private struct LockScreenView: View {
                     .foregroundStyle(attributes.tint)
                 Spacer()
                 if state.isPaused {
-                    Text("Paused").font(.subheadline.bold()).foregroundStyle(.secondary)
+                    Text(state.isStopped ? "Stopped" : "Paused").font(.subheadline.bold()).foregroundStyle(.secondary)
                 }
             }
             HStack(alignment: .top) {

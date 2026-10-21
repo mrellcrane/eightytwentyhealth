@@ -4,8 +4,9 @@ import MapKit
 import EightyTwentyCore
 
 /// Record a run or walk like Strava: Start, Pause/Resume, Finish (hold), then Save or Discard.
-/// Before you start, the map shows where to run: every path colored by surface and the
-/// researched routes and tracks (`RouteCatalog`), filtered by the surface chips.
+/// The map shows where to run, before and during: every path colored by surface and the
+/// researched routes and tracks (`RouteCatalog`), filtered by the surface chips, with your
+/// own line drawn over them.
 struct RunView: View {
     /// What to record when nothing is in progress. Nil means whatever you picked last.
     var activity: ActivityKind? = nil
@@ -42,9 +43,9 @@ struct RunView: View {
     private var noun: String { recorder.activity.title.lowercased() }
     private var tint: Color { recorder.activity == .walk ? .green : .orange }
     private var surfaces: Set<RunSurface> { RunSurface.set(from: surfacesStored) }
-    /// Paths and routes show while you pick where to go. While recording and after, only
-    /// the route you chose stays, so the map is about your run (and stays light).
-    private var showsLayers: Bool { recorder.state == .idle }
+    /// The chips and the routes list are for picking where to go, before you start. The
+    /// paths and routes themselves stay on the map the whole time, so you can run over them.
+    private var isPicking: Bool { recorder.state == .idle }
     private var followedRoute: RunRoute? {
         followedRouteID.isEmpty ? nil : library.catalog.route(id: followedRouteID)
     }
@@ -54,6 +55,8 @@ struct RunView: View {
     /// Past this many degrees of latitude (about 15 km), paths are too dense to draw; routes still show.
     private static let trailSpan = 0.14
     private static let maxTrails = 450
+    /// Fewer while recording: the map redraws with every GPS fix, and the longest paths are the ones you'd follow.
+    private static let maxTrailsRecording = 250
 
     var body: some View {
         VStack(spacing: 0) {
@@ -166,10 +169,14 @@ struct RunView: View {
                 UserAnnotation()
                 trailLayer
                 routeLayer
-                // One line per segment, so a pause doesn't draw a straight line across town.
+                // The smoothed track, one line per segment so a pause doesn't draw a straight
+                // line across town. White-cased like the routes, and on top of them.
                 ForEach(Array(recorder.tracker.segments.filter { $0.count > 1 }.enumerated()), id: \.offset) { _, segment in
-                    MapPolyline(coordinates: segment.map { CLLocationCoordinate2D(latitude: $0.latitude, longitude: $0.longitude) })
-                        .stroke(tint, lineWidth: 5)
+                    let coordinates = segment.map { CLLocationCoordinate2D(latitude: $0.latitude, longitude: $0.longitude) }
+                    MapPolyline(coordinates: coordinates)
+                        .stroke(.white, style: StrokeStyle(lineWidth: 9, lineCap: .round, lineJoin: .round))
+                    MapPolyline(coordinates: coordinates)
+                        .stroke(tint, style: StrokeStyle(lineWidth: 5, lineCap: .round, lineJoin: .round))
                 }
             }
             .mapStyle(.standard(emphasis: .muted))
@@ -185,7 +192,7 @@ struct RunView: View {
             }
         }
         .overlay(alignment: .top) {
-            if showsLayers {
+            if isPicking {
                 SurfaceFilterBar(stored: $surfacesStored) {
                     pickedFrom = here
                     showingRoutes = true
@@ -195,7 +202,7 @@ struct RunView: View {
             }
         }
         .overlay(alignment: .bottom) {
-            if let selection, showsLayers {
+            if let selection {
                 RouteCard(
                     selection: selection,
                     catalog: library.catalog,
@@ -206,7 +213,7 @@ struct RunView: View {
                     self.selection = nil
                 }
                 .padding(10)
-            } else if showsLayers, !visibleTrails.isEmpty {
+            } else if !visibleTrails.isEmpty {
                 Text("© OpenStreetMap contributors")
                     .font(.caption2)
                     .padding(.horizontal, 6)
@@ -232,13 +239,14 @@ struct RunView: View {
         }
     }
 
-    /// Researched routes and tracks with a pin at each start; while recording, just the one you picked.
+    /// Researched routes and tracks with a pin at each start, and the one you kept on the map
+    /// even when the chips or the zoom would hide it.
     @MapContentBuilder
     private var routeLayer: some MapContent {
         ForEach(visibleRoutes) { route in
             routeLines(route, emphasized: isPicked(route))
         }
-        if let followedRoute, !showsLayers {
+        if let followedRoute, !visibleRoutes.contains(where: { $0.id == followedRoute.id }) {
             routeLines(followedRoute, emphasized: true)
         }
         ForEach(visibleRoutes) { route in
@@ -279,7 +287,7 @@ struct RunView: View {
 
     /// Recomputes what's drawn: on camera moves, filter changes, and when recording starts or ends.
     private func refreshLayers() {
-        guard showsLayers, let box = mapBox else {
+        guard let box = mapBox else {
             visibleTrails = []
             visibleRoutes = []
             return
@@ -287,7 +295,7 @@ struct RunView: View {
         let catalog = library.catalog
         visibleRoutes = box.latitudeSpan < 0.6 ? catalog.routes(in: box, surfaces: surfaces) : []
         visibleTrails = showTrails && box.latitudeSpan < Self.trailSpan
-            ? catalog.trails(in: box, surfaces: surfaces, limit: Self.maxTrails)
+            ? catalog.trails(in: box, surfaces: surfaces, limit: isPicking ? Self.maxTrails : Self.maxTrailsRecording)
             : []
         // Counts and zoom only (never where you are), so a "nothing shows" report can be checked in Sentry.
         if !loggedLayers, !catalog.routes.isEmpty {
@@ -299,8 +307,7 @@ struct RunView: View {
 
     /// Picks the route or path under your finger, with about 24 points of slack.
     private func tap(at screenPoint: CGPoint, proxy: MapProxy) {
-        guard showsLayers,
-              let tapped = proxy.convert(screenPoint, from: .local),
+        guard let tapped = proxy.convert(screenPoint, from: .local),
               let edge = proxy.convert(CGPoint(x: screenPoint.x + 24, y: screenPoint.y), from: .local)
         else { return }
         let point = GeoPoint(tapped)
@@ -329,6 +336,10 @@ struct RunView: View {
             } else if recorder.state == .idle {
                 Text(recorder.gpsQuality).font(.footnote).foregroundStyle(.secondary)
                 Text(updatesSummary).font(.footnote).foregroundStyle(.secondary)
+            } else if recorder.state == .running, tracker.isStopped {
+                Label("Stopped. The clock starts again when you do.", systemImage: "pause.circle")
+                    .font(.footnote)
+                    .foregroundStyle(.secondary)
             }
 
             HStack {
@@ -338,6 +349,17 @@ struct RunView: View {
             HStack {
                 stat(PaceFormat.pace(tracker.currentPace(), unitMeters: unitMeters), "Pace /\(unit)")
                 stat(PaceFormat.pace(tracker.averagePace(at: now), unitMeters: unitMeters), "Avg /\(unit)")
+            }
+
+            if recorder.state == .finished {
+                let elapsed = tracker.elapsedTime(at: now)
+                if elapsed - tracker.movingTime(at: now) >= 30 {
+                    Text("\(PaceFormat.duration(elapsed)) start to finish, stops and pauses included. Pace counts moving time only.")
+                        .font(.footnote)
+                        .foregroundStyle(.secondary)
+                        .multilineTextAlignment(.center)
+                        .padding(.horizontal)
+                }
             }
 
             if recorder.state == .finished, !tracker.splits.isEmpty {

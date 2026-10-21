@@ -10,7 +10,10 @@ struct RecordingAttributes: ActivityAttributes {
         /// Moving time as of `at`. While moving, the clock runs on its own from `clockStart`.
         var movingSeconds: Double
         var at: Date
+        /// The clock is held: you paused, or stopped moving (`isStopped`).
         var isPaused: Bool
+        /// Stopped without pausing (a light, say); the clock starts again when you do.
+        var isStopped: Bool
         var meters: Double
         /// The latest distance update, like "2 miles in 18:40".
         var latest: String?

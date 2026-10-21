@@ -77,7 +77,32 @@ final class RunTrackerTests: XCTestCase {
         XCTAssertFalse(tracker.add(point(meters: 400, seconds: 2)), "200 m/s is a GPS jump")
         XCTAssertFalse(tracker.add(point(meters: 3, seconds: 0)), "Same timestamp")
         XCTAssertTrue(tracker.add(point(meters: 6, seconds: 2)))
-        XCTAssertEqual(tracker.distance, 6, accuracy: 0.1)
+        XCTAssertEqual(tracker.distance, 6, accuracy: 1.5, "Smoothed, so a little short of the raw 6 m at first")
+        XCTAssertEqual(tracker.fixCount, 6)
+        XCTAssertEqual(tracker.rejectedCount, 4)
+    }
+
+    func testPausingWhileStoppedClosesTheStop() {
+        var tracker = RunTracker()
+        tracker.start(at: start)
+        steadyRun(meters: 300, tracker: &tracker)
+        // Standing at the corner, then you hit Pause.
+        for s in 101...130 { tracker.add(point(meters: 300, seconds: Double(s))) }
+        XCTAssertTrue(tracker.isStopped)
+        tracker.pause(at: start.addingTimeInterval(140))
+        XCTAssertFalse(tracker.isStopped)
+        tracker.resume(at: start.addingTimeInterval(200))
+        steadyRun(meters: 300, tracker: &tracker, from: 300, timeOffset: 200)
+        let end = start.addingTimeInterval(300)
+        tracker.finish(at: end)
+
+        XCTAssertEqual(tracker.stops.count, 1)
+        XCTAssertEqual(tracker.stops[0].end, start.addingTimeInterval(140))
+        XCTAssertEqual(tracker.pauses, [PauseInterval(start: start.addingTimeInterval(140), end: start.addingTimeInterval(200))])
+        let stopped = tracker.stops[0].end.timeIntervalSince(tracker.stops[0].start)
+        XCTAssertEqual(tracker.movingTime(at: end), 300 - 60 - stopped, accuracy: 0.001)
+        XCTAssertEqual(stopped, 40, accuracy: 5)
+        XCTAssertEqual(tracker.distance, 600, accuracy: 10)
     }
 
     func testIgnoresPointsBeforeStart() {

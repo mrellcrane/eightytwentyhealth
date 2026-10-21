@@ -316,7 +316,8 @@ final class AppModel {
                 start: start,
                 end: end,
                 distanceMeters: tracker.distance,
-                pauses: tracker.pauses,
+                // Stops too, so Health's duration is moving time, like the log's.
+                pauses: (tracker.pauses + tracker.stops).sorted { $0.start < $1.start },
                 route: recorder.routeLocations
             )
             save()
