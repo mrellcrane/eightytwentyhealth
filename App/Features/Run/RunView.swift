@@ -16,7 +16,10 @@ struct RunView: View {
     @AppStorage(PrefKey.recordActivity) private var lastActivity = ActivityKind.run.rawValue
     @AppStorage(PrefKey.cueEvery) private var cueEvery = 1.0
     @AppStorage(PrefKey.cueSpeak) private var cueSpeak = true
-    @AppStorage(PrefKey.routeSurfaces) private var surfacesStored = ""
+    /// Surface chips, as `RunSurface.stored` text. Not remembered between visits: a filter
+    /// left on from last time hid every track nearby and was easy to miss, so each visit
+    /// starts with everything showing.
+    @State private var surfacesStored = ""
     @AppStorage(PrefKey.showTrails) private var showTrails = true
     @AppStorage(PrefKey.followedRoute) private var followedRouteID = ""
     @State private var camera: MapCameraPosition = .userLocation(fallback: .automatic)

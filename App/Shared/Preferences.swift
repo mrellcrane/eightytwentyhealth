@@ -38,10 +38,8 @@ enum PrefKey {
     /// whether they're read out loud as well as shown.
     static let cueEvery = "cueEvery"
     static let cueSpeak = "cueSpeak"
-    /// Run map: surfaces shown (comma-separated `RunSurface` raw values, empty = all),
-    /// whether every path is drawn or just the researched routes, and the route you
-    /// picked to run (stays on the map while you record).
-    static let routeSurfaces = "routeSurfaces"
+    /// Run map: whether every path is drawn or just the researched routes, and the route
+    /// you picked to run (stays on the map while you record).
     static let showTrails = "showTrails"
     static let followedRoute = "followedRoute"
     /// What you want the coach to know (history, goals). Sent with each chat, never logged.
