@@ -18,8 +18,6 @@ public struct TrackFilter: Sendable {
         public let timestamp: Date
         /// Meters per second.
         public let speed: Double
-        /// Whether the GPS chip measured speed for this fix, so `speed` is more than a guess from positions.
-        public let measuredSpeed: Bool
         /// False for the first few fixes after a (re)start, while speed is still a guess.
         public let isSettled: Bool
     }
@@ -157,7 +155,7 @@ public struct TrackFilter: Sendable {
         self.last = point.timestamp
         rejectingSince = nil
         updates += 1
-        return estimate(at: point.timestamp, measuredSpeed: velocity != nil)
+        return estimate(at: point.timestamp)
     }
 
     private mutating func restart(at point: RoutePoint) -> Estimate {
@@ -174,17 +172,16 @@ public struct TrackFilter: Sendable {
         last = point.timestamp
         updates = v == nil ? 0 : 2
         rejectingSince = nil
-        return estimate(at: point.timestamp, measuredSpeed: v != nil)
+        return estimate(at: point.timestamp)
     }
 
-    private func estimate(at timestamp: Date, measuredSpeed: Bool) -> Estimate {
+    private func estimate(at timestamp: Date) -> Estimate {
         let e = east!, n = north!, origin = origin!
         return Estimate(
             latitude: origin.latitude + n.position / Self.metersPerDegree,
             longitude: origin.longitude + e.position / origin.metersPerDegreeLongitude,
             timestamp: timestamp,
             speed: hypot(e.velocity, n.velocity),
-            measuredSpeed: measuredSpeed,
             isSettled: updates >= 3
         )
     }

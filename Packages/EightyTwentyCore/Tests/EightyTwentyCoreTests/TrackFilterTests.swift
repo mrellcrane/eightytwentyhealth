@@ -67,23 +67,26 @@ final class TrackFilterTests: XCTestCase {
 
     /// Phone GPS: an error that wanders slowly (about 3 m, over ~20 s) plus a little
     /// second-to-second jitter, and the chip's own speed and heading, a bit noisy.
-    func fixes(_ truth: [Truth], doppler: Bool = true, seed: UInt64 = 7) -> [RoutePoint] {
+    func fixes(_ truth: [Truth], doppler: Bool = true, seed: UInt64 = 7,
+               wander: Double = 3, jitter: Double = 1.5, accuracy: Double = 5, lag: Int = 0) -> [RoutePoint] {
         var noise = Noise(state: seed)
-        let a = exp(-1.0 / 20), wander = 3.0, jitter = 1.5
+        let a = exp(-1.0 / 20)
         var ex = 0.0, ey = 0.0
         return truth.enumerated().map { i, t in
             ex = a * ex + (1 - a * a).squareRoot() * wander * noise.gaussian()
             ey = a * ey + (1 - a * a).squareRoot() * wander * noise.gaussian()
             let x = t.x + ex + jitter * noise.gaussian(), y = t.y + ey + jitter * noise.gaussian()
-            let moving = t.speed > 0
+            // The chip's speed and heading, `lag` seconds behind you.
+            let chip = truth[max(0, i - lag)]
+            let moving = chip.speed > 0
             return RoutePoint(
                 latitude: origin.latitude + y / Self.metersPerDegree,
                 longitude: origin.longitude + x / (Self.metersPerDegree * cos(origin.latitude * .pi / 180)),
                 timestamp: start.addingTimeInterval(Double(i)),
-                horizontalAccuracy: 5,
-                speed: doppler ? max(0, t.speed + 0.15 * noise.gaussian()) : nil,
+                horizontalAccuracy: accuracy,
+                speed: doppler ? max(0, chip.speed + 0.15 * noise.gaussian()) : nil,
                 speedAccuracy: doppler ? 0.4 : nil,
-                course: doppler && moving ? t.course + 4 * noise.gaussian() : nil,
+                course: doppler && moving ? (chip.course + 4 * noise.gaussian() + 360).truncatingRemainder(dividingBy: 360) : nil,
                 courseAccuracy: doppler && moving ? 10 : nil
             )
         }
@@ -163,6 +166,49 @@ final class TrackFilterTests: XCTestCase {
         XCTAssertEqual(smoothError, 0, accuracy: 0.06)
         XCTAssertLessThan(smoothError, (rawLength(raw) - length) / length / 5)
         XCTAssertLessThan(turning(tracker.route), turning(raw) / 3)
+    }
+
+    /// A twisty trail: S-bends, two switchbacks 6 m across, tight wiggles and a long curve.
+    var trail: [Leg] {
+        [.straight(60, heading: 0), .arc(radius: 15, degrees: 90), .arc(radius: 15, degrees: -120), .straight(40, heading: 330),
+         .arc(radius: 6, degrees: 180), .straight(50, heading: 150), .arc(radius: 6, degrees: -180), .straight(50, heading: 330),
+         .arc(radius: 10, degrees: 90), .arc(radius: 10, degrees: -90), .arc(radius: 10, degrees: 90), .straight(80, heading: 60),
+         .arc(radius: 20, degrees: -200), .straight(60, heading: 220)]
+    }
+
+    /// Average distance from the truth at points in the middle of a turn.
+    func turnError(_ points: [RoutePoint], _ truth: [Truth]) -> Double {
+        let errors = points.compactMap { p -> Double? in
+            let i = Int(p.timestamp.timeIntervalSince(start).rounded())
+            guard i > 0, i + 1 < truth.count else { return nil }
+            var turn = abs(truth[i + 1].course - truth[i - 1].course)
+            if turn > 180 { turn = 360 - turn }
+            guard turn > 20 else { return nil }
+            let x = (p.longitude - origin.longitude) * Self.metersPerDegree * cos(origin.latitude * .pi / 180)
+            let y = (p.latitude - origin.latitude) * Self.metersPerDegree
+            return hypot(x - truth[i].x, y - truth[i].y)
+        }
+        return errors.reduce(0, +) / Double(errors.count)
+    }
+
+    /// Smoothing mustn't round off a trail's bends: the length holds, and the line stays at
+    /// least as close to the turns as raw GPS, in the open and under trees, even with the
+    /// chip's heading running behind.
+    func testTwistyTrailKeepsItsLengthAndItsTurns() {
+        let conditions: [(name: String, wander: Double, jitter: Double, accuracy: Double, lag: Int)] = [
+            ("open sky", 3, 1.5, 5, 0), ("under trees", 5, 2.5, 12, 0), ("trees, heading 2 s late", 5, 2.5, 12, 2),
+        ]
+        for c in conditions {
+            for seed: UInt64 in [1, 2, 3] {
+                let (truth, length) = path(trail, speed: 2.4)
+                let raw = fixes(truth, seed: seed, wander: c.wander, jitter: c.jitter, accuracy: c.accuracy, lag: c.lag)
+                let tracker = record(raw)
+                let label = "\(c.name), seed \(seed)"
+                XCTAssertEqual(tracker.distance, length, accuracy: length * 0.02, label)
+                XCTAssertLessThan(turnError(tracker.route, truth), turnError(raw, truth) * 1.1, label)
+                XCTAssertLessThan(error(tracker.route, truth), error(raw, truth), label)
+            }
+        }
     }
 
     func testFollowsATurnaround() {

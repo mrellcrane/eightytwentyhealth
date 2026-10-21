@@ -181,7 +181,8 @@ public struct RunTracker: Sendable {
             rejectedCount += 1
             return false
         }
-        if let previousRaw { rawLength += previousRaw.distance(to: point) }
+        let before = previousRaw
+        if let before { rawLength += before.distance(to: point) }
         previousRaw = point
         let smoothed = RoutePoint(latitude: estimate.latitude, longitude: estimate.longitude, timestamp: estimate.timestamp,
                                   altitude: point.altitude, horizontalAccuracy: point.horizontalAccuracy,
@@ -208,9 +209,10 @@ public struct RunTracker: Sendable {
             isStopped = false
             movingSeconds += seconds
             let meters: Double
-            if seconds <= 5, let previous, previous.measuredSpeed, estimate.measuredSpeed {
-                // Speed over time: unlike the line, it doesn't pick up GPS wander or cut corners.
-                meters = (previous.speed + estimate.speed) / 2 * seconds
+            if seconds <= 5, let from = before.flatMap(Self.chipSpeed), let to = Self.chipSpeed(point) {
+                // The chip's speed over time: unlike the line, it doesn't pick up GPS wander or
+                // cut corners, and unlike the filter's, it doesn't dip in tight turns.
+                meters = (from + to) / 2 * seconds
             } else {
                 // From the last point counted, so creeping along while "stopped" isn't lost.
                 meters = last.distance(to: smoothed)
@@ -224,6 +226,12 @@ public struct RunTracker: Sendable {
             stoppedAt = from
         }
         return true
+    }
+
+    /// Meters per second as the GPS chip measured it, if it did.
+    private static func chipSpeed(_ point: RoutePoint) -> Double? {
+        guard let speed = point.speed, speed >= 0, let accuracy = point.speedAccuracy, accuracy >= 0 else { return nil }
+        return speed
     }
 
     /// Whether you were moving between the last fix and this one, with some slack either
