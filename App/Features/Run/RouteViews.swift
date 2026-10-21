@@ -110,12 +110,15 @@ enum RouteSelection {
 }
 
 /// Surface filter chips across the top of the run map. With everything on they double
-/// as the color key; tap one to show only that surface.
+/// as the color key; tap one to show only that surface. A filter has to be obvious, since
+/// it hides routes and tracks too: off chips are dimmed with a hollow dot, and "Show all"
+/// stands out at the front until everything's back on.
 struct SurfaceFilterBar: View {
     @Binding var stored: String
     let showRoutes: () -> Void
 
     private var picked: Set<RunSurface> { RunSurface.set(from: stored) }
+    private var filtered: Bool { picked.count < RunSurface.allCases.count }
 
     var body: some View {
         ScrollView(.horizontal, showsIndicators: false) {
@@ -128,12 +131,28 @@ struct SurfaceFilterBar: View {
                         .background(.regularMaterial, in: Capsule())
                 }
                 .buttonStyle(.plain)
+                allChip
                 ForEach(RunSurface.allCases) { surface in
                     chip(surface)
                 }
             }
             .padding(.horizontal, 12)
         }
+    }
+
+    private var allChip: some View {
+        Button {
+            stored = ""
+        } label: {
+            Label(filtered ? "Show all" : "All", systemImage: filtered ? "xmark.circle.fill" : "checkmark")
+                .font(.caption.weight(.semibold))
+                .foregroundStyle(filtered ? .white : .primary)
+                .padding(.horizontal, 10)
+                .padding(.vertical, 7)
+                .background(filtered ? AnyShapeStyle(Color.accentColor) : AnyShapeStyle(.regularMaterial), in: Capsule())
+        }
+        .buttonStyle(.plain)
+        .accessibilityLabel(filtered ? "Show all surfaces" : "All surfaces showing")
     }
 
     private func chip(_ surface: RunSurface) -> some View {
@@ -143,15 +162,18 @@ struct SurfaceFilterBar: View {
         } label: {
             HStack(spacing: 5) {
                 Circle()
-                    .fill(on ? .white : surface.color)
+                    .strokeBorder(on ? Color.white : surface.color, lineWidth: 1.5)
+                    .background(Circle().fill(on ? Color.white : Color.clear))
                     .frame(width: 8, height: 8)
                 Text(surface.title)
+                    .strikethrough(!on)
             }
             .font(.caption.weight(.semibold))
-            .foregroundStyle(on ? .white : .primary)
+            .foregroundStyle(on ? .white : .secondary)
             .padding(.horizontal, 10)
             .padding(.vertical, 7)
             .background(on ? AnyShapeStyle(surface.color) : AnyShapeStyle(.regularMaterial), in: Capsule())
+            .opacity(on ? 1 : 0.7)
         }
         .buttonStyle(.plain)
         .accessibilityLabel(surface.title)

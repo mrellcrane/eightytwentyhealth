@@ -198,7 +198,7 @@ struct RunView: View {
                     showingRoutes = true
                 }
                     .padding(.top, 8)
-                    .padding(.trailing, 52) // clear of the location button
+                    .padding(.trailing, 68) // clear of the location button
             }
         }
         .overlay(alignment: .bottom) {
