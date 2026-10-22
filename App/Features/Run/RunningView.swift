@@ -53,17 +53,7 @@ struct RunningView: View {
                     Text("This week")
                 }
 
-                if let day = uncheckedRunDay(runs: input.runs, checkIns: checkIns, today: today) {
-                    Section {
-                        CheckInRow(day: day, today: today) { signal in
-                            var updated = checkIns
-                            updated[day] = signal
-                            checkInsRaw = RunCheckIns.encode(updated)
-                        }
-                    } header: {
-                        Text("How did it feel?")
-                    }
-                }
+                feelSection(runs: input.runs, checkIns: checkIns, today: today)
 
                 Section {
                     ForEach(plan.outlook(runs: input.runs, checkIns: checkIns, today: today)) { item in
@@ -93,6 +83,7 @@ struct RunningView: View {
                 } header: {
                     Text("Set up your plan")
                 }
+                feelSection(runs: input.runs, checkIns: checkIns, today: today)
             }
 
             Section {
@@ -137,9 +128,30 @@ struct RunningView: View {
         .refreshable { await model.refreshRuns() }
     }
 
-    /// The latest run in the last few days that hasn't had a check-in.
-    private func uncheckedRunDay(runs: [RunEntry], checkIns: [DayKey: RunSignal], today: DayKey) -> DayKey? {
-        runs.map(\.day).filter { $0 >= today.adding(days: -3) && $0 <= today && checkIns[$0] == nil }.max()
+    /// Every run of the last two weeks and how it felt, so you can rate one or change it any time.
+    @ViewBuilder
+    private func feelSection(runs: [RunEntry], checkIns: [DayKey: RunSignal], today: DayKey) -> some View {
+        let days = RunEntry.recentDays(runs, today: today)
+        if !days.isEmpty {
+            Section {
+                ForEach(days, id: \.day) { run in
+                    CheckInRow(run: run, today: today, signal: checkIns[run.day]) { signal in
+                        var updated = checkIns
+                        updated[run.day] = signal
+                        checkInsRaw = RunCheckIns.encode(updated)
+                    }
+                }
+            } header: {
+                Text("How did it feel?")
+            } footer: {
+                VStack(alignment: .leading, spacing: 4) {
+                    ForEach(RunSignal.allCases, id: \.self) { signal in
+                        Text("\(signal.title): \(signal.meaning)")
+                    }
+                    Text("Tap a color to rate a run or change it, and tap it again to clear it.")
+                }
+            }
+        }
     }
 
     /// Your biggest week lately, rounded: a sensible place to hold before building.
@@ -247,29 +259,47 @@ extension OutlookRow {
     }
 }
 
+/// A run's day and miles, and how it felt: tap a color to set it, tap it again to clear it.
 private struct CheckInRow: View {
-    let day: DayKey
+    let run: RunEntry
     let today: DayKey
-    let record: (RunSignal) -> Void
+    let signal: RunSignal?
+    let record: (RunSignal?) -> Void
 
     var body: some View {
-        VStack(alignment: .leading, spacing: 10) {
-            Text(day == today ? "Today's run" : "\(TrainingCalendar.shortName(day))'s run")
-                .font(.headline)
-            HStack(spacing: 12) {
-                ForEach(RunSignal.allCases, id: \.self) { signal in
-                    Button(signal.title) { record(signal) }
-                        .buttonStyle(.bordered)
-                        .tint(Self.color(signal))
-                }
-            }
-            ForEach(RunSignal.allCases, id: \.self) { signal in
-                Text("\(signal.title): \(signal.meaning)")
+        HStack {
+            VStack(alignment: .leading, spacing: 2) {
+                Text(dayLabel).font(.headline)
+                Text("\(RunningPlan.format(run.miles)) mi, \(signal?.title.lowercased() ?? "not rated yet")")
                     .font(.caption)
                     .foregroundStyle(.secondary)
             }
+            Spacer()
+            HStack(spacing: 14) {
+                ForEach(RunSignal.allCases, id: \.self) { choice in
+                    Button {
+                        record(choice == signal ? nil : choice)
+                    } label: {
+                        ZStack {
+                            Circle().fill(choice == signal ? Self.color(choice) : Color.clear)
+                            Circle().strokeBorder(Self.color(choice), lineWidth: 2.5)
+                        }
+                        .frame(width: 30, height: 30)
+                        .contentShape(Circle())
+                    }
+                    .buttonStyle(.borderless)
+                    .accessibilityLabel(choice.title)
+                    .accessibilityAddTraits(choice == signal ? [.isSelected] : [])
+                }
+            }
         }
-        .padding(.vertical, 4)
+        .padding(.vertical, 2)
+    }
+
+    private var dayLabel: String {
+        if run.day == today { return "Today" }
+        if run.day == today.adding(days: -1) { return "Yesterday" }
+        return TrainingCalendar.label(run.day)
     }
 
     static func color(_ signal: RunSignal) -> Color {

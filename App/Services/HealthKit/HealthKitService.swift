@@ -287,6 +287,17 @@ final class HealthKitService {
         return replacement.uuid
     }
 
+    /// Deletes a workout this app saved, with the distance and route saved with it.
+    func deleteWorkout(_ uuid: UUID) async throws {
+        guard isAvailable,
+              let workout = try await samples(of: HKObjectType.workoutType(), matching: HKQuery.predicateForObject(with: uuid))
+                .first as? HKWorkout else { return }
+        let routes = try await samples(of: HKSeriesType.workoutRoute(), matching: HKQuery.predicateForObjects(from: workout))
+        let distances = try await samples(of: HKQuantityType(.distanceWalkingRunning), matching: HKQuery.predicateForObjects(from: workout))
+        let doomed: [HKObject] = [workout] + (routes as [HKObject]) + (distances as [HKObject])
+        try await store.delete(doomed)
+    }
+
     private func locations(in route: HKWorkoutRoute) async throws -> [CLLocation] {
         let batches = RouteBatches()
         return try await withCheckedThrowingContinuation { continuation in

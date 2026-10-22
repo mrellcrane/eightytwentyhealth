@@ -3,7 +3,8 @@ import UIKit
 import MapKit
 import EightyTwentyCore
 
-/// Record a run or walk like Strava: Start, Pause/Resume, Finish (hold), then Save or Discard.
+/// Record a run or walk like Strava: Start, Pause/Resume, Finish (which saves it), then
+/// Discard if you didn't mean to keep it.
 /// The map shows where to run, before and during: every path colored by surface and the
 /// researched routes and tracks (`RouteCatalog`), filtered by the surface chips, with your
 /// own line drawn over them.
@@ -35,8 +36,6 @@ struct RunView: View {
     /// What the map first drew this visit has been logged (see `refreshLayers`).
     @State private var loggedLayers = false
     @State private var confirmDiscard = false
-    @State private var saving = false
-    @State private var saved = false
 
     /// Lives on AppModel so a run survives navigating away from this screen.
     private var recorder: RunRecorder { model.runRecorder }
@@ -65,8 +64,8 @@ struct RunView: View {
         VStack(spacing: 0) {
             map
                 .frame(maxHeight: recorder.state == .finished ? 260 : .infinity)
-            // Before you start, or after you finish and before saving, in case you picked wrong.
-            if recorder.state == .idle || (recorder.state == .finished && !saved) {
+            // Before you start, or after you finish in case you picked wrong.
+            if recorder.state == .idle || recorder.state == .finished {
                 activityPicker
                     .padding(.horizontal)
                     .padding(.top, 12)
@@ -123,7 +122,13 @@ struct RunView: View {
             refreshLayers()
         }
         .confirmationDialog("Discard this \(noun)?", isPresented: $confirmDiscard, titleVisibility: .visible) {
-            Button("Discard", role: .destructive) { recorder.reset(usesMiles: usesMiles); saved = false }
+            Button("Discard", role: .destructive) {
+                Task { await model.discardRecording() }
+                recorder.reset(usesMiles: usesMiles)
+                recorder.prepare()
+            }
+        } message: {
+            Text("It comes back out of your log and Apple Health.")
         }
     }
 
@@ -155,6 +160,10 @@ struct RunView: View {
             set: { kind in
                 recorder.activity = kind
                 lastActivity = kind.rawValue
+                // Already saved: change it in the log and Apple Health too.
+                if recorder.state == .finished, let log = model.recorded {
+                    Task { await model.change(log, to: kind) }
+                }
             }
         )) {
             ForEach(RunRecorder.activities) { kind in
@@ -162,6 +171,7 @@ struct RunView: View {
             }
         }
         .pickerStyle(.segmented)
+        .disabled(model.savingToHealth)
     }
 
     // MARK: Map
@@ -410,63 +420,31 @@ struct RunView: View {
         case .paused:
             HStack(spacing: 40) {
                 RoundButton(title: "Resume", systemImage: "play.fill", tint: tint) { recorder.resume() }
-                HoldToFinishButton { recorder.finish() }
+                // One tap. It only shows once you've paused, so a pocket tap can't end your run.
+                RoundButton(title: "Finish", systemImage: "stop.fill", tint: .red) {
+                    Task { await model.finishRecording() }
+                }
             }
         case .finished:
-            if saved {
-                VStack(spacing: 12) {
+            VStack(spacing: 12) {
+                if model.savingToHealth {
+                    ProgressView("Saving to Apple Health")
+                } else {
                     Label("Saved to your log and Apple Health", systemImage: "checkmark.circle.fill")
                         .foregroundStyle(.green)
-                    Button("New \(noun)") {
-                        recorder.reset(usesMiles: usesMiles)
-                        saved = false
-                        recorder.prepare()
-                    }
-                    .buttonStyle(.bordered)
                 }
-            } else {
                 HStack(spacing: 24) {
                     Button("Discard", role: .destructive) { confirmDiscard = true }
                         .buttonStyle(.bordered)
-                    Button {
-                        saving = true
-                        Task {
-                            saved = await model.logRecording(recorder)
-                            saving = false
-                        }
-                    } label: {
-                        if saving { ProgressView() } else { Text("Save \(noun)") }
+                    Button("New \(noun)") {
+                        recorder.reset(usesMiles: usesMiles)
+                        recorder.prepare()
                     }
                     .buttonStyle(.borderedProminent)
                     .tint(tint)
-                    .disabled(saving)
                 }
+                .disabled(model.savingToHealth)
             }
         }
-    }
-}
-
-/// Finish needs a 1-second hold, so a pocket tap can't end your run or walk.
-struct HoldToFinishButton: View {
-    let action: () -> Void
-    @State private var holding = false
-
-    var body: some View {
-        VStack(spacing: 6) {
-            Image(systemName: "stop.fill").font(.title)
-            Text(holding ? "Hold..." : "Finish").font(.headline)
-        }
-        .frame(width: 96, height: 96)
-        .background(Color.red.gradient, in: Circle())
-        .foregroundStyle(.white)
-        .scaleEffect(holding ? 1.1 : 1)
-        .animation(.easeInOut(duration: 0.2), value: holding)
-        .onLongPressGesture(minimumDuration: 1) {
-            action()
-        } onPressingChanged: { pressing in
-            holding = pressing
-        }
-        .accessibilityAddTraits(.isButton)
-        .accessibilityAction { action() }
     }
 }

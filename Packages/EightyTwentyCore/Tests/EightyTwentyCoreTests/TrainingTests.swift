@@ -20,6 +20,18 @@ final class RunningPlanTests: XCTestCase {
         XCTAssertEqual(RunningPlan(start: day(10, 21), startMiles: 11).start, day(10, 19), "Snaps to Monday")
     }
 
+    func testRecentRunDaysForCheckIns() {
+        let runs = [
+            RunEntry(day: day(10, 20), miles: 5), RunEntry(day: day(10, 20), miles: 1),
+            RunEntry(day: day(10, 8), miles: 3), RunEntry(day: day(10, 9), miles: 2),
+            RunEntry(day: day(10, 23), miles: 4),
+        ]
+        // Two weeks through Thursday Oct 22: Oct 9 on. Two runs on one day share a check-in.
+        XCTAssertEqual(RunEntry.recentDays(runs, today: day(10, 22)),
+                       [RunEntry(day: day(10, 20), miles: 6), RunEntry(day: day(10, 9), miles: 2)])
+        XCTAssertEqual(RunEntry.recentDays([], today: day(10, 22)), [])
+    }
+
     func testGreenWeeksFollowTheTable() {
         let weeks = plan.weeks(runs: [], checkIns: [:], today: day(10, 19), weeksAhead: 7)
         XCTAssertEqual(weeks.map(\.target), [11, 12, 13, 10, 14, 15, 16, 12])

@@ -10,6 +10,17 @@ public struct RunEntry: Equatable, Sendable {
         self.day = day
         self.miles = miles
     }
+
+    /// The days you ran in the `days` days through `today`, newest first, each with its
+    /// miles added up: one per check-in, since how a run felt is kept by the day.
+    public static func recentDays(_ runs: [RunEntry], today: DayKey, days: Int = 14) -> [RunEntry] {
+        let earliest = today.adding(days: -(days - 1))
+        var miles: [DayKey: Double] = [:]
+        for run in runs where run.day >= earliest && run.day <= today {
+            miles[run.day, default: 0] += run.miles
+        }
+        return miles.map { RunEntry(day: $0.key, miles: $0.value) }.sorted { $0.day > $1.day }
+    }
 }
 
 /// How a run sat with you by the next morning. It decides next week's miles.

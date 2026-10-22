@@ -9,6 +9,9 @@ import EightyTwentyCore
 /// using only "While Using" permission (the blue pill in the status bar). While it
 /// records, it shows on the Lock Screen (`RecordingLiveActivity`) and gives distance
 /// updates (`DistanceCues`) as a notification, read out loud if you like.
+///
+/// Everything it feeds the tracker also goes to disk (`RunJournal`), so a recording the
+/// app closes in the middle of comes back (`restore`).
 @MainActor
 @Observable
 final class RunRecorder {
@@ -33,6 +36,7 @@ final class RunRecorder {
     private var latestCue: String?
     private let liveActivity: RecordingLiveActivity
     private let announcer: CueAnnouncer
+    private let journal = JournalFile()
 
     init(usesMiles: Bool) {
         tracker = RunTracker(splitDistance: usesMiles ? 1609.344 : 1000)
@@ -57,32 +61,81 @@ final class RunRecorder {
 
     func start() {
         guard tracker.state == .idle else { return }
+        let now = Date.now
         backgroundSession = CLBackgroundActivitySession()
         // A walk is slower, so it takes slower still to count as standing around.
         tracker.stopSpeed = activity == .walk ? 0.5 : 0.9
-        tracker.start(at: .now)
+        tracker.start(at: now)
+        journal.replace(with: [.start(now, activity: activity, splitDistance: tracker.splitDistance, stopSpeed: tracker.stopSpeed)])
         startUpdates()
         latestCue = nil
         updateCues()
-        liveActivity.start(activity, unitMeters: Units.meters(usesMiles: usesMiles), unitLabel: Units.label(usesMiles: usesMiles),
-                           state: liveState(at: .now))
+        startLiveActivity(at: now)
     }
 
     func pause() {
-        tracker.pause(at: .now)
-        liveActivity.update(liveState(at: .now), now: true)
+        let now = Date.now
+        tracker.pause(at: now)
+        journal.append(.pause(now))
+        liveActivity.update(liveState(at: now), now: true)
     }
 
     func resume() {
-        tracker.resume(at: .now)
-        liveActivity.update(liveState(at: .now), now: true)
+        let now = Date.now
+        tracker.resume(at: now)
+        journal.append(.resume(now))
+        if backgroundSession == nil {
+            // Brought back after the app closed mid-recording: GPS and the Lock Screen start again.
+            backgroundSession = CLBackgroundActivitySession()
+            startUpdates()
+            updateCues()
+            startLiveActivity(at: now)
+        } else {
+            liveActivity.update(liveState(at: now), now: true)
+        }
     }
 
     func finish() {
-        tracker.finish(at: .now)
+        let now = Date.now
+        tracker.finish(at: now)
+        journal.append(.finish(now))
         stopUpdates()
         liveActivity.end()
         logFilter()
+    }
+
+    /// Brings back a recording the app closed in the middle of: paused where it stopped
+    /// if that was in the last half hour, otherwise finished there, to be saved. Returns
+    /// whether there was one.
+    func restore() -> Bool {
+        guard tracker.state == .idle else { return false }
+        let entries = journal.read()
+        guard let recording = RunJournal.recover(entries, now: .now) else {
+            journal.clear()
+            return false
+        }
+        tracker = recording.tracker
+        activity = recording.activity
+        usesMiles = recording.tracker.splitDistance > 1000
+        fixes = [:]
+        cues = nil
+        latestCue = nil
+        // Written back whole, so a line torn when the app closed can't swallow the next one.
+        let last = recording.lastWritten
+        let closing: RunJournal.Entry = tracker.state == .paused ? .pause(last) : .finish(last)
+        journal.replace(with: entries + [closing])
+        Log.app.info("Recovered a \(activity.rawValue) the app closed in the middle of: \(tracker.state == .paused ? "paused" : "finished")")
+        return true
+    }
+
+    /// Once it's saved, the copy on disk isn't needed.
+    func clearJournal() {
+        journal.clear()
+    }
+
+    private func startLiveActivity(at date: Date) {
+        liveActivity.start(activity, unitMeters: Units.meters(usesMiles: usesMiles), unitLabel: Units.label(usesMiles: usesMiles),
+                           state: liveState(at: date))
     }
 
     /// The smoothed route as CLLocations, for Apple Health: what the map showed, with each
@@ -114,6 +167,7 @@ final class RunRecorder {
 
     func reset(usesMiles: Bool) {
         stopUpdates()
+        journal.clear()
         tracker = RunTracker(splitDistance: usesMiles ? 1609.344 : 1000)
         fixes = [:]
         self.usesMiles = usesMiles
@@ -153,8 +207,10 @@ final class RunRecorder {
                     }
                     // iOS holds updates while you stand still; the clock stops with them.
                     if update.stationary, self.tracker.state == .running, !self.tracker.isStopped {
-                        self.tracker.markStationary(at: .now)
-                        self.liveActivity.update(self.liveState(at: .now), now: true)
+                        let now = Date.now
+                        self.tracker.markStationary(at: now)
+                        self.journal.append(.stationary(now))
+                        self.liveActivity.update(self.liveState(at: now), now: true)
                     }
                     if let location = update.location {
                         self.isLocationDenied = false
@@ -181,6 +237,7 @@ final class RunRecorder {
             courseAccuracy: location.courseAccuracy >= 0 ? location.courseAccuracy : nil
         )
         let wasStopped = tracker.isStopped
+        if tracker.state == .running { journal.append(.fix(point)) }
         if tracker.add(point) {
             fixes[location.timestamp] = location
             let seconds = tracker.movingTime(at: location.timestamp)
@@ -220,5 +277,62 @@ final class RunRecorder {
         case ..<30: return "GPS: OK"
         default: return "GPS: weak"
         }
+    }
+}
+
+/// `RunJournal` on disk: one file, a line appended for everything the tracker is fed.
+@MainActor
+private final class JournalFile {
+    private let url = URL.applicationSupportDirectory.appending(path: "recording.jsonl")
+    private var handle: FileHandle?
+    /// Reported once per recording, not once a second.
+    private var failed = false
+
+    /// What's there from last time, if anything.
+    func read() -> [RunJournal.Entry] {
+        guard let data = try? Data(contentsOf: url) else { return [] }
+        return RunJournal.entries(in: data)
+    }
+
+    /// Starts the file over with these entries, then appends after them.
+    func replace(with entries: [RunJournal.Entry]) {
+        close()
+        failed = false
+        do {
+            try FileManager.default.createDirectory(at: url.deletingLastPathComponent(), withIntermediateDirectories: true)
+            let data = entries.reduce(into: Data()) { $0.append(RunJournal.line($1)) }
+            // Readable with the phone locked, which is most of a run.
+            try data.write(to: url, options: .completeFileProtectionUntilFirstUserAuthentication)
+            let handle = try FileHandle(forWritingTo: url)
+            try handle.seekToEnd()
+            self.handle = handle
+        } catch {
+            report(error)
+        }
+    }
+
+    func append(_ entry: RunJournal.Entry) {
+        guard let handle else { return }
+        do {
+            try handle.write(contentsOf: RunJournal.line(entry))
+        } catch {
+            report(error)
+        }
+    }
+
+    func clear() {
+        close()
+        try? FileManager.default.removeItem(at: url)
+    }
+
+    private func close() {
+        try? handle?.close()
+        handle = nil
+    }
+
+    private func report(_ error: Error) {
+        guard !failed else { return }
+        failed = true
+        Log.app.warning("Couldn't write the recording to disk: \(error.localizedDescription)")
     }
 }

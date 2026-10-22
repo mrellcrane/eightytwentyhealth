@@ -35,6 +35,11 @@ final class AppModel {
     private(set) var healthAsked: Bool?
     /// Running workouts from Apple Health over the last 120 days. Refreshed on foreground.
     private(set) var healthRuns: [HealthKitRun] = []
+    /// The run or walk saved when you last finished recording, for Discard and the run/walk picker.
+    private(set) var recorded: ActivityLog?
+    /// While the one just recorded is going into Apple Health.
+    private(set) var savingToHealth = false
+    private var checkedForRecording = false
 
     init(container: ModelContainer) {
         let oura = OuraAccount()
@@ -58,6 +63,7 @@ final class AppModel {
     // MARK: Lifecycle
 
     func onForeground() async {
+        await recoverRecording()
         // A nap whose alarm rang while the app was in the background or closed.
         nap.logIfOver(using: self)
         await applyReminderSettings()
@@ -291,10 +297,19 @@ final class AppModel {
         Log.app.info("Nap logged")
     }
 
-    /// Saves a finished run or walk. Returns false only if nothing could be saved.
-    func logRecording(_ recorder: RunRecorder) async -> Bool {
+    /// Finish stops the clock and saves the run or walk straight away: to the log, then
+    /// Apple Health. Discard takes it back out (`discardRecording`).
+    func finishRecording() async {
+        // A second tap that lands before the screen changes mustn't save it twice.
+        guard runRecorder.state == .running || runRecorder.state == .paused else { return }
+        runRecorder.finish()
+        await saveRecording()
+    }
+
+    private func saveRecording() async {
+        let recorder = runRecorder
         let tracker = recorder.tracker
-        guard let start = tracker.startedAt, let end = tracker.endedAt else { return false }
+        guard let start = tracker.startedAt, let end = tracker.endedAt else { return }
         let kind = recorder.activity
         let moving = tracker.movingTime(at: end)
         let polyline = Polyline.encode(tracker.route.map { (latitude: $0.latitude, longitude: $0.longitude) })
@@ -309,7 +324,12 @@ final class AppModel {
         )
         context.insert(entry)
         save()
+        recorded = entry
+        recorder.clearJournal()
+        Log.app.info("Recorded \(kind.rawValue) saved to the log")
 
+        // The run/walk picker and Discard wait for this, so Health ends up matching the log.
+        savingToHealth = true
         do {
             entry.healthKitUUID = try await healthKit.saveWorkout(
                 kind,
@@ -326,7 +346,48 @@ final class AppModel {
             notice = "\(kind.title) saved here, but not to Apple Health (\(error.localizedDescription))."
             Log.health.warning("Recorded \(kind.rawValue) not saved to Apple Health: \(error.localizedDescription)")
         }
-        return true
+        savingToHealth = false
+        await refreshRuns()
+    }
+
+    /// Discard, after finishing: the run or walk comes back out of the log and Apple Health.
+    func discardRecording() async {
+        guard let log = recorded else { return }
+        recorded = nil
+        delete(log)
+        Log.app.info("Recorded \(log.kind) discarded")
+        if let uuid = log.healthKitUUID {
+            do {
+                try await healthKit.deleteWorkout(uuid)
+            } catch {
+                notice = "Discarded here, but it's still in Apple Health (\(error.localizedDescription)). You can delete it in the Health app."
+                Log.health.warning("Couldn't delete the workout from Health: \(error.localizedDescription)")
+            }
+        }
+        await refreshRuns()
+    }
+
+    /// A run or walk the app closed in the middle of (a crash, an update installing) comes
+    /// back from disk once per launch: paused where it stopped if that was in the last half
+    /// hour, so you can carry on, otherwise saved as it was.
+    private func recoverRecording() async {
+        guard !checkedForRecording else { return }
+        checkedForRecording = true
+        guard runRecorder.restore() else { return }
+        let noun = runRecorder.activity.title.lowercased()
+        if runRecorder.state == .finished {
+            // The same start already in the log means it was saved and only the copy on disk was left.
+            let start = runRecorder.tracker.startedAt
+            let logs = (try? context.fetch(FetchDescriptor<ActivityLog>())) ?? []
+            if logs.contains(where: { $0.deletedAt == nil && $0.source == ActivitySource.runRecorder.rawValue && $0.timestamp == start }) {
+                runRecorder.reset(usesMiles: runRecorder.tracker.splitDistance > 1000)
+                return
+            }
+            await saveRecording()
+            notice = "The app closed in the middle of your \(noun), so it was saved where it stopped."
+        } else {
+            notice = "The app closed in the middle of your \(noun). It's paused where it stopped. To carry on or finish, open Running, then Record a run here."
+        }
     }
 
     /// Turns a logged run into a walk, or a walk into a run: here, and in Apple Health,
