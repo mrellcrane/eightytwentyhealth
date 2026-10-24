@@ -336,12 +336,15 @@ final class AppModel {
                 start: start,
                 end: end,
                 distances: tracker.distanceSamples,
+                kilograms: Units.bodyKilograms,
                 // Stops too, so Health's duration is moving time, like the log's.
                 pauses: (tracker.pauses + tracker.stops).sorted { $0.start < $1.start },
                 route: recorder.routeLocations
             )
             save()
-            Log.health.info("Recorded \(kind.rawValue) saved to Apple Health")
+            let calories = Units.bodyKilograms == nil ? "no weight set"
+                : healthKit.canWriteActiveEnergy ? "with calories" : "Active Energy not allowed"
+            Log.health.info("Recorded \(kind.rawValue) saved to Apple Health, \(calories)")
         } catch {
             notice = "\(kind.title) saved here, but not to Apple Health (\(error.localizedDescription))."
             Log.health.warning("Recorded \(kind.rawValue) not saved to Apple Health: \(error.localizedDescription)")
@@ -399,7 +402,7 @@ final class AppModel {
         Log.app.info("Changed a logged \(was.rawValue) to a \(kind.rawValue)")
         if let uuid = log.healthKitUUID {
             do {
-                if let replacement = try await healthKit.resaveWorkout(uuid, as: kind) {
+                if let replacement = try await healthKit.resaveWorkout(uuid, as: kind, kilograms: Units.bodyKilograms) {
                     log.healthKitUUID = replacement
                     save()
                     Log.health.info("Workout saved again as a \(kind.rawValue)")

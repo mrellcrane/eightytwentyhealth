@@ -23,6 +23,7 @@ struct SettingsView: View {
     @AppStorage(PrefKey.workWeekdaysOnly) private var workWeekdaysOnly = true
 
     @AppStorage(PrefKey.coachNotes) private var coachNotes = ""
+    @AppStorage(PrefKey.weightKilograms) private var weightKilograms = 0.0
     @State private var connecting = false
     @State private var latestBackupURL: URL?
     @State private var importing = false
@@ -40,12 +41,24 @@ struct SettingsView: View {
             workSection
             remindersSection
 
-            Section("Units") {
+            Section {
                 Picker("Distance", selection: $usesMiles) {
                     Text("Miles").tag(true)
                     Text("Kilometers").tag(false)
                 }
                 .pickerStyle(.segmented)
+                LabeledContent("Weight") {
+                    HStack(spacing: 4) {
+                        TextField("Not set", text: weightText)
+                            .keyboardType(.numberPad)
+                            .multilineTextAlignment(.trailing)
+                        Text(usesMiles ? "lb" : "kg").foregroundStyle(.secondary)
+                    }
+                }
+            } header: {
+                Text("Units")
+            } footer: {
+                Text("Your weight gives the runs and walks you record their calories in Apple Health.")
             }
 
             barsSection
@@ -59,6 +72,15 @@ struct SettingsView: View {
         } message: {
             Text(message ?? "")
         }
+    }
+
+    /// Weight in whole pounds or kilograms, as you've picked for distance; stored in kg.
+    private var weightText: Binding<String> {
+        let perUnit = usesMiles ? Units.kilogramsPerPound : 1
+        return Binding(
+            get: { weightKilograms > 0 ? String(Int((weightKilograms / perUnit).rounded())) : "" },
+            set: { weightKilograms = (Double($0) ?? 0) * perUnit }
+        )
     }
 
     // MARK: Oura

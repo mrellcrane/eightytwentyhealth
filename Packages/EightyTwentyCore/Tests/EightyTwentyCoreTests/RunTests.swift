@@ -171,6 +171,14 @@ final class RunTrackerTests: XCTestCase {
     }
 }
 
+final class ActiveEnergyTests: XCTestCase {
+    func testAboutOneCaloriePerKgPerKmRunningAndHalfWalking() {
+        XCTAssertEqual(ActiveEnergy.kilocalories(meters: 10_000, kilograms: 70, kind: .run), 700, accuracy: 0.001)
+        XCTAssertEqual(ActiveEnergy.kilocalories(meters: 5000, kilograms: 70, kind: .walk), 175, accuracy: 0.001)
+        XCTAssertEqual(ActiveEnergy.kilocalories(meters: 0, kilograms: 70, kind: .run), 0)
+    }
+}
+
 final class PolylineTests: XCTestCase {
     func testGoogleReferenceExample() {
         let points: [(latitude: Double, longitude: Double)] = [(38.5, -120.2), (40.7, -120.95), (43.252, -126.453)]

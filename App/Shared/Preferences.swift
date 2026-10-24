@@ -48,6 +48,8 @@ enum PrefKey {
     static let readAloudSpeed = "readAloudSpeed"
     static let readAloudVoice = "readAloudVoice"
     static let readAloudVoiceName = "readAloudVoiceName"
+    /// Your weight in kg (0 = not set), for the calories in runs and walks you record.
+    static let weightKilograms = "weightKilograms"
 
     /// Registered at launch so `@AppStorage` defaults and direct UserDefaults reads agree.
     static let defaults: [String: Any] = [
@@ -83,6 +85,14 @@ enum Units {
 
     static func meters(usesMiles: Bool) -> Double { usesMiles ? 1609.344 : 1000 }
     static func label(usesMiles: Bool) -> String { usesMiles ? "mi" : "km" }
+
+    static let kilogramsPerPound = 0.45359237
+
+    /// Your weight from Settings. Nil until you set it, and recordings go to Health without calories.
+    static var bodyKilograms: Double? {
+        let kilograms = UserDefaults.standard.double(forKey: PrefKey.weightKilograms)
+        return kilograms > 0 ? kilograms : nil
+    }
 }
 
 extension Date {

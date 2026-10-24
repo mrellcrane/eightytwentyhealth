@@ -54,7 +54,7 @@ Oura tokens and the Claude API key live in the Keychain, this device only (servi
 ### Data safety layers
 
 1. CloudKit sync of UserData.
-2. Mirror to Apple Health: mood > State of Mind, meditation > Mindful Minutes, recorded run or walk > running or walking workout + route (only runs count toward the running plan).
+2. Mirror to Apple Health: mood > State of Mind, meditation > Mindful Minutes, recorded run or walk > running or walking workout + route, distance in short samples that skip pauses and stops, and calories once your weight is set (`Run/ActiveEnergy`; only runs count toward the running plan).
 3. Daily plain-JSON `BackupDocument` to iCloud Drive and local Documents (30 kept). Restore merges by id, external id and Health UUID; it never overwrites or deletes. The format only grows (new optional fields).
 
 ## Sources and dedupe

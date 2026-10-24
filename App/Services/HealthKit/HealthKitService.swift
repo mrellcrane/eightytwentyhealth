@@ -54,7 +54,13 @@ final class HealthKitService {
             HKObjectType.workoutType(),
             HKSeriesType.workoutRoute(),
             HKQuantityType(.distanceWalkingRunning),
+            HKQuantityType(.activeEnergyBurned),
         ]
+    }
+
+    /// Whether recorded runs and walks can carry calories: Active Energy is allowed.
+    var canWriteActiveEnergy: Bool {
+        store.authorizationStatus(for: HKQuantityType(.activeEnergyBurned)) == .sharingAuthorized
     }
 
     /// True once iOS has shown the permission sheet for everything we use. After that,
@@ -245,23 +251,26 @@ final class HealthKitService {
 
     /// Saves a recorded run or walk as an outdoor running or walking workout with its
     /// GPS route, so it shows up in Apple Fitness/Health (and anything that syncs from Health).
-    /// Only running workouts count toward the running plan (`runs(from:to:)`).
-    func saveWorkout(_ kind: ActivityKind, start: Date, end: Date, distances: [DistanceSample], pauses: [PauseInterval],
-                     route: [CLLocation]) async throws -> UUID? {
+    /// Only running workouts count toward the running plan (`runs(from:to:)`). With your
+    /// weight, it carries an estimate of the calories too (`ActiveEnergy`).
+    func saveWorkout(_ kind: ActivityKind, start: Date, end: Date, distances: [DistanceSample], kilograms: Double?,
+                     pauses: [PauseInterval], route: [CLLocation]) async throws -> UUID? {
         let events = pauses.flatMap { pause in
             [
                 HKWorkoutEvent(type: .pause, dateInterval: DateInterval(start: pause.start, duration: 0), metadata: nil),
                 HKWorkoutEvent(type: .resume, dateInterval: DateInterval(start: pause.end, duration: 0), metadata: nil),
             ]
         }
-        return try await saveWorkout(kind, start: start, end: end, distances: distances, events: events, route: route)?.uuid
+        return try await saveWorkout(kind, start: start, end: end, distances: distances, kilograms: kilograms, events: events,
+                                     route: route)?.uuid
     }
 
     /// Saves a recorded workout again as `kind` (run or walk), with the same times, distance
-    /// samples, pauses and route, then deletes the original and the distance and route saved with it.
+    /// samples, pauses and route, then deletes the original and the distance, calories and route
+    /// saved with it. Calories are worked out again, since a walk burns less than a run.
     /// Health can't change a workout's type in place. Returns the new workout's UUID, or nil
     /// if the original isn't in Health anymore.
-    func resaveWorkout(_ uuid: UUID, as kind: ActivityKind) async throws -> UUID? {
+    func resaveWorkout(_ uuid: UUID, as kind: ActivityKind, kilograms: Double?) async throws -> UUID? {
         guard isAvailable,
               let original = try await samples(of: HKObjectType.workoutType(), matching: HKQuery.predicateForObject(with: uuid))
                 .first as? HKWorkout else { return nil }
@@ -274,12 +283,13 @@ final class HealthKitService {
         let copies = distances.compactMap { $0 as? HKQuantitySample }.map {
             DistanceSample(start: $0.startDate, end: $0.endDate, meters: $0.quantity.doubleValue(for: .meter()))
         }
+        let calories = await energy(savedWith: original)
         let events = (original.workoutEvents ?? []).filter { $0.type == .pause || $0.type == .resume }
 
         // The new one first, so a failure leaves the original as it was.
-        guard let replacement = try await saveWorkout(kind, start: original.startDate, end: original.endDate,
-                                                      distances: copies, events: events, route: locations) else { return nil }
-        let doomed: [HKObject] = [original] + (routes as [HKObject]) + (distances as [HKObject])
+        guard let replacement = try await saveWorkout(kind, start: original.startDate, end: original.endDate, distances: copies,
+                                                      kilograms: kilograms, events: events, route: locations) else { return nil }
+        let doomed: [HKObject] = [original] + (routes as [HKObject]) + (distances as [HKObject]) + (calories as [HKObject])
         do {
             try await store.delete(doomed)
         } catch {
@@ -297,8 +307,14 @@ final class HealthKitService {
                 .first as? HKWorkout else { return }
         let routes = try await samples(of: HKSeriesType.workoutRoute(), matching: HKQuery.predicateForObjects(from: workout))
         let distances = try await samples(of: HKQuantityType(.distanceWalkingRunning), matching: HKQuery.predicateForObjects(from: workout))
-        let doomed: [HKObject] = [workout] + (routes as [HKObject]) + (distances as [HKObject])
+        let calories = await energy(savedWith: workout)
+        let doomed: [HKObject] = [workout] + (routes as [HKObject]) + (distances as [HKObject]) + (calories as [HKObject])
         try await store.delete(doomed)
+    }
+
+    /// Calories saved with a workout. None, rather than an error, if Active Energy was never allowed.
+    private func energy(savedWith workout: HKWorkout) async -> [HKSample] {
+        (try? await samples(of: HKQuantityType(.activeEnergyBurned), matching: HKQuery.predicateForObjects(from: workout))) ?? []
     }
 
     private func locations(in route: HKWorkoutRoute) async throws -> [CLLocation] {
@@ -316,8 +332,8 @@ final class HealthKitService {
         }
     }
 
-    private func saveWorkout(_ kind: ActivityKind, start: Date, end: Date, distances: [DistanceSample], events: [HKWorkoutEvent],
-                             route: [CLLocation]) async throws -> HKWorkout? {
+    private func saveWorkout(_ kind: ActivityKind, start: Date, end: Date, distances: [DistanceSample], kilograms: Double?,
+                             events: [HKWorkoutEvent], route: [CLLocation]) async throws -> HKWorkout? {
         let configuration = HKWorkoutConfiguration()
         configuration.activityType = kind == .walk ? .walking : .running
         configuration.locationType = .outdoor
@@ -326,16 +342,18 @@ final class HealthKitService {
         _ = try await builder.beginCollection(at: start)
         // Many short samples, none over a pause: Health drops the part of a sample that
         // falls in one, so a single sample over the whole workout lost the distance there.
-        let samples = distances.filter { $0.meters > 0 }.map { sample in
-            HKQuantitySample(
-                type: HKQuantityType(.distanceWalkingRunning),
-                quantity: HKQuantity(unit: .meter(), doubleValue: sample.meters),
-                start: sample.start,
-                end: sample.end
-            )
+        let moving = distances.filter { $0.meters > 0 }
+        var quantities = moving.map { quantity(.distanceWalkingRunning, .meter(), $0.meters, over: $0) }
+        // Calories over the same stretches. Left out until Active Energy is allowed, so the
+        // workout still saves.
+        if let kilograms, canWriteActiveEnergy {
+            quantities += moving.map {
+                quantity(.activeEnergyBurned, .kilocalorie(),
+                         ActiveEnergy.kilocalories(meters: $0.meters, kilograms: kilograms, kind: kind), over: $0)
+            }
         }
-        if !samples.isEmpty {
-            _ = try await builder.addSamples(samples)
+        if !quantities.isEmpty {
+            _ = try await builder.addSamples(quantities)
         }
         if !events.isEmpty {
             _ = try await builder.addWorkoutEvents(events)
@@ -351,6 +369,12 @@ final class HealthKitService {
             _ = try await routeBuilder.finishRoute(with: workout, metadata: nil)
         }
         return workout
+    }
+
+    private func quantity(_ type: HKQuantityTypeIdentifier, _ unit: HKUnit, _ value: Double,
+                          over stretch: DistanceSample) -> HKQuantitySample {
+        HKQuantitySample(type: HKQuantityType(type), quantity: HKQuantity(unit: unit, doubleValue: value),
+                         start: stretch.start, end: stretch.end)
     }
 }
 
