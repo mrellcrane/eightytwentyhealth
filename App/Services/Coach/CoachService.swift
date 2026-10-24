@@ -50,6 +50,12 @@ final class CoachService {
     private(set) var logID: UUID?
     private(set) var isThinking = false
     private(set) var errorMessage: String?
+    /// A lost connection cut the answer off, usually iOS pausing the app while you
+    /// were in another one. `resendIfDropped` asks again once you're back.
+    private(set) var dropped = false
+    /// Answers asked again on their own since the last one came back, so a phone
+    /// with no signal doesn't keep trying.
+    private var resends = 0
     /// "Look up studies" in progress or failed, by turn of the current conversation.
     private(set) var lookups: [Int: LookupState] = [:]
     /// Talking the current answer through.
@@ -96,6 +102,8 @@ final class CoachService {
         conversation = CoachConversation(context: text, question: question.trimmingCharacters(in: .whitespacesAndNewlines))
         logID = UUID()
         errorMessage = nil
+        dropped = false
+        resends = 0
         lookups = [:]
         endChat()
         persist(modelContext)
@@ -106,6 +114,8 @@ final class CoachService {
         conversation = log.record.conversation
         logID = log.id
         errorMessage = nil
+        dropped = false
+        resends = 0
         lookups = [:]
         endChat()
     }
@@ -122,6 +132,7 @@ final class CoachService {
         conversation = nil
         logID = nil
         errorMessage = nil
+        dropped = false
         lookups = [:]
         endChat()
     }
@@ -131,15 +142,17 @@ final class CoachService {
         guard let sent = conversation, sent.awaitingReply, !isThinking else { return }
         isThinking = true
         errorMessage = nil
+        dropped = false
         let started = Date()
         defer { isThinking = false }
         do {
-            let (reply, text, info) = try await client.reply(to: sent)
+            let (reply, text, info) = try await BackgroundTime.keepAlive("Coach answer") { try await client.reply(to: sent) }
             // You may have started a new question while this one was out.
             guard conversation == sent else { return }
             var answered = sent
             answered.record(reply, text: text)
             conversation = answered
+            resends = 0
             persist(modelContext)
             Log.coach.info("Answered turn \(answered.turns.count) in \(Self.seconds(since: started)): \(reply.steps.count) steps, \(info.summary)")
         } catch let error as CoachError {
@@ -150,9 +163,28 @@ final class CoachService {
             default: Log.coach.error(summary)
             }
         } catch {
-            errorMessage = "Couldn't reach Claude: \(error.localizedDescription)"
+            dropped = Self.isDropped(error)
+            if !dropped {
+                errorMessage = "Couldn't reach Claude: \(error.localizedDescription)"
+            } else {
+                errorMessage = resends < 2 ? "Lost the connection. Asking again..." : "Lost the connection. Check your signal and try again."
+            }
             Log.coach.warning("Turn \(sent.turns.count) failed after \(Self.seconds(since: started)): \(error.localizedDescription)")
         }
+    }
+
+    /// Asks again for an answer a lost connection cut off. The Ask screen calls it
+    /// when you're back in the app.
+    func resendIfDropped(modelContext: ModelContext) async {
+        guard dropped, !isThinking, resends < 2 else { return }
+        resends += 1
+        Log.coach.info("Asking again after a lost connection (\(resends) of 2)")
+        await send(modelContext: modelContext)
+    }
+
+    private static func isDropped(_ error: Error) -> Bool {
+        guard let code = (error as? URLError)?.code else { return false }
+        return [.networkConnectionLost, .notConnectedToInternet, .timedOut, .cancelled].contains(code)
     }
 
     // MARK: Chat
@@ -176,7 +208,7 @@ final class CoachService {
         defer { if chatID == id { isChatting = false } }
         let started = Date()
         do {
-            let stream = try await streamChat(key: key, id: id)
+            let stream = try await BackgroundTime.keepAlive("Coach chat") { try await streamChat(key: key, id: id) }
             guard chatID == id else { return true }
             let answer = try stream.answer()
             chat?.finish(answer)
@@ -347,7 +379,8 @@ final class CoachService {
         lookups[index] = .searching
         let started = Date()
         do {
-            let result = try await client.lookUpStudies(question, known: Self.unique(shown + saved))
+            let known = Self.unique(shown + saved)
+            let result = try await BackgroundTime.keepAlive("Study lookup") { try await client.lookUpStudies(question, known: known) }
             store(result.studies, modelContext: modelContext)
             lookups[index] = nil
             // You may have moved to another question meanwhile; the studies are saved either way.

@@ -8,6 +8,7 @@ struct AskView: View {
     @Environment(AppModel.self) private var model
     @Environment(\.modelContext) private var context
     @Environment(\.dismiss) private var dismiss
+    @Environment(\.scenePhase) private var scenePhase
 
     @State private var question = ""
     @State private var face: Int?
@@ -87,6 +88,14 @@ struct AskView: View {
         }
         // Closing the screen ends the chat. The answer stays, in Coach history.
         .onDisappear { coach.endChat() }
+        // Switching apps can drop an answer in flight: ask again once you're back.
+        // The drop may land before or after the app is active again, so watch both.
+        .onChange(of: scenePhase) { _, phase in
+            if phase == .active { Task { await coach.resendIfDropped(modelContext: context) } }
+        }
+        .onChange(of: coach.dropped) { _, dropped in
+            if dropped, scenePhase == .active { Task { await coach.resendIfDropped(modelContext: context) } }
+        }
     }
 
     private static let end = "end"
