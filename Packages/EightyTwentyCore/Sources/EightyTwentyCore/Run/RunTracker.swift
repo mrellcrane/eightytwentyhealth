@@ -44,6 +44,19 @@ public struct PauseInterval: Equatable, Sendable {
     public let end: Date
 }
 
+/// Distance covered between two times, all of it moving.
+public struct DistanceSample: Equatable, Sendable {
+    public let start: Date
+    public let end: Date
+    public let meters: Double
+
+    public init(start: Date, end: Date, meters: Double) {
+        self.start = start
+        self.end = end
+        self.meters = meters
+    }
+}
+
 public struct Split: Equatable, Sendable {
     public let index: Int
     /// Seconds of moving time for this split.
@@ -89,6 +102,10 @@ public struct RunTracker: Sendable {
     public private(set) var pauses: [PauseInterval] = []
     /// When you stopped moving without pausing; left out of moving time, like pauses.
     public private(set) var stops: [PauseInterval] = []
+    /// The distance in stretches of up to 10 seconds, none of them over a pause or stop,
+    /// for Apple Health. Health leaves out the part of a sample that falls in a pause, so
+    /// one sample from start to finish comes up short by the time you stood still.
+    public private(set) var distanceSamples: [DistanceSample] = []
     /// Standing still right now, so the clock isn't running.
     public private(set) var isStopped = false
     /// For checking the filter in the logs: fixes in, fixes thrown out, and the lengths of
@@ -220,6 +237,7 @@ public struct RunTracker: Sendable {
             lineLength += last.distance(to: smoothed)
             segment.append(smoothed)
             addDistance(meters, stepSeconds: seconds)
+            addSample(meters, from: from, to: point.timestamp)
             trail.append((distance, movingSeconds))
         } else if !isStopped {
             isStopped = true
@@ -292,6 +310,17 @@ public struct RunTracker: Sendable {
         let seconds = last.seconds - earliest.seconds
         guard meters >= 30, seconds > 0 else { return nil }
         return seconds / meters
+    }
+
+    /// Adds a step to the last distance sample if it carries straight on from it and the
+    /// sample stays within 10 seconds, or starts a new one.
+    private mutating func addSample(_ meters: Double, from start: Date, to end: Date) {
+        let end = max(start, end)
+        if let last = distanceSamples.last, last.end == start, end.timeIntervalSince(last.start) <= 10 {
+            distanceSamples[distanceSamples.count - 1] = DistanceSample(start: last.start, end: end, meters: last.meters + meters)
+        } else {
+            distanceSamples.append(DistanceSample(start: start, end: end, meters: meters))
+        }
     }
 
     private mutating func addDistance(_ meters: Double, stepSeconds: Double) {

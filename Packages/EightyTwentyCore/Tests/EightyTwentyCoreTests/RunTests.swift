@@ -105,6 +105,46 @@ final class RunTrackerTests: XCTestCase {
         XCTAssertEqual(tracker.distance, 600, accuracy: 10)
     }
 
+    func testDistanceSamplesKeepClearOfPausesAndStops() {
+        var tracker = RunTracker()
+        tracker.start(at: start)
+        steadyRun(meters: 300, tracker: &tracker)
+        // A light, then on again; later a pause.
+        for s in 101...130 { tracker.add(point(meters: 300, seconds: Double(s))) }
+        steadyRun(meters: 300, tracker: &tracker, from: 300, timeOffset: 131)
+        tracker.pause(at: start.addingTimeInterval(240))
+        tracker.resume(at: start.addingTimeInterval(300))
+        steadyRun(meters: 300, tracker: &tracker, from: 600, timeOffset: 300)
+        let end = start.addingTimeInterval(400)
+        tracker.finish(at: end)
+        XCTAssertEqual(tracker.stops.count, 1)
+
+        let samples = tracker.distanceSamples
+        let paused = tracker.pauses + tracker.stops
+        XCTAssertEqual(samples.reduce(0) { $0 + $1.meters }, tracker.distance, accuracy: 0.001)
+        for sample in samples {
+            XCTAssertLessThanOrEqual(sample.end.timeIntervalSince(sample.start), 10)
+        }
+        // Health counts only the part of a sample outside pauses, so all of it counts.
+        XCTAssertEqual(healthTotal(samples, paused: paused), tracker.distance, accuracy: 0.001)
+        // One sample from start to finish, as before, came up short.
+        let whole = [DistanceSample(start: start, end: end, meters: tracker.distance)]
+        XCTAssertLessThan(healthTotal(whole, paused: paused), tracker.distance * 0.9)
+    }
+
+    /// The distance Apple Health gives a workout: each sample prorated by how much of it
+    /// falls outside the paused stretches.
+    private func healthTotal(_ samples: [DistanceSample], paused: [PauseInterval]) -> Double {
+        samples.reduce(0) { total, sample in
+            let length = sample.end.timeIntervalSince(sample.start)
+            guard length > 0 else { return total + sample.meters }
+            let overlap = paused.reduce(0) { sum, pause in
+                sum + max(0, min(sample.end, pause.end).timeIntervalSince(max(sample.start, pause.start)))
+            }
+            return total + sample.meters * (1 - overlap / length)
+        }
+    }
+
     func testIgnoresPointsBeforeStart() {
         var tracker = RunTracker()
         XCTAssertFalse(tracker.add(point(meters: 0, seconds: 0)))

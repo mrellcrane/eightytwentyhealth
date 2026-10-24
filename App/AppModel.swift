@@ -335,7 +335,7 @@ final class AppModel {
                 kind,
                 start: start,
                 end: end,
-                distanceMeters: tracker.distance,
+                distances: tracker.distanceSamples,
                 // Stops too, so Health's duration is moving time, like the log's.
                 pauses: (tracker.pauses + tracker.stops).sorted { $0.start < $1.start },
                 route: recorder.routeLocations
@@ -399,7 +399,7 @@ final class AppModel {
         Log.app.info("Changed a logged \(was.rawValue) to a \(kind.rawValue)")
         if let uuid = log.healthKitUUID {
             do {
-                if let replacement = try await healthKit.resaveWorkout(uuid, as: kind, distanceMeters: log.distanceMeters ?? 0) {
+                if let replacement = try await healthKit.resaveWorkout(uuid, as: kind) {
                     log.healthKitUUID = replacement
                     save()
                     Log.health.info("Workout saved again as a \(kind.rawValue)")
