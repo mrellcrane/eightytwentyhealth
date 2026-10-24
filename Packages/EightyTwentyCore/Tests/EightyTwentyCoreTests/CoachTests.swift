@@ -406,16 +406,21 @@ final class CoachRequestTests: XCTestCase {
 // MARK: - Response
 
 final class CoachClientTests: XCTestCase {
-    func response(stop: String = "end_turn", text: String = CoachRequestTests.sampleText, extraBlocks: String = "") -> String {
+    func response(stop: String = "end_turn", text: String = CoachRequestTests.sampleText, extraBlocks: String = "",
+                  usage: String = #"{"input_tokens":5000,"cache_read_input_tokens":0,"output_tokens":700}"#) -> String {
         let escaped = String(decoding: try! JSONEncoder().encode(text), as: UTF8.self)
         return """
         {"id":"msg_1","type":"message","role":"assistant","model":"claude-opus-5-5","stop_reason":"\(stop)",
-         "content":[\(extraBlocks){"type":"thinking","thinking":"","signature":"sig"},{"type":"text","text":\(escaped)}]}
+         "content":[\(extraBlocks){"type":"thinking","thinking":"","signature":"sig"},{"type":"text","text":\(escaped)}],
+         "usage":\(usage)}
         """
     }
 
+    /// What came back on Oct 23, 2026: the schema filled with nothing.
+    static let blankText = #"{"summary":"","steps":[{"title":"","minutes":0,"how":"","why":"","effect":"","source":"","catalogID":"none","logAs":"other"}],"avoid":"","seeADoctor":"","crisis":false}"#
+
     func testParsesStructuredReply() throws {
-        let (reply, text) = try CoachClient.parse(Data(response().utf8), status: 200)
+        let (reply, text, _) = try CoachClient.parse(Data(response().utf8), status: 200)
         XCTAssertEqual(reply, CoachRequestTests.sampleReply)
         XCTAssertEqual(text, CoachRequestTests.sampleText)
         XCTAssertEqual(reply.steps[0].activityKind, .walk)
@@ -474,6 +479,62 @@ final class CoachClientTests: XCTestCase {
             XCTAssertEqual(error as? CoachError, .http(status: 400, message: "messages: too long"))
         }
         XCTAssertEqual(transport.requests.count, 1)
+    }
+
+    func testBlankReplies() throws {
+        XCTAssertTrue(try CoachClient.parse(Data(response(text: Self.blankText).utf8), status: 200).reply.isBlank)
+        XCTAssertFalse(CoachRequestTests.sampleReply.isBlank)
+        var untitled = CoachRequestTests.sampleReply
+        untitled.steps.append(.init(title: " ", minutes: 5, how: "x", why: "", effect: "", source: "", catalogID: "none", logAs: "other"))
+        XCTAssertTrue(untitled.isBlank, "A step with no title draws an empty card")
+        let crisis = CoachReply(summary: "Call or text 988 now.", steps: [], avoid: "", seeADoctor: "", crisis: true)
+        XCTAssertFalse(crisis.isBlank, "A crisis answer may have no steps")
+    }
+
+    func testABlankReplyIsAskedAgainOnce() async throws {
+        var answers = [response(text: Self.blankText), response()]
+        let transport = MockTransport { _ in (200, answers.removeFirst(), [:]) }
+        let client = CoachClient(transport: transport, apiKey: { "sk-test" })
+        let result = try await client.reply(to: CoachConversation(context: "CTX", question: "Q"))
+        XCTAssertEqual(result.reply, CoachRequestTests.sampleReply)
+        XCTAssertEqual(result.text, CoachRequestTests.sampleText)
+        XCTAssertEqual(result.info.blankRetries, 1)
+        XCTAssertEqual(transport.requests.count, 2)
+    }
+
+    func testBlankTwiceIsAnError() async {
+        let transport = MockTransport { _ in (200, self.response(text: Self.blankText), [:]) }
+        let client = CoachClient(transport: transport, apiKey: { "sk-test" })
+        do {
+            _ = try await client.reply(to: CoachConversation(context: "CTX", question: "Q"))
+            XCTFail("Expected an error")
+        } catch let CoachError.blank(info) {
+            XCTAssertEqual(info.blankRetries, 1)
+            XCTAssertEqual(info.outputTokens, 700)
+        } catch {
+            XCTFail("\(error)")
+        }
+        XCTAssertEqual(transport.requests.count, 2)
+    }
+
+    func testReplyInfo() throws {
+        let plain = try CoachClient.parse(Data(response().utf8), status: 200).info
+        XCTAssertEqual(plain.stopReason, "end_turn")
+        XCTAssertEqual(plain.model, "claude-opus-5-5")
+        XCTAssertEqual([plain.inputTokens, plain.cachedTokens, plain.outputTokens], [5000, 0, 700])
+        XCTAssertFalse(plain.fellBack)
+        XCTAssertEqual(plain.summary, "stop end_turn, claude-opus-5-5, 5000 in, 0 cached, 700 out")
+
+        // Sticky turns go straight to the fallback model: no block, only the iteration.
+        let sticky = try CoachClient.parse(Data(response(usage: """
+            {"input_tokens":5000,"output_tokens":600,"iterations":[{"type":"fallback_message","input_tokens":5000,"output_tokens":600}]}
+            """).utf8), status: 200).info
+        XCTAssertTrue(sticky.fellBack)
+        XCTAssertTrue(sticky.summary.hasSuffix(", after a fallback"))
+
+        let switched = try CoachClient.parse(Data(response(
+            extraBlocks: #"{"type":"fallback","from":{"model":"claude-opus-5-5"},"to":{"model":"claude-opus-5"}},"#).utf8), status: 200).info
+        XCTAssertTrue(switched.fellBack)
     }
 
     func testMissingKeyNeverHitsTheNetwork() async {

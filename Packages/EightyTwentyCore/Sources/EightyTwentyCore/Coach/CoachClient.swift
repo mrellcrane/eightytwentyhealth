@@ -54,6 +54,47 @@ public struct CoachReply: Codable, Equatable, Sendable {
         self.seeADoctor = seeADoctor
         self.crisis = crisis
     }
+
+    /// The schema holds but there's nothing to show: no summary, or a step with no title.
+    /// Claude once answered with every field empty, which drew a blank "1." card.
+    public var isBlank: Bool {
+        summary.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty
+            || steps.contains { $0.title.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty }
+    }
+}
+
+/// How an answer came back, for the log: no text, only counts and names.
+public struct CoachReplyInfo: Equatable, Sendable {
+    public var stopReason: String?
+    /// The model that wrote the answer.
+    public var model: String?
+    public var inputTokens = 0
+    public var cachedTokens = 0
+    public var outputTokens = 0
+    /// Another model answered after the first declined.
+    public var fellBack = false
+    /// Blank answers thrown away before this one.
+    public var blankRetries = 0
+
+    public init() {}
+
+    init(_ json: JSONValue) {
+        stopReason = json["stop_reason"]?.stringValue
+        model = json["model"]?.stringValue
+        let usage = json["usage"]
+        inputTokens = usage?["input_tokens"]?.intValue ?? 0
+        cachedTokens = usage?["cache_read_input_tokens"]?.intValue ?? 0
+        outputTokens = usage?["output_tokens"]?.intValue ?? 0
+        // The block marks a switch this turn; usage.iterations also covers turns sent straight to the fallback model.
+        fellBack = (usage?["iterations"]?.arrayValue ?? []).contains { $0["type"]?.stringValue == "fallback_message" }
+            || (json["content"]?.arrayValue ?? []).contains { $0["type"]?.stringValue == "fallback" }
+    }
+
+    public var summary: String {
+        "stop \(stopReason ?? "none"), \(model ?? "unknown model"), \(inputTokens) in, \(cachedTokens) cached, \(outputTokens) out"
+            + (fellBack ? ", after a fallback" : "")
+            + (blankRetries > 0 ? ", after \(blankRetries) blank" : "")
+    }
 }
 
 public enum CoachError: Error, Equatable, Sendable {
@@ -64,6 +105,8 @@ public enum CoachError: Error, Equatable, Sendable {
     case refused
     case truncated
     case badReply
+    /// Blank twice in a row (`CoachReply.isBlank`). Carries the second one's info for the log.
+    case blank(CoachReplyInfo)
     case http(status: Int, message: String)
 
     public var userMessage: String {
@@ -75,6 +118,7 @@ public enum CoachError: Error, Equatable, Sendable {
         case .refused: return "Claude declined to answer that one. Try putting it another way."
         case .truncated: return "The answer got cut off. Try again."
         case .badReply: return "Couldn't read Claude's answer. Try again."
+        case .blank: return "Claude came back with an empty answer. Try again, or put it another way."
         case .http(let status, let message): return "Claude API error \(status): \(message)"
         }
     }
@@ -375,9 +419,19 @@ public struct CoachClient: Sendable {
     }
 
     /// Returns the reply plus the raw JSON text to record in the conversation.
-    public func reply(to conversation: CoachConversation) async throws -> (reply: CoachReply, text: String) {
+    /// A blank answer is asked again once; it's never recorded.
+    public func reply(to conversation: CoachConversation) async throws -> (reply: CoachReply, text: String, info: CoachReplyInfo) {
         let key = try await apiKey()
         guard !key.isEmpty else { throw CoachError.noKey }
+        let first = try await send(conversation, key: key)
+        guard first.reply.isBlank else { return first }
+        var second = try await send(conversation, key: key)
+        second.info.blankRetries = 1
+        guard !second.reply.isBlank else { throw CoachError.blank(second.info) }
+        return second
+    }
+
+    private func send(_ conversation: CoachConversation, key: String) async throws -> (reply: CoachReply, text: String, info: CoachReplyInfo) {
         do {
             return try await send(conversation, key: key, fallbacks: true)
         } catch CoachError.http(400, let message) where message.localizedCaseInsensitiveContains("fallback") {
@@ -387,13 +441,13 @@ public struct CoachClient: Sendable {
         }
     }
 
-    private func send(_ conversation: CoachConversation, key: String, fallbacks: Bool) async throws -> (reply: CoachReply, text: String) {
+    private func send(_ conversation: CoachConversation, key: String, fallbacks: Bool) async throws -> (reply: CoachReply, text: String, info: CoachReplyInfo) {
         let request = try CoachRequest.urlRequest(conversation, apiKey: key, fallbacks: fallbacks)
         let (data, response) = try await transport.send(request)
         return try Self.parse(data, status: response.statusCode)
     }
 
-    public static func parse(_ data: Data, status: Int) throws -> (reply: CoachReply, text: String) {
+    public static func parse(_ data: Data, status: Int) throws -> (reply: CoachReply, text: String, info: CoachReplyInfo) {
         let json = try checked(data, status: status)
         switch json["stop_reason"]?.stringValue {
         case "refusal": throw CoachError.refused
@@ -403,7 +457,7 @@ public struct CoachClient: Sendable {
         guard let reply = try? JSONDecoder().decode(CoachReply.self, from: Data(text(of: json).utf8)) else {
             throw CoachError.badReply
         }
-        return (reply, text(of: json))
+        return (reply, text(of: json), CoachReplyInfo(json))
     }
 
     /// Structured output arrives as text blocks; thinking, tool and fallback blocks are skipped.

@@ -134,14 +134,14 @@ final class CoachService {
         let started = Date()
         defer { isThinking = false }
         do {
-            let (reply, text) = try await client.reply(to: sent)
+            let (reply, text, info) = try await client.reply(to: sent)
             // You may have started a new question while this one was out.
             guard conversation == sent else { return }
             var answered = sent
             answered.record(reply, text: text)
             conversation = answered
             persist(modelContext)
-            Log.coach.info("Answered turn \(answered.turns.count) in \(Self.seconds(since: started)): \(reply.steps.count) steps")
+            Log.coach.info("Answered turn \(answered.turns.count) in \(Self.seconds(since: started)): \(reply.steps.count) steps, \(info.summary)")
         } catch let error as CoachError {
             errorMessage = error.userMessage
             let summary = "Turn \(sent.turns.count) failed after \(Self.seconds(since: started)): \(Self.logLabel(error))"
@@ -432,6 +432,7 @@ final class CoachService {
     private static func logLabel(_ error: CoachError) -> String {
         switch error {
         case .http(let status, _): return "HTTP \(status)"
+        case .blank(let info): return "blank answer twice, \(info.summary)"
         default: return "\(error)"
         }
     }
