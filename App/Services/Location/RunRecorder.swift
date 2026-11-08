@@ -23,6 +23,19 @@ final class RunRecorder {
     private(set) var isLocationDenied = false
     /// Run or walk: the same GPS and math, saved as its own kind and Apple Health workout.
     var activity: ActivityKind = .run
+    /// Run or walk is picked from your pace when you finish (`GaitDetector`), not by you
+    /// up front. `activity` is set then.
+    var autoDetect = false
+    /// What auto picked when you finished, so the screen can say so.
+    private(set) var pickedFromPace: ActivityKind?
+    /// The recording so far as running and walking stretches. Worked out on every fix,
+    /// whether or not it's on auto, so the map and the finish screen can show the split.
+    private(set) var gaits: [GaitSegment] = []
+    /// Your run and walk paces and the line between them, learned from past recordings
+    /// and this one so far.
+    private(set) var paceProfile = PaceProfile.starting
+    /// Past recordings' speeds, which the paces are learned from. Kept on this phone only.
+    private var paceHistory: PaceHistory
 
     static let activities: [ActivityKind] = [.run, .walk]
 
@@ -43,11 +56,17 @@ final class RunRecorder {
         self.usesMiles = usesMiles
         liveActivity = RecordingLiveActivity()
         announcer = CueAnnouncer()
+        paceHistory = UserDefaults.standard.data(forKey: PrefKey.paceHistory)
+            .flatMap { try? JSONDecoder().decode(PaceHistory.self, from: $0) } ?? PaceHistory()
+        paceProfile = GaitDetector.profile(from: paceHistory.speeds())
         // Nothing records across launches, so one still showing was left behind.
         liveActivity.end()
     }
 
     var state: RunTracker.State { tracker.state }
+
+    /// Running or walking right now (or when you stopped). Nil before there's anything to go on.
+    var currentGait: Gait? { gaits.last?.gait }
 
     /// Ask for permission and warm up GPS so the first fix is ready when you hit Start.
     func prepare() {
@@ -63,10 +82,13 @@ final class RunRecorder {
         guard tracker.state == .idle else { return }
         let now = Date.now
         backgroundSession = CLBackgroundActivitySession()
-        // A walk is slower, so it takes slower still to count as standing around.
-        tracker.stopSpeed = activity == .walk ? 0.5 : 0.9
+        // A walk is slower, so it takes slower still to count as standing around. On auto it
+        // might be a walk.
+        tracker.stopSpeed = activity == .walk || autoDetect ? 0.5 : 0.9
         tracker.start(at: now)
-        journal.replace(with: [.start(now, activity: activity, splitDistance: tracker.splitDistance, stopSpeed: tracker.stopSpeed)])
+        updateGaits()
+        journal.replace(with: [.start(now, activity: activity, splitDistance: tracker.splitDistance, stopSpeed: tracker.stopSpeed,
+                                      autoDetect: autoDetect ? true : nil)])
         startUpdates()
         latestCue = nil
         updateCues()
@@ -99,6 +121,8 @@ final class RunRecorder {
         let now = Date.now
         tracker.finish(at: now)
         journal.append(.finish(now))
+        updateGaits()
+        pickActivity()
         stopUpdates()
         liveActivity.end()
         logFilter()
@@ -116,6 +140,9 @@ final class RunRecorder {
         }
         tracker = recording.tracker
         activity = recording.activity
+        autoDetect = recording.autoDetect
+        updateGaits()
+        if tracker.state == .finished { pickActivity() }
         usesMiles = recording.tracker.splitDistance > 1000
         fixes = [:]
         cues = nil
@@ -131,6 +158,42 @@ final class RunRecorder {
     /// Once it's saved, the copy on disk isn't needed.
     func clearJournal() {
         journal.clear()
+    }
+
+    /// On auto, the finished recording is a run if you ran at least half of it.
+    private func pickActivity() {
+        guard autoDetect, let kind = GaitDetector.activity(for: gaits) else { return }
+        activity = kind
+        pickedFromPace = kind
+    }
+
+    /// Once it's saved, its speeds go into what your paces are learned from.
+    func learnPaces() {
+        guard let start = tracker.startedAt else { return }
+        paceHistory.record(start: start, samples: tracker.distanceSamples)
+        savePaceHistory()
+    }
+
+    /// A discarded recording comes back out of what your paces are learned from.
+    func forgetPaces(startedAt start: Date) {
+        guard paceHistory.contains(start: start) else { return }
+        paceHistory.remove(start: start)
+        savePaceHistory()
+    }
+
+    private func savePaceHistory() {
+        if let data = try? JSONEncoder().encode(paceHistory) {
+            UserDefaults.standard.set(data, forKey: PrefKey.paceHistory)
+        }
+        updateGaits()
+    }
+
+    /// The paces from past recordings plus this one, and this one split by them.
+    private func updateGaits() {
+        var speeds = paceHistory.speeds(excluding: tracker.startedAt)
+        speeds.add(SpeedHistogram(tracker.distanceSamples))
+        paceProfile = GaitDetector.profile(from: speeds)
+        gaits = GaitDetector.split(tracker.distanceSamples, threshold: paceProfile.threshold)
     }
 
     private func startLiveActivity(at date: Date) {
@@ -160,6 +223,8 @@ final class RunRecorder {
         let t = tracker
         guard t.fixCount > 0, t.lineLength > 0, let end = t.endedAt else { return }
         let elapsed = t.elapsedTime(at: end)
+        let runStretches = gaits.filter { $0.gait == .run }.count
+        Log.app.info("Recorded \(activity.rawValue)\(autoDetect ? " (picked from pace)" : ""): \(gaits.count) run/walk stretches, \(runStretches) of them running; paces \(paceProfile.isLearned ? "learned" : "still the starting guess")")
         Log.app.info("Recorded \(activity.rawValue): \(t.fixCount) fixes, \(t.rejectedCount) thrown out, \(t.stops.count) stops; raw line \(Self.percent(t.rawLength / t.lineLength)) of smoothed, distance \(Self.percent(t.distance / t.lineLength)) of smoothed line, moving \(Self.percent(elapsed > 0 ? t.movingTime(at: end) / elapsed : 1)) of elapsed")
     }
 
@@ -170,6 +235,8 @@ final class RunRecorder {
         journal.clear()
         tracker = RunTracker(splitDistance: usesMiles ? 1609.344 : 1000)
         fixes = [:]
+        updateGaits()
+        pickedFromPace = nil
         self.usesMiles = usesMiles
         cues = nil
         latestCue = nil
@@ -237,16 +304,20 @@ final class RunRecorder {
             courseAccuracy: location.courseAccuracy >= 0 ? location.courseAccuracy : nil
         )
         let wasStopped = tracker.isStopped
+        let wasGait = currentGait
         if tracker.state == .running { journal.append(.fix(point)) }
         if tracker.add(point) {
             fixes[location.timestamp] = location
+            updateGaits()
             let seconds = tracker.movingTime(at: location.timestamp)
             if let cue = cues?.update(meters: tracker.distance, seconds: seconds), let cues {
                 announce(cues.message(cue), number: cue.number)
                 liveActivity.update(liveState(at: location.timestamp), now: true)
             } else {
-                // Stopping or starting again freezes or restarts the Lock Screen clock right away.
-                liveActivity.update(liveState(at: location.timestamp), now: tracker.isStopped != wasStopped)
+                // Stopping or starting again freezes or restarts the Lock Screen clock right away;
+                // on auto, switching between running and walking shows there right away too.
+                let gaitChanged = autoDetect && currentGait != wasGait
+                liveActivity.update(liveState(at: location.timestamp), now: tracker.isStopped != wasStopped || gaitChanged)
             }
         }
     }
@@ -266,7 +337,8 @@ final class RunRecorder {
     private func liveState(at date: Date) -> RecordingAttributes.ContentState {
         RecordingAttributes.ContentState(movingSeconds: tracker.movingTime(at: date), at: date,
                                          isPaused: tracker.state == .paused || tracker.isStopped,
-                                         isStopped: tracker.isStopped, meters: tracker.distance, latest: latestCue)
+                                         isStopped: tracker.isStopped, meters: tracker.distance, latest: latestCue,
+                                         gait: autoDetect ? currentGait?.activity.rawValue : nil)
     }
 
     /// GPS quality for the little indicator before you start.

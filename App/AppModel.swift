@@ -326,6 +326,7 @@ final class AppModel {
         save()
         recorded = entry
         recorder.clearJournal()
+        recorder.learnPaces()
         Log.app.info("Recorded \(kind.rawValue) saved to the log")
 
         // The run/walk picker and Discard wait for this, so Health ends up matching the log.
@@ -358,6 +359,7 @@ final class AppModel {
         guard let log = recorded else { return }
         recorded = nil
         delete(log)
+        runRecorder.forgetPaces(startedAt: log.timestamp)
         Log.app.info("Recorded \(log.kind) discarded")
         if let uuid = log.healthKitUUID {
             do {

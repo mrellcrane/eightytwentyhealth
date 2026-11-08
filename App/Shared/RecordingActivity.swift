@@ -17,6 +17,8 @@ struct RecordingAttributes: ActivityAttributes {
         var meters: Double
         /// The latest distance update, like "2 miles in 18:40".
         var latest: String?
+        /// On auto: running or walking right now, as an `ActivityKind` raw value.
+        var gait: String? = nil
 
         var clockStart: Date { at.addingTimeInterval(-movingSeconds) }
 
@@ -30,4 +32,9 @@ struct RecordingAttributes: ActivityAttributes {
     var unitLabel: String
 
     var activity: ActivityKind { ActivityKind(rawValue: kind) ?? .run }
+
+    /// What to show: running or walking right now when it's on auto, otherwise what you picked.
+    func showing(_ state: ContentState) -> ActivityKind {
+        state.gait.flatMap(ActivityKind.init(rawValue:)) ?? activity
+    }
 }

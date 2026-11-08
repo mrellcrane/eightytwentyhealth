@@ -4,7 +4,9 @@ import MapKit
 import EightyTwentyCore
 
 /// Record a run or walk like Strava: Start, Pause/Resume, Finish (which saves it), then
-/// Discard if you didn't mean to keep it.
+/// Discard if you didn't mean to keep it. Running and walking are told apart by pace as you
+/// go (`GaitDetector`): the route is orange where you ran and green where you walked, and on
+/// Auto the finished recording is saved as whichever you did more of.
 /// The map shows where to run, before and during: every path colored by surface and the
 /// researched routes and tracks (`RouteCatalog`), filtered by the surface chips, with your
 /// own line drawn over them.
@@ -12,9 +14,16 @@ struct RunView: View {
     /// What to record when nothing is in progress. Nil means whatever you picked last.
     var activity: ActivityKind? = nil
 
+    /// The picker before you start.
+    private enum Choice: String, CaseIterable, Identifiable {
+        case auto, run, walk
+        var id: String { rawValue }
+        var title: String { self == .auto ? "Auto" : self == .run ? "Run" : "Walk" }
+    }
+
     @Environment(AppModel.self) private var model
     @AppStorage(PrefKey.usesMiles) private var usesMiles = Units.defaultUsesMiles
-    @AppStorage(PrefKey.recordActivity) private var lastActivity = ActivityKind.run.rawValue
+    @AppStorage(PrefKey.recordChoice) private var lastChoice = Choice.auto.rawValue
     @AppStorage(PrefKey.cueEvery) private var cueEvery = 1.0
     @AppStorage(PrefKey.cueSpeak) private var cueSpeak = true
     /// Surface chips, as `RunSurface.stored` text. Not remembered between visits: a filter
@@ -43,7 +52,15 @@ struct RunView: View {
     private var unit: String { Units.label(usesMiles: usesMiles) }
     /// "run" or "walk", for buttons.
     private var noun: String { recorder.activity.title.lowercased() }
-    private var tint: Color { recorder.activity == .walk ? .green : .orange }
+    /// What the title and colors show: on Auto, what you're doing right now (nothing yet
+    /// before you start); otherwise what you picked. Once finished, what it was saved as.
+    private var showing: ActivityKind? {
+        guard recorder.autoDetect, recorder.state != .finished else { return recorder.activity }
+        return recorder.state == .idle ? nil : recorder.currentGait?.activity
+    }
+    private var title: String { showing?.title ?? "Run or walk" }
+    private var tint: Color { showing == .walk ? .green : .orange }
+    private var perUnit: String { usesMiles ? "/mi" : "/km" }
     private var surfaces: Set<RunSurface> { RunSurface.set(from: surfacesStored) }
     /// The chips and the routes list are for picking where to go, before you start. The
     /// paths and routes themselves stay on the map the whole time, so you can run over them.
@@ -70,13 +87,16 @@ struct RunView: View {
                     .padding(.horizontal)
                     .padding(.top, 12)
             }
-            TimelineView(.periodic(from: .now, by: 1)) { context in
-                stats(at: context.date)
+            if recorder.state == .finished {
+                // Splits and the run/walk stretches can run long.
+                ScrollView { statsTimeline }
+            } else {
+                statsTimeline
             }
             controls
                 .padding(.vertical, 24)
         }
-        .navigationTitle(recorder.activity.title)
+        .navigationTitle(title)
         .navigationBarTitleDisplayMode(.inline)
         .navigationBarBackButtonHidden(recorder.state == .running || recorder.state == .paused)
         .toolbar {
@@ -108,7 +128,12 @@ struct RunView: View {
         }
         .onAppear {
             if recorder.state == .idle {
-                recorder.activity = activity ?? ActivityKind(rawValue: lastActivity) ?? .run
+                if let activity {
+                    recorder.activity = activity
+                    recorder.autoDetect = false
+                } else {
+                    apply(Choice(rawValue: lastChoice) ?? .auto)
+                }
                 recorder.reset(usesMiles: usesMiles)
                 recorder.prepare()
             }
@@ -154,12 +179,37 @@ struct RunView: View {
         return "Updates every \(DistanceCues.number(cueEvery)) \(unit)\(cueSpeak ? ", read out loud" : ""). Tap the bell to change."
     }
 
+    @ViewBuilder
     private var activityPicker: some View {
-        Picker("Recording", selection: Binding(
+        if recorder.state == .idle {
+            Picker("Recording", selection: Binding(
+                get: { recorder.autoDetect ? Choice.auto : recorder.activity == .walk ? .walk : .run },
+                set: { choice in
+                    apply(choice)
+                    lastChoice = choice.rawValue
+                }
+            )) {
+                ForEach(Choice.allCases) { choice in
+                    Text(choice.title).tag(choice)
+                }
+            }
+            .pickerStyle(.segmented)
+        } else {
+            savedAsPicker
+        }
+    }
+
+    private func apply(_ choice: Choice) {
+        recorder.autoDetect = choice == .auto
+        if choice != .auto { recorder.activity = choice == .walk ? .walk : .run }
+    }
+
+    /// After you finish, in case it picked (or you picked) wrong.
+    private var savedAsPicker: some View {
+        Picker("Saved as", selection: Binding(
             get: { recorder.activity },
             set: { kind in
                 recorder.activity = kind
-                lastActivity = kind.rawValue
                 // Already saved: change it in the log and Apple Health too.
                 if recorder.state == .finished, let log = model.recorded {
                     Task { await model.change(log, to: kind) }
@@ -182,14 +232,18 @@ struct RunView: View {
                 UserAnnotation()
                 trailLayer
                 routeLayer
-                // The smoothed track, one line per segment so a pause doesn't draw a straight
-                // line across town. White-cased like the routes, and on top of them.
-                ForEach(Array(recorder.tracker.segments.filter { $0.count > 1 }.enumerated()), id: \.offset) { _, segment in
-                    let coordinates = segment.map { CLLocationCoordinate2D(latitude: $0.latitude, longitude: $0.longitude) }
-                    MapPolyline(coordinates: coordinates)
+                // The smoothed track, a line per pause-free stretch so a pause doesn't draw a
+                // straight line across town, orange where you ran and green where you walked.
+                // White-cased like the routes, and on top of them: every casing first, so one
+                // line's casing doesn't cover the end of the line before it.
+                let lines = trackLines
+                ForEach(Array(lines.enumerated()), id: \.offset) { _, line in
+                    MapPolyline(coordinates: line.coordinates)
                         .stroke(.white, style: StrokeStyle(lineWidth: 9, lineCap: .round, lineJoin: .round))
-                    MapPolyline(coordinates: coordinates)
-                        .stroke(tint, style: StrokeStyle(lineWidth: 5, lineCap: .round, lineJoin: .round))
+                }
+                ForEach(Array(lines.enumerated()), id: \.offset) { _, line in
+                    MapPolyline(coordinates: line.coordinates)
+                        .stroke(Self.color(line.gait), style: StrokeStyle(lineWidth: 5, lineCap: .round, lineJoin: .round))
                 }
             }
             .mapStyle(.standard(emphasis: .muted))
@@ -237,6 +291,15 @@ struct RunView: View {
             }
         }
     }
+
+    private var trackLines: [(gait: Gait, coordinates: [CLLocationCoordinate2D])] {
+        let otherwise: Gait = recorder.activity == .walk ? .walk : .run
+        return GaitDetector.lines(recorder.tracker.segments, gaits: recorder.gaits, otherwise: otherwise).map { line in
+            (gait: line.gait, coordinates: line.points.map { CLLocationCoordinate2D(latitude: $0.latitude, longitude: $0.longitude) })
+        }
+    }
+
+    static func color(_ gait: Gait) -> Color { gait == .walk ? .green : .orange }
 
     /// Every path in view, in its surface's color; faded where the surface is a guess.
     @MapContentBuilder
@@ -339,6 +402,27 @@ struct RunView: View {
 
     // MARK: Stats
 
+    private var statsTimeline: some View {
+        TimelineView(.periodic(from: .now, by: 1)) { context in
+            stats(at: context.date)
+        }
+    }
+
+    /// "9:40 /mi" for a speed in meters per second.
+    private func pace(speed: Double) -> String {
+        "\(PaceFormat.pace(1 / speed, unitMeters: unitMeters)) \(perUnit)"
+    }
+
+    /// Before you start on Auto: where the line is and whether it's learned yet.
+    private var autoSummary: String {
+        let profile = recorder.paceProfile
+        let line = "Auto: faster than \(pace(speed: profile.threshold)) is running, slower is walking."
+        guard profile.isLearned else {
+            return line + " It learns your own run and walk paces as you record."
+        }
+        return line + " Your paces: run \(pace(speed: profile.runSpeed)), walk \(pace(speed: profile.walkSpeed))."
+    }
+
     private func stats(at now: Date) -> some View {
         let tracker = recorder.tracker
         return VStack(spacing: 16) {
@@ -349,10 +433,21 @@ struct RunView: View {
             } else if recorder.state == .idle {
                 Text(recorder.gpsQuality).font(.footnote).foregroundStyle(.secondary)
                 Text(updatesSummary).font(.footnote).foregroundStyle(.secondary)
+                if recorder.autoDetect {
+                    Text(autoSummary)
+                        .font(.footnote)
+                        .foregroundStyle(.secondary)
+                        .multilineTextAlignment(.center)
+                        .padding(.horizontal)
+                }
             } else if recorder.state == .running, tracker.isStopped {
                 Label("Stopped. The clock starts again when you do.", systemImage: "pause.circle")
                     .font(.footnote)
                     .foregroundStyle(.secondary)
+            } else if recorder.state == .running, let gait = recorder.currentGait {
+                Label(gait == .run ? "Running" : "Walking", systemImage: gait.activity.systemImage)
+                    .font(.footnote.weight(.semibold))
+                    .foregroundStyle(Self.color(gait))
             }
 
             HStack {
@@ -375,6 +470,10 @@ struct RunView: View {
                 }
             }
 
+            if recorder.state == .finished {
+                gaitSummary
+            }
+
             if recorder.state == .finished, !tracker.splits.isEmpty {
                 VStack(alignment: .leading, spacing: 4) {
                     Text("Splits").font(.headline)
@@ -391,6 +490,56 @@ struct RunView: View {
             }
         }
         .padding(.top, 16)
+    }
+
+    /// How much you ran and walked, and each stretch in order, once there's both.
+    @ViewBuilder
+    private var gaitSummary: some View {
+        let segments = recorder.gaits
+        let totals = GaitDetector.totals(segments)
+        let moving = segments.reduce(0) { $0 + $1.seconds }
+        if let picked = recorder.pickedFromPace, picked == recorder.activity, moving > 0 {
+            let ran = totals[.run]?.seconds ?? 0
+            Text("Saved as a \(noun) from your pace: running \(PaceFormat.duration(ran)) of \(PaceFormat.duration(moving)). Pick the other one above if that's wrong.")
+                .font(.footnote)
+                .foregroundStyle(.secondary)
+                .multilineTextAlignment(.center)
+                .padding(.horizontal)
+        }
+        if totals.count > 1 {
+            VStack(alignment: .leading, spacing: 4) {
+                Text("Running and walking").font(.headline)
+                ForEach([Gait.run, .walk], id: \.self) { gait in
+                    if let total = totals[gait] {
+                        gaitRow(gait == .run ? "Running" : "Walking", gait: gait, seconds: total.seconds, meters: total.meters)
+                            .fontWeight(.semibold)
+                    }
+                }
+                if segments.count > 2 {
+                    ForEach(Array(segments.enumerated()), id: \.offset) { _, segment in
+                        gaitRow(segment.gait == .run ? "Run" : "Walk", gait: segment.gait,
+                                seconds: segment.seconds, meters: segment.meters)
+                    }
+                    .padding(.top, 4)
+                }
+            }
+            .padding(.horizontal)
+        }
+    }
+
+    private func gaitRow(_ label: String, gait: Gait, seconds: Double, meters: Double) -> some View {
+        HStack {
+            Circle().fill(Self.color(gait)).frame(width: 8, height: 8)
+            Text(label)
+            Spacer()
+            Text(PaceFormat.duration(seconds))
+            Text("\(PaceFormat.distance(meters, unitMeters: unitMeters)) \(unit)")
+                .frame(minWidth: 64, alignment: .trailing)
+            Text("\(PaceFormat.pace(meters > 0 ? seconds / meters : nil, unitMeters: unitMeters)) \(perUnit)")
+                .frame(minWidth: 80, alignment: .trailing)
+        }
+        .font(.subheadline)
+        .monospacedDigit()
     }
 
     private func stat(_ value: String, _ label: String) -> some View {

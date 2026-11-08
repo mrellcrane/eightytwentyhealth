@@ -19,9 +19,9 @@ struct RecordingActivityWidget: Widget {
         } dynamicIsland: { context in
             DynamicIsland {
                 DynamicIslandExpandedRegion(.leading) {
-                    Label(context.attributes.activity.title, systemImage: context.attributes.activity.systemImage)
+                    Label(context.attributes.showing(context.state).title, systemImage: context.attributes.showing(context.state).systemImage)
                         .font(.headline)
-                        .foregroundStyle(context.attributes.tint)
+                        .foregroundStyle(context.attributes.tint(context.state))
                 }
                 DynamicIslandExpandedRegion(.trailing) {
                     ClockText(state: context.state)
@@ -35,16 +35,16 @@ struct RecordingActivityWidget: Widget {
                     }
                 }
             } compactLeading: {
-                Image(systemName: context.attributes.activity.systemImage)
-                    .foregroundStyle(context.attributes.tint)
+                Image(systemName: context.attributes.showing(context.state).systemImage)
+                    .foregroundStyle(context.attributes.tint(context.state))
             } compactTrailing: {
                 Text("\(context.attributes.distance(context.state)) \(context.attributes.unitLabel)")
                     .monospacedDigit()
             } minimal: {
-                Image(systemName: context.attributes.activity.systemImage)
-                    .foregroundStyle(context.attributes.tint)
+                Image(systemName: context.attributes.showing(context.state).systemImage)
+                    .foregroundStyle(context.attributes.tint(context.state))
             }
-            .keylineTint(context.attributes.tint)
+            .keylineTint(context.attributes.tint(context.state))
         }
     }
 }
@@ -56,9 +56,9 @@ private struct LockScreenView: View {
     var body: some View {
         VStack(alignment: .leading, spacing: 10) {
             HStack {
-                Label(attributes.activity.title, systemImage: attributes.activity.systemImage)
+                Label(attributes.showing(state).title, systemImage: attributes.showing(state).systemImage)
                     .font(.headline)
-                    .foregroundStyle(attributes.tint)
+                    .foregroundStyle(attributes.tint(state))
                 Spacer()
                 if state.isPaused {
                     Text(state.isStopped ? "Stopped" : "Paused").font(.subheadline.bold()).foregroundStyle(.secondary)
@@ -106,7 +106,7 @@ private struct Stat<Value: View>: View {
 }
 
 extension RecordingAttributes {
-    var tint: Color { activity == .walk ? .green : .orange }
+    func tint(_ state: ContentState) -> Color { showing(state) == .walk ? .green : .orange }
 
     func distance(_ state: ContentState) -> String {
         PaceFormat.distance(state.meters, unitMeters: unitMeters)

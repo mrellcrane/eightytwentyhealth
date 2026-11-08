@@ -8,8 +8,9 @@ import Foundation
 /// app dying mid-write costs only that line.
 public enum RunJournal {
     public enum Entry: Codable, Equatable, Sendable {
-        /// Always first: the settings that shape everything after it.
-        case start(Date, activity: ActivityKind, splitDistance: Double, stopSpeed: Double)
+        /// Always first: the settings that shape everything after it. `autoDetect`: run or
+        /// walk is picked from your pace at the finish (nil in journals from before it existed).
+        case start(Date, activity: ActivityKind, splitDistance: Double, stopSpeed: Double, autoDetect: Bool? = nil)
         case fix(RoutePoint)
         case stationary(Date)
         case pause(Date)
@@ -18,7 +19,7 @@ public enum RunJournal {
 
         public var date: Date {
             switch self {
-            case .start(let date, _, _, _), .stationary(let date), .pause(let date), .resume(let date), .finish(let date):
+            case .start(let date, _, _, _, _), .stationary(let date), .pause(let date), .resume(let date), .finish(let date):
                 return date
             case .fix(let point):
                 return point.timestamp
@@ -30,6 +31,8 @@ public enum RunJournal {
     public struct Recording: Sendable {
         public var tracker: RunTracker
         public var activity: ActivityKind
+        /// Run or walk is picked from your pace rather than by you.
+        public var autoDetect: Bool
         /// The last thing written: where a recording cut off by the app closing ends.
         public var lastWritten: Date
     }
@@ -50,7 +53,7 @@ public enum RunJournal {
 
     /// Replays the entries into a fresh tracker. Nil if the recording never started.
     public static func replay(_ entries: [Entry]) -> Recording? {
-        guard case let .start(startedAt, activity, splitDistance, stopSpeed)? = entries.first else { return nil }
+        guard case let .start(startedAt, activity, splitDistance, stopSpeed, autoDetect)? = entries.first else { return nil }
         var tracker = RunTracker(splitDistance: splitDistance)
         tracker.stopSpeed = stopSpeed
         tracker.start(at: startedAt)
@@ -66,7 +69,7 @@ public enum RunJournal {
             }
             last = max(last, entry.date)
         }
-        return Recording(tracker: tracker, activity: activity, lastWritten: last)
+        return Recording(tracker: tracker, activity: activity, autoDetect: autoDetect ?? false, lastWritten: last)
     }
 
     /// A recording found on disk when the app opens. One cut off within `resumeWithin`

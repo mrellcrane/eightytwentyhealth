@@ -32,8 +32,11 @@ enum PrefKey {
     /// JSON [yyyy-MM-dd: green/yellow/red], one per run day.
     static let runCheckIns = "runCheckIns"
     static let trainingGoal = "trainingGoal"
-    /// What the recorder records when you open it: run or walk, as an `ActivityKind` raw value.
-    static let recordActivity = "recordActivity"
+    /// What the recorder records when you open it: "auto" (run or walk picked from your
+    /// pace), "run" or "walk". A new key, so auto is where everyone starts.
+    static let recordChoice = "recordChoice"
+    /// JSON `PaceHistory`: past recordings' speeds, which your run and walk paces are learned from.
+    static let paceHistory = "paceHistory"
     /// Distance updates while recording: every this many miles or km (0 = off), and
     /// whether they're read out loud as well as shown.
     static let cueEvery = "cueEvery"
