@@ -107,6 +107,25 @@ final class HealthKitService {
         }
     }
 
+    /// The runs and walks this app recorded, each with the distance samples saved with it
+    /// (10 seconds of moving each, for recordings since late October 2026), so the run/walk
+    /// detection can learn your paces from what you've already recorded.
+    func recordedDistances(from start: Date, to end: Date) async -> [(start: Date, samples: [DistanceSample])] {
+        guard isAvailable else { return [] }
+        let workouts = (try? await samples(of: HKObjectType.workoutType(), from: start, to: end, sources: [HKSource.default()])) ?? []
+        var recordings: [(start: Date, samples: [DistanceSample])] = []
+        for case let workout as HKWorkout in workouts
+        where workout.workoutActivityType == .running || workout.workoutActivityType == .walking {
+            let distances = (try? await samples(of: HKQuantityType(.distanceWalkingRunning),
+                                                matching: HKQuery.predicateForObjects(from: workout))) ?? []
+            let copies = distances.compactMap { $0 as? HKQuantitySample }.map {
+                DistanceSample(start: $0.startDate, end: $0.endDate, meters: $0.quantity.doubleValue(for: .meter()))
+            }
+            recordings.append((start: workout.startDate, samples: copies))
+        }
+        return recordings
+    }
+
     /// Moods you logged in Apple's Health app (or another app), for import.
     func externalMoods(from start: Date, to end: Date) async -> [HealthKitMood] {
         guard isAvailable else { return [] }

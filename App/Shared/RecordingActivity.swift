@@ -19,6 +19,11 @@ struct RecordingAttributes: ActivityAttributes {
         var latest: String?
         /// On auto: running or walking right now, as an `ActivityKind` raw value.
         var gait: String? = nil
+        /// How far and how long you've run and walked so far (`GaitDetector`). Nil for none.
+        var ranMeters: Double? = nil
+        var ranSeconds: Double? = nil
+        var walkedMeters: Double? = nil
+        var walkedSeconds: Double? = nil
 
         var clockStart: Date { at.addingTimeInterval(-movingSeconds) }
 

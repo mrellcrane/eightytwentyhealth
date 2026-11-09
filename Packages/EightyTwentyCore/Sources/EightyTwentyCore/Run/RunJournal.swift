@@ -16,6 +16,8 @@ public enum RunJournal {
         case pause(Date)
         case resume(Date)
         case finish(Date)
+        /// The pedometer's running total of steps since the start, as of the date.
+        case steps(Date, Int)
 
         public var date: Date {
             switch self {
@@ -23,6 +25,8 @@ public enum RunJournal {
                 return date
             case .fix(let point):
                 return point.timestamp
+            case .steps(let date, _):
+                return date
             }
         }
     }
@@ -33,6 +37,7 @@ public enum RunJournal {
         public var activity: ActivityKind
         /// Run or walk is picked from your pace rather than by you.
         public var autoDetect: Bool
+        public var steps: StepTrack
         /// The last thing written: where a recording cut off by the app closing ends.
         public var lastWritten: Date
     }
@@ -57,6 +62,7 @@ public enum RunJournal {
         var tracker = RunTracker(splitDistance: splitDistance)
         tracker.stopSpeed = stopSpeed
         tracker.start(at: startedAt)
+        var steps = StepTrack(start: startedAt)
         var last = startedAt
         for entry in entries.dropFirst() {
             switch entry {
@@ -66,10 +72,11 @@ public enum RunJournal {
             case .pause(let date): tracker.pause(at: date)
             case .resume(let date): tracker.resume(at: date)
             case .finish(let date): tracker.finish(at: date)
+            case .steps(let date, let count): steps.add(at: date, steps: count)
             }
             last = max(last, entry.date)
         }
-        return Recording(tracker: tracker, activity: activity, autoDetect: autoDetect ?? false, lastWritten: last)
+        return Recording(tracker: tracker, activity: activity, autoDetect: autoDetect ?? false, steps: steps, lastWritten: last)
     }
 
     /// A recording found on disk when the app opens. One cut off within `resumeWithin`

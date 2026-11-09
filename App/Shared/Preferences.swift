@@ -37,6 +37,8 @@ enum PrefKey {
     static let recordChoice = "recordChoice"
     /// JSON `PaceHistory`: past recordings' speeds, which your run and walk paces are learned from.
     static let paceHistory = "paceHistory"
+    /// Set once your recorded runs and walks in Apple Health have gone into `paceHistory`.
+    static let paceHistoryImported = "paceHistoryImported"
     /// Distance updates while recording: every this many miles or km (0 = off), and
     /// whether they're read out loud as well as shown.
     static let cueEvery = "cueEvery"

@@ -69,11 +69,38 @@ private struct LockScreenView: View {
                 Stat(label: attributes.unitLabel) { Text(attributes.distance(state)) }
                 Stat(label: "avg /\(attributes.unitLabel)") { Text(attributes.pace(state)) }
             }
+            if state.ranMeters != nil || state.walkedMeters != nil {
+                HStack(spacing: 16) {
+                    GaitAmount(title: "Ran", systemImage: "figure.run", meters: state.ranMeters, seconds: state.ranSeconds,
+                               attributes: attributes)
+                        .foregroundStyle(.orange)
+                    GaitAmount(title: "Walked", systemImage: "figure.walk", meters: state.walkedMeters,
+                               seconds: state.walkedSeconds, attributes: attributes)
+                        .foregroundStyle(.green)
+                }
+            }
             if let latest = state.latest {
                 Text(latest).font(.caption).foregroundStyle(.secondary)
             }
         }
         .padding()
+    }
+}
+
+/// "Ran 2.10 mi · 22:10": how much of the recording so far was running, or walking.
+private struct GaitAmount: View {
+    let title: String
+    let systemImage: String
+    let meters: Double?
+    let seconds: Double?
+    let attributes: RecordingAttributes
+
+    var body: some View {
+        Label("\(title) \(PaceFormat.distance(meters ?? 0, unitMeters: attributes.unitMeters)) \(attributes.unitLabel) · \(PaceFormat.duration(seconds ?? 0))",
+              systemImage: systemImage)
+            .font(.caption.weight(.semibold).monospacedDigit())
+            .lineLimit(1)
+            .minimumScaleFactor(0.8)
     }
 }
 

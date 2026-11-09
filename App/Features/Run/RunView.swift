@@ -106,6 +106,10 @@ struct RunView: View {
         .onChange(of: surfacesStored) { refreshLayers() }
         .onChange(of: showTrails) { refreshLayers() }
         .task {
+            // Once: what you've already recorded teaches Auto your paces.
+            await model.importPastPaces()
+        }
+        .task {
             await library.load()
             refreshLayers()
             // The layers wait for the map to report what it's showing; say so if it never does.
@@ -413,14 +417,39 @@ struct RunView: View {
         "\(PaceFormat.pace(1 / speed, unitMeters: unitMeters)) \(perUnit)"
     }
 
-    /// Before you start on Auto: where the line is and whether it's learned yet.
+    /// Before you start on Auto: where the lines are and whether they're learned yet.
     private var autoSummary: String {
         let profile = recorder.paceProfile
-        let line = "Auto: faster than \(pace(speed: profile.threshold)) is running, slower is walking."
-        guard profile.isLearned else {
-            return line + " It learns your own run and walk paces as you record."
+        let cadence = Int(profile.cadenceThreshold.rounded())
+        var text = "Auto: \(cadence)+ steps a minute is running. If the phone can't count steps, faster than \(pace(speed: profile.threshold)) is."
+        if profile.isLearned {
+            text += " Your paces: run \(pace(speed: profile.runSpeed)), walk \(pace(speed: profile.walkSpeed))."
         }
-        return line + " Your paces: run \(pace(speed: profile.runSpeed)), walk \(pace(speed: profile.walkSpeed))."
+        if profile.isCadenceLearned {
+            text += " Your steps: run \(Int(profile.runCadence.rounded())), walk \(Int(profile.walkCadence.rounded())) a minute."
+        }
+        if !profile.isLearned || !profile.isCadenceLearned {
+            text += " It learns yours as you record."
+        }
+        return text
+    }
+
+    /// "Ran 2.10 mi · 22:10   Walked 0.35 mi · 5:02" while you record.
+    @ViewBuilder
+    private var gaitSoFar: some View {
+        let totals = GaitDetector.totals(recorder.gaits)
+        if !totals.isEmpty {
+            HStack(spacing: 16) {
+                ForEach([Gait.run, .walk], id: \.self) { gait in
+                    if let total = totals[gait] {
+                        Label("\(gait == .run ? "Ran" : "Walked") \(PaceFormat.distance(total.meters, unitMeters: unitMeters)) \(unit) · \(PaceFormat.duration(total.seconds))",
+                              systemImage: gait.activity.systemImage)
+                            .foregroundStyle(Self.color(gait))
+                    }
+                }
+            }
+            .font(.footnote.weight(.semibold).monospacedDigit())
+        }
     }
 
     private func stats(at now: Date) -> some View {
@@ -448,6 +477,9 @@ struct RunView: View {
                 Label(gait == .run ? "Running" : "Walking", systemImage: gait.activity.systemImage)
                     .font(.footnote.weight(.semibold))
                     .foregroundStyle(Self.color(gait))
+            }
+            if recorder.state == .running || recorder.state == .paused {
+                gaitSoFar
             }
 
             HStack {

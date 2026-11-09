@@ -354,6 +354,17 @@ final class AppModel {
         await refreshRuns()
     }
 
+    /// Once: the runs and walks you already recorded here, from Apple Health, teach the
+    /// run/walk detection your paces, so it doesn't start from the averages.
+    func importPastPaces() async {
+        guard !UserDefaults.standard.bool(forKey: PrefKey.paceHistoryImported),
+              await healthKit.hasAskedForAuthorization() else { return }
+        let recordings = await healthKit.recordedDistances(from: .now.addingTimeInterval(-365 * 86_400), to: .now)
+        let added = runRecorder.importPaces(recordings)
+        UserDefaults.standard.set(true, forKey: PrefKey.paceHistoryImported)
+        Log.app.info("Pace learning: \(recordings.count) recorded runs and walks in Apple Health, \(added) usable; paces \(runRecorder.paceProfile.isLearned ? "learned" : "still the starting guess")")
+    }
+
     /// Discard, after finishing: the run or walk comes back out of the log and Apple Health.
     func discardRecording() async {
         guard let log = recorded else { return }

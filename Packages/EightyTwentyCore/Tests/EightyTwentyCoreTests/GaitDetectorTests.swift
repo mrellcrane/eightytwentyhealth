@@ -43,10 +43,10 @@ final class GaitDetectorTests: XCTestCase {
 
     func profile(walk: (Double, Double)? = nil, run: (Double, Double)? = nil, hours: Double = 10) -> PaceProfile {
         var noise = Noise(state: 7)
-        var speeds = SpeedHistogram()
-        if let walk { speeds.add(SpeedHistogram(samples(minutes: hours * 60, speed: walk.0, sd: walk.1, at: 0, noise: &noise))) }
-        if let run { speeds.add(SpeedHistogram(samples(minutes: hours * 60, speed: run.0, sd: run.1, at: 0, noise: &noise))) }
-        return GaitDetector.profile(from: speeds)
+        var speeds = Histogram(binWidth: Histogram.speedBin)
+        if let walk { speeds.add(Histogram.speeds(samples(minutes: hours * 60, speed: walk.0, sd: walk.1, at: 0, noise: &noise))) }
+        if let run { speeds.add(Histogram.speeds(samples(minutes: hours * 60, speed: run.0, sd: run.1, at: 0, noise: &noise))) }
+        return GaitDetector.profile(speeds: speeds)
     }
 
     // MARK: Learning
@@ -91,7 +91,7 @@ final class GaitDetectorTests: XCTestCase {
     func testOneMixedRecordingIsEnoughToLearnFrom() {
         // Day one, no history: walk, run, walk, run, at this person's own paces.
         let samples = recording([(5, 1.6), (12, 2.6), (3, 1.55), (10, 2.7)], sd: 0.1)
-        let learned = GaitDetector.profile(from: SpeedHistogram(samples))
+        let learned = GaitDetector.profile(speeds: Histogram.speeds(samples))
         XCTAssertFalse(learned.isLearned, "8 minutes of walking is less than the starting guess counts for")
         XCTAssertGreaterThan(learned.walkSpeed, 1.47, "already moving from 1.4 toward this person's 1.6")
         XCTAssertEqual(learned.runSpeed, 2.65, accuracy: 0.05)
@@ -227,5 +227,94 @@ final class GaitDetectorTests: XCTestCase {
         let replayed = try XCTUnwrap(RunJournal.replay(RunJournal.entries(in: old)))
         XCTAssertEqual(replayed.activity, .walk)
         XCTAssertFalse(replayed.autoDetect)
+    }
+
+    // MARK: Steps per minute
+
+    /// A step count every 2 seconds from the start, at `stretches` of (minutes, steps a minute).
+    func steps(_ stretches: [(Double, Double)]) -> StepTrack {
+        var track = StepTrack(start: start)
+        var t = 0.0, total = 0.0
+        for (minutes, cadence) in stretches {
+            for _ in 0..<Int(minutes * 30) {
+                t += 2
+                total += cadence / 30
+                track.add(at: start.addingTimeInterval(t), steps: Int(total.rounded()))
+            }
+        }
+        return track
+    }
+
+    func testStepsPerMinuteFromRunningTotals() throws {
+        var track = StepTrack(start: start)
+        track.add(at: start.addingTimeInterval(10), steps: 20)
+        track.add(at: start.addingTimeInterval(20), steps: 50)
+        track.add(at: start.addingTimeInterval(15), steps: 99) // out of order: ignored
+        XCTAssertEqual(try XCTUnwrap(track.stepsPerMinute(from: start, to: start.addingTimeInterval(10))), 120, accuracy: 0.01)
+        // Halfway between counts, by straight line: 35 at 15 s.
+        XCTAssertEqual(try XCTUnwrap(track.stepsPerMinute(from: start.addingTimeInterval(15), to: start.addingTimeInterval(20))),
+                       180, accuracy: 0.01)
+        // Just past the last count, the latest rate carries on; well past it, nothing.
+        XCTAssertEqual(try XCTUnwrap(track.stepsPerMinute(from: start.addingTimeInterval(20), to: start.addingTimeInterval(30))),
+                       180, accuracy: 0.01)
+        XCTAssertNil(track.stepsPerMinute(from: start.addingTimeInterval(30), to: start.addingTimeInterval(40)))
+        XCTAssertNil(track.stepsPerMinute(from: start.addingTimeInterval(-10), to: start), "before the start")
+        XCTAssertNil(StepTrack().stepsPerMinute(from: start, to: start.addingTimeInterval(10)))
+    }
+
+    func testStepsDecideWherePaceCannot() {
+        // A slow jog up a hill at 1.9 m/s, then a fast walk at 2.1 m/s: by pace alone these
+        // come out backwards. By steps per minute they're right.
+        let samples = recording([(5, 1.9), (5, 2.1)])
+        let track = steps([(5, 160), (5, 125)])
+        XCTAssertEqual(GaitDetector.split(samples, threshold: 2.0).map(\.gait), [.walk, .run], "pace alone")
+        XCTAssertEqual(GaitDetector.split(samples, threshold: 2.0, steps: track).map(\.gait), [.run, .walk])
+    }
+
+    func testPaceFillsInWhereThereAreNoSteps() {
+        // Step counts stop after 5 minutes (motion access turned off, say): pace takes over.
+        let samples = recording([(5, 1.5), (5, 2.8)])
+        let track = steps([(5, 110)])
+        XCTAssertEqual(GaitDetector.split(samples, threshold: 2.0, steps: track).map(\.gait), [.walk, .run])
+    }
+
+    func testLearnsYourCadences() {
+        var noise = Noise(state: 3)
+        var cadences = Histogram(binWidth: Histogram.cadenceBin)
+        for _ in 0..<3000 { cadences.add(noise.normal(118, 5), seconds: 10) }
+        for _ in 0..<3000 { cadences.add(noise.normal(158, 6), seconds: 10) }
+        let learned = GaitDetector.profile(speeds: Histogram(binWidth: Histogram.speedBin), cadences: cadences)
+        XCTAssertTrue(learned.isCadenceLearned)
+        XCTAssertEqual(learned.walkCadence, 118, accuracy: 1)
+        XCTAssertEqual(learned.runCadence, 158, accuracy: 1)
+        XCTAssertEqual(learned.cadenceThreshold, 138, accuracy: 1)
+
+        let starting = PaceProfile.starting
+        XCTAssertEqual(starting.cadenceThreshold, 138.5, accuracy: 0.5, "the walk-run switch is around 140 a minute")
+        XCTAssertFalse(starting.isCadenceLearned)
+    }
+
+    func testHistoryKeepsStepsAndSkipsWholeRunAverages() {
+        var history = PaceHistory()
+        let samples = recording([(10, 1.5)])
+        history.record(start: start, samples: samples, steps: steps([(10, 115)]))
+        XCTAssertEqual(history.cadences().totalSeconds, 600, accuracy: 10)
+        // Older runs went to Health as one sample from start to finish: one average over every
+        // pace in it, so it's left out.
+        let lump = [DistanceSample(start: start, end: start.addingTimeInterval(1800), meters: 4000)]
+        history.record(start: start.addingTimeInterval(86_400), samples: lump)
+        XCTAssertEqual(history.recordings.count, 1)
+    }
+
+    func testJournalReplaysStepCounts() throws {
+        let entries: [RunJournal.Entry] = [
+            .start(start, activity: .run, splitDistance: 1000, stopSpeed: 0.5, autoDetect: true),
+            .steps(start.addingTimeInterval(10), 27),
+            .steps(start.addingTimeInterval(20), 55),
+        ]
+        let file = entries.reduce(into: Data()) { $0.append(RunJournal.line($1)) }
+        let recording = try XCTUnwrap(RunJournal.replay(RunJournal.entries(in: file)))
+        XCTAssertEqual(recording.steps.counts.map(\.steps), [0, 27, 55])
+        XCTAssertEqual(try XCTUnwrap(recording.steps.stepsPerMinute(from: start, to: start.addingTimeInterval(20))), 165, accuracy: 0.01)
     }
 }
