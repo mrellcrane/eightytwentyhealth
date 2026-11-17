@@ -54,6 +54,10 @@ final class RunRecorder {
     private var latestCue: String?
     private let liveActivity: RecordingLiveActivity
     private let announcer: CueAnnouncer
+    /// "Running", "Walking", "Stopped" out loud as they change (if on).
+    private var callouts = GaitCallouts()
+    /// Checks for a callout every couple of seconds, between fixes too.
+    private var calloutTask: Task<Void, Never>?
     private let journal = JournalFile()
 
     init(usesMiles: Bool) {
@@ -102,6 +106,7 @@ final class RunRecorder {
                                       autoDetect: autoDetect ? true : nil)])
         startUpdates()
         latestCue = nil
+        callouts.reset()
         updateCues()
         startLiveActivity(at: now)
     }
@@ -110,6 +115,8 @@ final class RunRecorder {
         let now = Date.now
         tracker.pause(at: now)
         journal.append(.pause(now))
+        // You know you paused; when you go again, it says what you're doing.
+        callouts.reset()
         liveActivity.update(liveState(at: now), now: true)
     }
 
@@ -308,6 +315,8 @@ final class RunRecorder {
 
     func stopUpdates() {
         pedometer.stopUpdates()
+        calloutTask?.cancel()
+        calloutTask = nil
         updatesTask?.cancel()
         updatesTask = nil
         backgroundSession?.invalidate()
@@ -315,6 +324,15 @@ final class RunRecorder {
     }
 
     private func startUpdates() {
+        if calloutTask == nil {
+            calloutTask = Task { [weak self] in
+                while !Task.isCancelled {
+                    try? await Task.sleep(for: .seconds(2))
+                    guard let self else { return }
+                    self.checkCallout(at: .now)
+                }
+            }
+        }
         guard updatesTask == nil else { return }
         updatesTask = Task { [weak self] in
             do {
@@ -328,6 +346,8 @@ final class RunRecorder {
                         let now = Date.now
                         self.tracker.markStationary(at: now)
                         self.journal.append(.stationary(now))
+                        // iOS may suspend the app until you move again, so say it now.
+                        self.checkCallout(at: now, sure: true)
                         self.liveActivity.update(self.liveState(at: now), now: true)
                     }
                     if let location = update.location {
@@ -360,6 +380,7 @@ final class RunRecorder {
         if tracker.add(point) {
             fixes[location.timestamp] = location
             updateGaits()
+            checkCallout(at: location.timestamp)
             let seconds = tracker.movingTime(at: location.timestamp)
             if let cue = cues?.update(meters: tracker.distance, seconds: seconds), let cues {
                 announce(cues.message(cue), number: cue.number)
@@ -371,6 +392,18 @@ final class RunRecorder {
                 liveActivity.update(liveState(at: location.timestamp), now: tracker.isStopped != wasStopped || gaitChanged)
             }
         }
+    }
+
+    /// Says "Running", "Walking" or "Stopped" once the recorder's read of you has changed
+    /// and held for a few seconds (`GaitCallouts`).
+    private func checkCallout(at now: Date, sure: Bool = false) {
+        guard tracker.state == .running, UserDefaults.standard.bool(forKey: PrefKey.gaitCallouts) else { return }
+        let current: GaitCallouts.Callout? = tracker.isStopped
+            ? .stopped
+            : GaitDetector.recent(tracker.distanceSamples, profile: paceProfile, steps: steps, at: now).map { GaitCallouts.Callout($0) }
+        guard let callout = callouts.update(current, at: now, sure: sure) else { return }
+        announcer.say(callout.spoken)
+        Log.app.info("Said \(callout.rawValue) during a \(activity.rawValue)")
     }
 
     private func announce(_ message: DistanceCues.Message, number: Int) {

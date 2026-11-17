@@ -1,8 +1,8 @@
 import AVFoundation
 import Foundation
 
-/// Reads distance updates out loud while you record, over your music (it dips, then
-/// comes back) and through headphones if they're in. The "audio" background mode
+/// Reads distance updates and "Running", "Walking", "Stopped" out loud while you record,
+/// over your music (it dips, then comes back) and through headphones if they're in. The "audio" background mode
 /// lets it speak with the screen locked.
 @MainActor
 final class CueAnnouncer: NSObject, AVSpeechSynthesizerDelegate {
@@ -25,7 +25,8 @@ final class CueAnnouncer: NSObject, AVSpeechSynthesizerDelegate {
     }
 
     nonisolated func speechSynthesizer(_ synthesizer: AVSpeechSynthesizer, didFinish utterance: AVSpeechUtterance) {
-        // Lets the music come back up.
+        // Lets the music come back up, unless something else is queued right behind it.
+        guard !synthesizer.isSpeaking else { return }
         try? AVAudioSession.sharedInstance().setActive(false, options: .notifyOthersOnDeactivation)
     }
 }

@@ -43,6 +43,8 @@ enum PrefKey {
     /// whether they're read out loud as well as shown.
     static let cueEvery = "cueEvery"
     static let cueSpeak = "cueSpeak"
+    /// Says "Running", "Walking" or "Stopped" out loud when the recorder's read of you changes.
+    static let gaitCallouts = "gaitCallouts"
     /// Run map: whether every path is drawn or just the researched routes, and the route
     /// you picked to run (stays on the map while you record).
     static let showTrails = "showTrails"
@@ -75,6 +77,7 @@ enum PrefKey {
         workWeekdaysOnly: true,
         cueEvery: 1.0,
         cueSpeak: true,
+        gaitCallouts: true,
         showTrails: true,
     ]
 

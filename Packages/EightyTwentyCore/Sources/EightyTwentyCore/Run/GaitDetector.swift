@@ -354,12 +354,7 @@ public enum GaitDetector {
                 if !segments.isEmpty { segments[segments.count - 1].meters += sample.meters }
                 continue
             }
-            let gait: Gait
-            if let cadence = steps.stepsPerMinute(from: sample.start, to: sample.end), cadence >= 40 {
-                gait = cadence >= cadenceThreshold ? .run : .walk
-            } else {
-                gait = sample.meters / duration >= threshold ? .run : .walk
-            }
+            let gait = gait(of: sample, threshold: threshold, steps: steps, cadenceThreshold: cadenceThreshold)
             if let last = segments.last, last.gait == gait {
                 segments[segments.count - 1].end = sample.end
                 segments[segments.count - 1].seconds += duration
@@ -387,6 +382,36 @@ public enum GaitDetector {
             segments.replaceSubrange(from...to, with: [merged])
         }
         return segments
+    }
+
+    /// One sample on its own: by steps per minute where `steps` covers it, otherwise by speed.
+    private static func gait(of sample: DistanceSample, threshold: Double, steps: StepTrack, cadenceThreshold: Double) -> Gait {
+        if let cadence = steps.stepsPerMinute(from: sample.start, to: sample.end), cadence >= 40 {
+            return cadence >= cadenceThreshold ? .run : .walk
+        }
+        let duration = sample.end.timeIntervalSince(sample.start)
+        return duration > 0 && sample.meters / duration >= threshold ? .run : .walk
+    }
+
+    /// What you're doing right now: whichever gait most of the last `window` seconds of
+    /// samples were, without `split`'s folding, so a change shows up in seconds rather than
+    /// only once it's outlasted `minimumSeconds`. Nil with under 5 moving seconds to go on
+    /// (just started, just got going again, or a gap in GPS).
+    public static func recent(_ samples: [DistanceSample], profile: PaceProfile, steps: StepTrack, at now: Date,
+                              window: TimeInterval = 15) -> Gait? {
+        var run = 0.0, walk = 0.0
+        for sample in samples.reversed() {
+            guard sample.end > now.addingTimeInterval(-window) else { break }
+            let duration = sample.end.timeIntervalSince(sample.start)
+            guard duration > 0 else { continue }
+            if gait(of: sample, threshold: profile.threshold, steps: steps, cadenceThreshold: profile.cadenceThreshold) == .run {
+                run += duration
+            } else {
+                walk += duration
+            }
+        }
+        guard run + walk >= 5 else { return nil }
+        return run > walk ? .run : .walk
     }
 
     /// The recording split by what's been learned (`profile`) and its step counts.

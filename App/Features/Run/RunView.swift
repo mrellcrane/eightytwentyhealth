@@ -26,6 +26,7 @@ struct RunView: View {
     @AppStorage(PrefKey.recordChoice) private var lastChoice = Choice.auto.rawValue
     @AppStorage(PrefKey.cueEvery) private var cueEvery = 1.0
     @AppStorage(PrefKey.cueSpeak) private var cueSpeak = true
+    @AppStorage(PrefKey.gaitCallouts) private var gaitCallouts = true
     /// Surface chips, as `RunSurface.stored` text. Not remembered between visits: a filter
     /// left on from last time hid every track nearby and was easy to miss, so each visit
     /// starts with everything showing.
@@ -172,15 +173,22 @@ struct RunView: View {
             }
             Toggle("Read out loud", isOn: $cueSpeak)
                 .disabled(cueEvery == 0)
+            Section("When it sees you change") {
+                Toggle("Say running, walking, stopped", isOn: $gaitCallouts)
+            }
         } label: {
-            Image(systemName: cueEvery > 0 ? "bell.badge" : "bell.slash")
+            Image(systemName: cueEvery > 0 || gaitCallouts ? "bell.badge" : "bell.slash")
         }
-        .accessibilityLabel("Distance updates")
+        .accessibilityLabel("Updates while you record")
     }
 
     private var updatesSummary: String {
-        guard cueEvery > 0 else { return "No distance updates. Tap the bell to turn them on." }
-        return "Updates every \(DistanceCues.number(cueEvery)) \(unit)\(cueSpeak ? ", read out loud" : ""). Tap the bell to change."
+        var parts = [cueEvery > 0
+            ? "Updates every \(DistanceCues.number(cueEvery)) \(unit)\(cueSpeak ? ", read out loud" : "")."
+            : "No distance updates."]
+        if gaitCallouts { parts.append("Says running, walking and stopped as they change.") }
+        parts.append("Tap the bell to change.")
+        return parts.joined(separator: " ")
     }
 
     @ViewBuilder
