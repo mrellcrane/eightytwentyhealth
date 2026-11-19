@@ -141,6 +141,9 @@ struct RunView: View {
                 }
                 recorder.reset(usesMiles: usesMiles)
                 recorder.prepare()
+            } else if recorder.state == .finished {
+                // Back on a finished one (or one brought back after the app closed).
+                showWholeRoute()
             }
         }
         .onDisappear {
@@ -149,6 +152,16 @@ struct RunView: View {
         .onChange(of: recorder.state) { _, state in
             UIApplication.shared.isIdleTimerDisabled = state == .running
             if state != .idle { selection = nil }
+            if state == .finished {
+                // Waits for the map to shrink to make room for the stats, so the route is
+                // fitted to the size it ends up, not the full screen it was.
+                Task {
+                    try? await Task.sleep(for: .milliseconds(350))
+                    withAnimation { showWholeRoute() }
+                }
+            } else if state == .idle {
+                camera = .userLocation(fallback: .automatic)
+            }
             refreshLayers()
         }
         .confirmationDialog("Discard this \(noun)?", isPresented: $confirmDiscard, titleVisibility: .visible) {
@@ -312,6 +325,14 @@ struct RunView: View {
     }
 
     static func color(_ gait: Gait) -> Color { gait == .walk ? .green : .orange }
+
+    /// Zooms out to the whole route with a margin, like Strava, so a screenshot of the
+    /// finished screen shows where you went. Does nothing before there's a route.
+    private func showWholeRoute() {
+        let points = recorder.tracker.segments.joined().map { GeoPoint(latitude: $0.latitude, longitude: $0.longitude) }
+        guard let box = GeoBox(around: points) else { return }
+        camera = .region(box.padded(by: 0.12).region)
+    }
 
     /// Every path in view, in its surface's color; faded where the surface is a guess.
     @MapContentBuilder
