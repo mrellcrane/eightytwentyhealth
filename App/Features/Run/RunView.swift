@@ -27,6 +27,10 @@ struct RunView: View {
     @AppStorage(PrefKey.cueEvery) private var cueEvery = 1.0
     @AppStorage(PrefKey.cueSpeak) private var cueSpeak = true
     @AppStorage(PrefKey.gaitCallouts) private var gaitCallouts = true
+    @AppStorage(PrefKey.cueSayDistance) private var cueSayDistance = true
+    @AppStorage(PrefKey.cueSayTime) private var cueSayTime = true
+    @AppStorage(PrefKey.cueSayAverage) private var cueSayAverage = true
+    @AppStorage(PrefKey.cueSayLast) private var cueSayLast = true
     /// Surface chips, as `RunSurface.stored` text. Not remembered between visits: a filter
     /// left on from last time hid every track nearby and was easy to miss, so each visit
     /// starts with everything showing.
@@ -186,6 +190,17 @@ struct RunView: View {
             }
             Toggle("Read out loud", isOn: $cueSpeak)
                 .disabled(cueEvery == 0)
+            Section("Read out") {
+                // Stays open, so you can tick several in one go.
+                Group {
+                    Toggle("Distance", isOn: $cueSayDistance)
+                    Toggle("Time", isOn: $cueSayTime)
+                    Toggle("Average pace", isOn: $cueSayAverage)
+                    Toggle(lastPaceLabel, isOn: $cueSayLast)
+                }
+                .menuActionDismissBehavior(.disabled)
+                .disabled(cueEvery == 0 || !cueSpeak)
+            }
             Section("When it sees you change") {
                 Toggle("Say running, walking, stopped", isOn: $gaitCallouts)
             }
@@ -193,6 +208,13 @@ struct RunView: View {
             Image(systemName: cueEvery > 0 || gaitCallouts ? "bell.badge" : "bell.slash")
         }
         .accessibilityLabel("Updates while you record")
+    }
+
+    /// "Last mile pace", "Last 0.5 mi pace".
+    private var lastPaceLabel: String {
+        let every = cueEvery > 0 ? cueEvery : 1
+        let stretch = every == 1 ? (usesMiles ? "mile" : "km") : "\(DistanceCues.number(every)) \(unit)"
+        return "Last \(stretch) pace"
     }
 
     private var updatesSummary: String {

@@ -383,7 +383,7 @@ final class RunRecorder {
             checkCallout(at: location.timestamp)
             let seconds = tracker.movingTime(at: location.timestamp)
             if let cue = cues?.update(meters: tracker.distance, seconds: seconds), let cues {
-                announce(cues.message(cue), number: cue.number)
+                announce(cues.message(cue, saying: Self.spokenParts), number: cue.number)
                 liveActivity.update(liveState(at: location.timestamp), now: true)
             } else {
                 // Stopping or starting again freezes or restarts the Lock Screen clock right away;
@@ -406,9 +406,21 @@ final class RunRecorder {
         Log.app.info("Said \(callout.rawValue) during a \(activity.rawValue)")
     }
 
+    /// What you've picked to hear at each mark, read fresh so a change mid-run counts.
+    private static var spokenParts: DistanceCues.Spoken {
+        let defaults = UserDefaults.standard
+        var parts: DistanceCues.Spoken = []
+        if defaults.bool(forKey: PrefKey.cueSayDistance) { parts.insert(.distance) }
+        if defaults.bool(forKey: PrefKey.cueSayTime) { parts.insert(.time) }
+        if defaults.bool(forKey: PrefKey.cueSayAverage) { parts.insert(.averagePace) }
+        if defaults.bool(forKey: PrefKey.cueSayLast) { parts.insert(.lastPace) }
+        return parts
+    }
+
     private func announce(_ message: DistanceCues.Message, number: Int) {
         latestCue = message.title
-        let speak = UserDefaults.standard.bool(forKey: PrefKey.cueSpeak)
+        // With nothing picked to hear, the notification dings instead.
+        let speak = UserDefaults.standard.bool(forKey: PrefKey.cueSpeak) && !message.spoken.isEmpty
         if speak { announcer.say(message.spoken) }
         // Silent when it's read out loud, so it doesn't ding over the voice.
         Task {

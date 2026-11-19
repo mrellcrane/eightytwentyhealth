@@ -20,6 +20,23 @@ public struct DistanceCues: Sendable {
         public let spoken: String
     }
 
+    /// What's read out loud at each mark; each can be switched off. The notification
+    /// always has all of it.
+    public struct Spoken: OptionSet, Sendable {
+        public let rawValue: Int
+        public init(rawValue: Int) { self.rawValue = rawValue }
+
+        /// "2 miles."
+        public static let distance = Spoken(rawValue: 1 << 0)
+        /// "Time 19 minutes 15 seconds."
+        public static let time = Spoken(rawValue: 1 << 1)
+        /// "Average pace 9 minutes 38 seconds per mile."
+        public static let averagePace = Spoken(rawValue: 1 << 2)
+        /// "Last mile 9 minutes 45 seconds."
+        public static let lastPace = Spoken(rawValue: 1 << 3)
+        public static let all: Spoken = [.distance, .time, .averagePace, .lastPace]
+    }
+
     /// Choices for "every", in miles or km.
     public static let choices: [Double] = [0.25, 0.5, 1, 2]
 
@@ -63,28 +80,45 @@ public struct DistanceCues: Sendable {
         return cue
     }
 
-    public func message(_ cue: Cue) -> Message {
+    /// The update for a mark. `saying` picks what's read out loud (empty means nothing is).
+    public func message(_ cue: Cue, saying parts: Spoken = .all) -> Message {
         let done = cue.meters / unitMeters
         let average = cue.seconds / done
         let lastPace = cue.lastSeconds / units
         let unit = usesMiles ? "mi" : "km"
+        let unitWord = usesMiles ? "mile" : "kilometer"
         let distance = Self.distance(done, usesMiles: usesMiles, spoken: false)
 
         var body = "Average \(Self.pace(average)) /\(unit)."
-        var spoken = "\(Self.distance(done, usesMiles: usesMiles, spoken: true)). Time \(Self.spokenDuration(cue.seconds))."
-        if average < Self.slowestPace {
-            spoken += " Average pace \(Self.spokenDuration(average)) per \(usesMiles ? "mile" : "kilometer")."
-        }
         // After the first mark, the last interval says whether you're speeding up or slowing down.
         if cue.number > 1 {
             if units == 1 {
                 body += " Last \(usesMiles ? "mile" : "km") \(PaceFormat.duration(cue.lastSeconds))."
-                spoken += " Last \(usesMiles ? "mile" : "kilometer") \(Self.spokenDuration(cue.lastSeconds))."
             } else if lastPace < Self.slowestPace {
                 body += " Last \(Self.number(units)) \(unit) at \(Self.pace(lastPace)) /\(unit)."
-                spoken += " Last \(Self.distance(units, usesMiles: usesMiles, spoken: true)) at \(Self.spokenDuration(lastPace)) per \(usesMiles ? "mile" : "kilometer")."
             }
         }
+
+        var said: [String] = []
+        if parts.contains(.distance) {
+            said.append(Self.distance(done, usesMiles: usesMiles, spoken: true))
+        }
+        if parts.contains(.time) {
+            said.append("Time \(Self.spokenDuration(cue.seconds))")
+        }
+        if parts.contains(.averagePace), average < Self.slowestPace {
+            said.append("Average pace \(Self.spokenDuration(average)) per \(unitWord)")
+        }
+        // At the first mark the last interval is the average, so it's only said then if the
+        // average isn't.
+        if parts.contains(.lastPace), cue.number > 1 || !parts.contains(.averagePace) {
+            if units == 1 {
+                said.append("Last \(unitWord) \(Self.spokenDuration(cue.lastSeconds))")
+            } else if lastPace < Self.slowestPace {
+                said.append("Last \(Self.distance(units, usesMiles: usesMiles, spoken: true)) at \(Self.spokenDuration(lastPace)) per \(unitWord)")
+            }
+        }
+        let spoken = said.map { $0 + "." }.joined(separator: " ")
         return Message(title: "\(distance) in \(PaceFormat.duration(cue.seconds))", body: body, spoken: spoken)
     }
 

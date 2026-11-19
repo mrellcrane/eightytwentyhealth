@@ -43,6 +43,12 @@ enum PrefKey {
     /// whether they're read out loud as well as shown.
     static let cueEvery = "cueEvery"
     static let cueSpeak = "cueSpeak"
+    /// What's read out at each mark (`DistanceCues.Spoken`): distance, time, average pace,
+    /// last interval's pace. The notification always shows it all.
+    static let cueSayDistance = "cueSayDistance"
+    static let cueSayTime = "cueSayTime"
+    static let cueSayAverage = "cueSayAverage"
+    static let cueSayLast = "cueSayLast"
     /// Says "Running", "Walking" or "Stopped" out loud when the recorder's read of you changes.
     static let gaitCallouts = "gaitCallouts"
     /// Run map: whether every path is drawn or just the researched routes, and the route
@@ -77,6 +83,10 @@ enum PrefKey {
         workWeekdaysOnly: true,
         cueEvery: 1.0,
         cueSpeak: true,
+        cueSayDistance: true,
+        cueSayTime: true,
+        cueSayAverage: true,
+        cueSayLast: true,
         gaitCallouts: true,
         showTrails: true,
     ]

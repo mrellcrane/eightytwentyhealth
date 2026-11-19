@@ -38,6 +38,31 @@ final class DistanceCuesTests: XCTestCase {
         XCTAssertEqual(second.spoken, "2 miles. Time 19 minutes 15 seconds. Average pace 9 minutes 38 seconds per mile. Last mile 9 minutes 45 seconds.")
     }
 
+    func testReadsOnlyWhatYouPicked() throws {
+        var cues = DistanceCues(every: 1, usesMiles: true)
+        var found = run(&cues, to: mile, secondsPerMile: 570)
+        found += run(&cues, from: mile, to: 2.2 * mile, secondsPerMile: 585, startSeconds: 570)
+
+        XCTAssertEqual(cues.message(found[1], saying: .distance).spoken, "2 miles.")
+        XCTAssertEqual(cues.message(found[1], saying: .lastPace).spoken, "Last mile 9 minutes 45 seconds.")
+        XCTAssertEqual(cues.message(found[1], saying: [.distance, .averagePace]).spoken,
+                       "2 miles. Average pace 9 minutes 38 seconds per mile.")
+        XCTAssertEqual(cues.message(found[1], saying: []).spoken, "", "nothing picked, nothing read")
+        XCTAssertEqual(cues.message(found[1], saying: []).body, "Average 9:38 /mi. Last mile 9:45.", "the notification keeps it all")
+
+        // At the first mark the last mile is the average: said once, as whichever you picked.
+        XCTAssertEqual(cues.message(found[0], saying: .lastPace).spoken, "Last mile 9 minutes 30 seconds.")
+        XCTAssertEqual(cues.message(found[0], saying: [.averagePace, .lastPace]).spoken,
+                       "Average pace 9 minutes 30 seconds per mile.")
+    }
+
+    func testHalfMilesLastPaceOnly() throws {
+        var cues = DistanceCues(every: 0.5, usesMiles: true)
+        let found = run(&cues, to: 1.1 * mile, secondsPerMile: 1080)
+        XCTAssertEqual(cues.message(found[1], saying: [.distance, .lastPace]).spoken,
+                       "1 mile. Last 0.5 miles at 18 minutes per mile.")
+    }
+
     func testHalfMilesGiveTheLastStretchAsAPace() throws {
         var cues = DistanceCues(every: 0.5, usesMiles: true)
         let found = run(&cues, to: 1.1 * mile, secondsPerMile: 1080)
