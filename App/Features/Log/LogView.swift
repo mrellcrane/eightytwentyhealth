@@ -59,7 +59,7 @@ struct LogView: View {
                         .foregroundStyle(.secondary)
                 }
                 ForEach(recent) { item in
-                    RecentRow(item: item, usesMiles: usesMiles)
+                    row(item)
                         .swipeActions {
                             Button("Delete", role: .destructive) { delete(item) }
                         }
@@ -80,6 +80,20 @@ struct LogView: View {
         .sheet(isPresented: $showingMood) { MoodCheckInView() }
         .sheet(isPresented: $showingGratitude) { GratitudeView() }
         .sheet(item: $quickLogKind) { kind in QuickLogSheet(kind: kind) }
+    }
+
+    /// Activities open their details (a run or walk's route, distance, time and pace).
+    @ViewBuilder
+    private func row(_ item: RecentItem) -> some View {
+        if case .activity(let log) = item {
+            NavigationLink {
+                ActivityDetailView(log: log)
+            } label: {
+                RecentRow(item: item, usesMiles: usesMiles)
+            }
+        } else {
+            RecentRow(item: item, usesMiles: usesMiles)
+        }
     }
 
     private var recent: [RecentItem] {
