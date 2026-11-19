@@ -102,12 +102,13 @@ struct ActivityDetailView: View {
                 .stroke(tint, style: StrokeStyle(lineWidth: 5, lineCap: .round, lineJoin: .round))
             if let start = route.first {
                 Annotation("Start", coordinate: start) { dot(.green) }
+                    .annotationTitles(.hidden)
             }
             if let end = route.last {
                 Annotation("Finish", coordinate: end) { dot(.red) }
+                    .annotationTitles(.hidden)
             }
         }
-        .annotationTitles(.hidden)
         .mapStyle(.standard(emphasis: .muted))
     }
 
