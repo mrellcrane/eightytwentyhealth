@@ -83,6 +83,8 @@ enum PrefKey {
         workWeekdaysOnly: true,
         cueEvery: 1.0,
         cueSpeak: true,
+        // 190 lb, what you told me. Change it in Settings.
+        weightKilograms: 190 * Units.kilogramsPerPound,
         cueSayDistance: true,
         cueSayTime: true,
         cueSayAverage: true,

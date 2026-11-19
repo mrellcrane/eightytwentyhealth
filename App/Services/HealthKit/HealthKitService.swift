@@ -319,6 +319,19 @@ final class HealthKitService {
         return replacement.uuid
     }
 
+    /// The distance samples saved with a workout, for its splits. Nil if it isn't in Health
+    /// anymore or can't be read.
+    func distances(ofWorkout uuid: UUID) async -> [DistanceSample]? {
+        guard isAvailable,
+              let workout = try? await samples(of: HKObjectType.workoutType(), matching: HKQuery.predicateForObject(with: uuid))
+                .first as? HKWorkout,
+              let distances = try? await samples(of: HKQuantityType(.distanceWalkingRunning),
+                                                 matching: HKQuery.predicateForObjects(from: workout)) else { return nil }
+        return distances.compactMap { $0 as? HKQuantitySample }.map {
+            DistanceSample(start: $0.startDate, end: $0.endDate, meters: $0.quantity.doubleValue(for: .meter()))
+        }
+    }
+
     /// Deletes a workout this app saved, with the distance and route saved with it.
     func deleteWorkout(_ uuid: UUID) async throws {
         guard isAvailable,
